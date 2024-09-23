@@ -1,0 +1,42 @@
+﻿@model IEnumerable<ASI.Basecode.WebApp.Models.CategoryModel>
+
+@{
+    ViewData["Title"] = "Category List";
+}
+
+<h2 class="text-2xl font-bold mb-6">@ViewData["Title"]</h2>
+
+<div class="mb-4">
+    <a asp-action="Create" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        Create New Category
+    </a>
+</div>
+
+<table class="min-w-full bg-white border border-gray-300 shadow-md rounded-lg">
+    <thead>
+        <tr>
+            <th class="py-2 px-4 border-b">Name</th>
+            <th class="py-2 px-4 border-b">Description</th>
+            <th class="py-2 px-4 border-b">Icon</th>
+            <th class="py-2 px-4 border-b">Color</th>
+            <th class="py-2 px-4 border-b">Type</th>
+            <th class="py-2 px-4 border-b"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr class="hover:bg-gray-100">
+                <td class="py-2 px-4 border-b">@Html.DisplayFor(modelItem => item.Name)</td>
+                <td class="py-2 px-4 border-b">@Html.DisplayFor(modelItem => item.Description)</td>
+                <td class="py-2 px-4 border-b">@Html.DisplayFor(modelItem => item.Icon)</td>
+                <td class="py-2 px-4 border-b">@Html.DisplayFor(modelItem => item.Color)</td>
+                <td class="py-2 px-4 border-b">@Html.DisplayFor(modelItem => item.Type)</td>
+                <td class="py-2 px-4 border-b">
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="text-yellow-600 hover:text-yellow-900">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="text-red-600 hover:text-red-900">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
