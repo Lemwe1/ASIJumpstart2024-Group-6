@@ -1,22 +1,26 @@
 ﻿using ASI.Basecode.WebApp.Models;
 using ASI.Basecode.WebApp.Services;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 
 namespace ASI.Basecode.WebApp.Controllers
 {
     public class CategoryController : Controller
     {
+        private readonly ApplicationDbContext _context;  // Injected context
         private readonly CategoryService _categoryService;
 
-        public CategoryController(CategoryService categoryService)
+        public CategoryController(ApplicationDbContext context, CategoryService categoryService)
         {
-            _categoryService = categoryService;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
         }
 
         // GET: /Category/
         public async Task<IActionResult> Index()
         {
+            ViewData["Title"] = "Category"; // Setting the title for the page
             var categories = await _categoryService.GetCategoriesAsync();
             return View(categories);
         }
@@ -27,17 +31,40 @@ namespace ASI.Basecode.WebApp.Controllers
             return View();
         }
 
-        // POST: /Category/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CategoryModel category)
+        public async Task<IActionResult> Create([FromBody] CategoryModel category)
         {
             if (ModelState.IsValid)
             {
-                await _categoryService.AddCategoryAsync(category);
-                return RedirectToAction(nameof(Index));
+                // Check if _context and _categoryService are not null
+                if (_context == null)
+                {
+                    return BadRequest("Database context is not available.");
+                }
+
+                if (category == null)
+                {
+                    return BadRequest("Category data is missing.");
+                }
+
+                // Add category to the database
+                _context.Categories.Add(category);
+                await _context.SaveChangesAsync();
+
+                // Return the new category data as JSON to be used in the client-side JavaScript
+                return Json(new
+                {
+                    id = category.Id,
+                    name = category.Name,
+                    type = category.Type,
+                    icon = category.Icon,
+                    color = category.Color
+                });
             }
-            return View(category);
+
+            // Return an error message if model validation fails
+            return BadRequest("Failed to create category.");
         }
 
         // GET: /Category/Edit/5

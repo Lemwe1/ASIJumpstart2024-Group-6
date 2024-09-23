@@ -18,9 +18,9 @@ namespace ASI.Basecode.Data
         {
         }
 
-
+        
         public virtual DbSet<MUser> MUsers { get; set; }
-    
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -80,5 +80,8 @@ namespace ASI.Basecode.Data
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
+
     }
 }
+

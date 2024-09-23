@@ -61,6 +61,9 @@ namespace ASI.Basecode.WebApp
             {
                 options.Filters.Add(new AuthorizeFilter("RequireAuthenticatedUser"));
             });
+
+
         }
+
     }
 }

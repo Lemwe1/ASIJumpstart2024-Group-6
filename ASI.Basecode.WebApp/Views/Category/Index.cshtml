@@ -6,37 +6,164 @@
 
 <h2 class="text-2xl font-bold mb-6">@ViewData["Title"]</h2>
 
-<div class="mb-4">
-    <a asp-action="Create" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-        Create New Category
-    </a>
+<!-- Grid Layout for Categories -->
+<div class="grid grid-cols-3 gap-6" id="categoryGrid">
+    <!-- Existing Categories -->
+    @foreach (var item in Model)
+    {
+        <div class="p-6 rounded-lg shadow-lg text-white relative flex flex-col items-center justify-center" style="background-color:@item.Color;">
+            <!-- Icon (Make it larger and center it) -->
+            <i class="@item.Icon text-6xl mb-4"></i>
+            <!-- Category Name -->
+            <h3 class="text-xl font-bold text-center">@item.Name</h3>
+            <!-- Type -->
+            <p class="text-center">@item.Type</p>
+            <!-- Edit Icon -->
+            <a asp-action="Edit" asp-route-id="@item.Id" class="absolute top-2 right-2 text-white hover:text-gray-300">
+                <i class="fas fa-pencil-alt"></i>
+            </a>
+        </div>
+    }
+
+    <!-- Create New Category Card (Click to open the modal) -->
+    <div id="newCategoryCard" class="bg-gray-200 p-6 rounded-lg shadow-lg flex items-center justify-center border-dashed border-2 border-gray-400 cursor-pointer" onclick="openModal()">
+        <i class="fas fa-plus text-4xl text-gray-400"></i>
+    </div>
 </div>
 
-<table class="min-w-full bg-white border border-gray-300 shadow-md rounded-lg">
-    <thead>
-        <tr>
-            <th class="py-2 px-4 border-b">Name</th>
-            <th class="py-2 px-4 border-b">Description</th>
-            <th class="py-2 px-4 border-b">Icon</th>
-            <th class="py-2 px-4 border-b">Color</th>
-            <th class="py-2 px-4 border-b">Type</th>
-            <th class="py-2 px-4 border-b"></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr class="hover:bg-gray-100">
-                <td class="py-2 px-4 border-b">@Html.DisplayFor(modelItem => item.Name)</td>
-                <td class="py-2 px-4 border-b">@Html.DisplayFor(modelItem => item.Description)</td>
-                <td class="py-2 px-4 border-b">@Html.DisplayFor(modelItem => item.Icon)</td>
-                <td class="py-2 px-4 border-b">@Html.DisplayFor(modelItem => item.Color)</td>
-                <td class="py-2 px-4 border-b">@Html.DisplayFor(modelItem => item.Type)</td>
-                <td class="py-2 px-4 border-b">
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="text-yellow-600 hover:text-yellow-900">Edit</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="text-red-600 hover:text-red-900">Delete</a>
-                </td>
-            </tr>
+<!-- Create Category Modal -->
+<div id="createCategoryModal" class="hidden fixed z-10 inset-0 overflow-y-auto bg-gray-800 bg-opacity-50">
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Add Category</h2>
+                <button id="closeModal" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <p class="mb-4 text-sm text-gray-500">Fill out all the fields below to add a category.</p>
+
+            <!-- Form -->
+            <form id="categoryForm">
+                @Html.AntiForgeryToken() <!-- Add anti-forgery token -->
+                <!-- Type Selector (Expense/Income) -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700">Type</label>
+                    <div class="flex mt-2">
+                        <input type="radio" id="expense" name="Type" value="Expense" class="hidden peer" checked>
+                        <label for="expense" class="peer-checked:bg-blue-500 peer-checked:text-white px-6 py-2 border border-gray-300 cursor-pointer rounded-l-md">
+                            Expense
+                        </label>
+                        <input type="radio" id="income" name="Type" value="Income" class="hidden peer">
+                        <label for="income" class="peer-checked:bg-blue-500 peer-checked:text-white px-6 py-2 border border-gray-300 cursor-pointer rounded-r-md">
+                            Income
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Name Input -->
+                <div class="mb-6">
+                    <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+                    <input type="text" name="Name" id="name" placeholder="Enter Name" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" required />
+                </div>
+
+                <!-- Icon Input -->
+                <div class="mb-6">
+                    <label for="icon" class="block text-sm font-medium text-gray-700">Icon</label>
+                    <select name="Icon" id="icon" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Select Icon</option>
+                        <option value="fas fa-apple-alt">Apple (Food)</option>
+                        <option value="fas fa-shopping-bag">Shopping Bag</option>
+                        <option value="fas fa-bolt">Bolt (Electricity)</option>
+                        <option value="fas fa-wallet">Wallet (Income)</option>
+                        <option value="fas fa-money-bill-wave">Money (Expense)</option>
+                    </select>
+                </div>
+
+                <!-- Color Picker -->
+                <div class="mb-6">
+                    <label for="colorPicker" class="block text-sm font-medium text-gray-700">Select Color</label>
+                    <input type="color" name="Color" id="colorPicker" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" required />
+                </div>
+
+                <!-- Confirm Button -->
+                <div class="mt-6">
+                    <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 rounded-md">
+                        Confirm
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for Modal Control and Adding New Category -->
+<script>
+    // Function to open the modal
+    function openModal() {
+        document.getElementById('createCategoryModal').classList.remove('hidden');
+    }
+
+    // Close the modal when clicking the close button
+    document.getElementById('closeModal').addEventListener('click', function () {
+        document.getElementById('createCategoryModal').classList.add('hidden');
+    });
+
+    // Handle form submission to add the new category dynamically and send data to the server
+    document.getElementById('categoryForm').addEventListener('submit', async function (event) {
+        event.preventDefault(); // Prevent the form from submitting normally
+
+        const name = document.getElementById('name').value;
+        const type = document.querySelector('input[name="Type"]:checked').value;
+        const icon = document.getElementById('icon').value;
+        const color = document.getElementById('colorPicker').value;
+
+        // Prepare data to send to the server
+        const categoryData = {
+            Name: name,
+            Type: type,
+            Icon: icon,
+            Color: color
+        };
+
+        // Send the data to the server using fetch
+        try {
+            const response = await fetch('/Category/Create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()  // Include AntiForgeryToken if applicable
+                },
+                body: JSON.stringify(categoryData)
+            });
+
+            if (response.ok) {
+                // Parse the response to get the newly created category
+                const newCategory = await response.json();
+
+                // Create the new category card HTML dynamically
+                const newCategoryHTML = `
+                        <div class="p-6 rounded-lg shadow-lg text-white relative flex flex-col items-center justify-center" style="background-color: ${newCategory.color};">
+                            <i class="${newCategory.icon} text-6xl mb-4"></i>
+                            <h3 class="text-xl font-bold text-center">${newCategory.name}</h3>
+                            <p class="text-center">${newCategory.type}</p>
+                        </div>
+                    `;
+
+                // Insert the new category card into the grid
+                document.getElementById('categoryGrid').insertAdjacentHTML('beforeend', newCategoryHTML);
+
+                // Close the modal
+                document.getElementById('createCategoryModal').classList.add('hidden');
+
+                // Clear the form
+                document.getElementById('categoryForm').reset();
+            } else {
+                alert('Failed to save category. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error occurred while saving the category.');
         }
-    </tbody>
-</table>
+    });
+</script>

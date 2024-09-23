@@ -7,7 +7,7 @@
 
     <!-- Sidebar -->
     <div class="w-64 bg-blue-100 shadow-lg flex flex-col">
-        
+
         <!-- SpendWise Title -->
         <div class="p-4">
             <h2 class="mt-2 ml-4 font-bold text-lg">
@@ -21,28 +21,27 @@
         </div>
 
         <!-- Navigation -->
-        <nav class="flex-1 mb-4 pl-4"> <!-- Same padding-left as SpendWise title for alignment -->
+        <nav class="flex-1 mb-4 pl-4">
+            <!-- Same padding-left as SpendWise title for alignment -->
             <ul>
                 <li class="p-2">
-                    <a asp-controller="Home" asp-action="Index" class="flex items-center text-gray-700 hover:text-blue-500 @if(ViewData["Title"] == "Home Page") {<text>font-bold</text>}">
+                    <a asp-controller="Home" asp-action="Index" class="flex items-center text-gray-700 hover:text-blue-500 @(ViewData["Title"].ToString() == "Home Page" ? "font-bold" : "")">
                         <i class="fas fa-home mr-3"></i> Home
                     </a>
                 </li>
                 <li class="p-2">
-                    <a asp-controller="Account" asp-action="Index" class="flex items-center text-gray-700 hover:text-blue-500 @if(ViewData["Title"] == "Account") {<text>font-bold</text>}">
+                    <a asp-controller="Account" asp-action="Index" class="flex items-center text-gray-700 hover:text-blue-500 @(ViewData["Title"].ToString() == "Account" ? "font-bold" : "")">
                         <i class="fas fa-user mr-3"></i> Account
                     </a>
                 </li>
                 <li class="p-2">
-                    <a asp-controller="Category" asp-action="Index" class="flex items-center text-gray-700 hover:text-blue-500 @if(ViewData["Title"] == "Category") {
-                     <text>font-bold</text>
-                      }">
-                     <i class="fas fa-layer-group mr-3"></i> Category
+                    <a asp-controller="Category" asp-action="Index" class="flex items-center text-gray-700 hover:text-blue-500 @(ViewData["Title"].ToString() == "Category" ? "font-bold" : "")">
+                        <i class="fas fa-layer-group mr-3"></i> Category
                     </a>
                 </li>
 
                 <li class="p-2">
-                    <a asp-controller="Settings" asp-action="Index" class="flex items-center text-gray-700 hover:text-blue-500 @if(ViewData["Title"] == "Settings") {<text>font-bold</text>}">
+                    <a asp-controller="Settings" asp-action="Index" class="flex items-center text-gray-700 hover:text-blue-500 @(ViewData["Title"].ToString() == "Settings" ? "font-bold" : "")">
                         <i class="fas fa-cog mr-3"></i> Settings
                     </a>
                 </li>

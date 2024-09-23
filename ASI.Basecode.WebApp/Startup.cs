@@ -4,6 +4,7 @@ using ASI.Basecode.Services.Manager;
 using ASI.Basecode.WebApp.Authentication;
 using ASI.Basecode.WebApp.Extensions.Configuration;
 using ASI.Basecode.WebApp.Models;
+using ASI.Basecode.WebApp.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Features;
@@ -82,6 +83,13 @@ namespace ASI.Basecode.WebApp
 
             services.AddMemoryCache();
 
+
+
+
+            services.AddDbContext<ApplicationDbContext>(options =>
+             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+ 
+
             // Register SQL database configuration context as services.
             services.AddDbContext<AsiBasecodeDBContext>(options =>
             {
@@ -92,6 +100,10 @@ namespace ASI.Basecode.WebApp
 
             services.AddControllersWithViews();
             services.AddRazorPages().AddRazorRuntimeCompilation();
+
+
+            // Registering the CategoryService
+            services.AddScoped<CategoryService>();
 
             //Configuration
             services.Configure<TokenAuthentication>(Configuration.GetSection("TokenAuthentication"));
