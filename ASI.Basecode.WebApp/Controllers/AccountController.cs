@@ -115,25 +115,25 @@ namespace ASI.Basecode.WebApp.Controllers
             return View();
         }
 
-        [HttpPost]
-        [AllowAnonymous]
-        public IActionResult Register(Services.ServiceModels.LoginViewModel model)
-        {
-            try
-            {
-                //_userService.AddUser(model);
-                return RedirectToAction("Login", "Account");
-            }
-            catch(InvalidDataException ex)
-            {
-                TempData["ErrorMessage"] = ex.Message;
-            }
-            catch(Exception ex)
-            {
-                TempData["ErrorMessage"] = Resources.Messages.Errors.ServerError;
-            }
-            return View();
-        }
+        //[HttpPost]
+        //[AllowAnonymous]
+        //public IActionResult Register(Services.ServiceModels.LoginViewModel model)
+        //{
+        //    try
+        //    {
+        //        //_userService.AddUser(model);
+        //        return RedirectToAction("Login", "Account");
+        //    }
+        //    catch (InvalidDataException ex)
+        //    {
+        //        TempData["ErrorMessage"] = ex.Message;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        TempData["ErrorMessage"] = Resources.Messages.Errors.ServerError;
+        //    }
+        //    return View();
+        //}
 
         /// <summary>
         /// Sign Out current account and return login view.

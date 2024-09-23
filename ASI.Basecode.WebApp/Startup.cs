@@ -95,7 +95,7 @@ namespace ASI.Basecode.WebApp
 
             //Configuration
             services.Configure<TokenAuthentication>(Configuration.GetSection("TokenAuthentication"));
-            
+
             // Session
             services.AddSession(options =>
             {
