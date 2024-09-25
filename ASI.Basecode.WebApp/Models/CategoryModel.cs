@@ -4,18 +4,19 @@ namespace ASI.Basecode.WebApp.Models
 {
     public class CategoryModel
     {
-        [Key]
         public int Id { get; set; }
 
         [Required]
+        [StringLength(100)]
         public string Name { get; set; }
 
-        public string Description { get; set; }
+        [Required]
+        public string Type { get; set; }
 
         public string Icon { get; set; }
 
+        [Required]
         public string Color { get; set; }
-
-        public string Type { get; set; }
     }
+
 }

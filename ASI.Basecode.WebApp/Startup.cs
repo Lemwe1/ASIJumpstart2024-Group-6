@@ -84,11 +84,12 @@ namespace ASI.Basecode.WebApp
             services.AddMemoryCache();
 
 
-
-
             services.AddDbContext<ApplicationDbContext>(options =>
-             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
- 
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
+                       .EnableSensitiveDataLogging() // Enable detailed logging for EF Core
+            );
+
+
 
             // Register SQL database configuration context as services.
             services.AddDbContext<AsiBasecodeDBContext>(options =>

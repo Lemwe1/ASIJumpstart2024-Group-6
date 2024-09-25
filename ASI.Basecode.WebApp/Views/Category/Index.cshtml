@@ -19,7 +19,7 @@
             <!-- Type -->
             <p class="text-center">@item.Type</p>
             <!-- Edit Icon -->
-            <a asp-action="Edit" asp-route-id="@item.Id" class="absolute top-2 right-2 text-white hover:text-gray-300">
+            <a href="javascript:void(0);" onclick="openEditModal('@item.Id')" class="absolute top-2 right-2 text-white hover:text-gray-300">
                 <i class="fas fa-pencil-alt"></i>
             </a>
         </div>
@@ -37,7 +37,7 @@
         <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-bold">Add Category</h2>
-                <button id="closeModal" class="text-gray-400 hover:text-gray-600">
+                <button id="closeCreateModal" class="text-gray-400 hover:text-gray-600">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -97,19 +97,30 @@
     </div>
 </div>
 
-<!-- JavaScript for Modal Control and Adding New Category -->
+<!-- Edit Category Modal -->
+<div id="editCategoryModal" class="hidden fixed z-50 inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-1/3 relative">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-bold">Edit Category</h2>
+            <button id="closeEditModal" class="text-gray-400 hover:text-gray-600" onclick="closeModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <!-- The form content from Edit.cshtml will be injected here -->
+        <div id="editFormContainer">
+            <!-- Form content will be loaded here -->
+        </div>
+    </div>
+</div>
+
+
 <script>
-    // Function to open the modal
+    // Function to open the Create modal
     function openModal() {
         document.getElementById('createCategoryModal').classList.remove('hidden');
     }
 
-    // Close the modal when clicking the close button
-    document.getElementById('closeModal').addEventListener('click', function () {
-        document.getElementById('createCategoryModal').classList.add('hidden');
-    });
-
-    // Handle form submission to add the new category dynamically and send data to the server
+    // Handle form submission for creating a new category
     document.getElementById('categoryForm').addEventListener('submit', async function (event) {
         event.preventDefault(); // Prevent the form from submitting normally
 
@@ -119,20 +130,17 @@
         const color = document.getElementById('colorPicker').value;
 
         // Prepare data to send to the server
-        const categoryData = {
-            Name: name,
-            Type: type,
-            Icon: icon,
-            Color: color
-        };
+        const categoryData = { Name: name, Type: type, Icon: icon, Color: color };
 
-        // Send the data to the server using fetch
+        // Get the Anti-Forgery Token
+        const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
         try {
             const response = await fetch('/Category/Create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()  // Include AntiForgeryToken if applicable
+                    'RequestVerificationToken': csrfToken  // Include AntiForgeryToken if applicable
                 },
                 body: JSON.stringify(categoryData)
             });
@@ -141,23 +149,29 @@
                 // Parse the response to get the newly created category
                 const newCategory = await response.json();
 
-                // Create the new category card HTML dynamically
-                const newCategoryHTML = `
-                        <div class="p-6 rounded-lg shadow-lg text-white relative flex flex-col items-center justify-center" style="background-color: ${newCategory.color};">
-                            <i class="${newCategory.icon} text-6xl mb-4"></i>
-                            <h3 class="text-xl font-bold text-center">${newCategory.name}</h3>
-                            <p class="text-center">${newCategory.type}</p>
-                        </div>
-                    `;
+                // Check if the newCategory contains the correct data
+                if (newCategory && newCategory.name && newCategory.type && newCategory.icon && newCategory.color) {
+                    // Create the new category card HTML dynamically
+                    const newCategoryHTML = `
+                            <div class="p-6 rounded-lg shadow-lg text-white relative flex flex-col items-center justify-center" style="background-color: ${newCategory.color};">
+                                <i class="${newCategory.icon} text-6xl mb-4"></i>
+                                <h3 class="text-xl font-bold text-center">${newCategory.name}</h3>
+                                <p class="text-center">${newCategory.type}</p>
+                            </div>
+                        `;
 
-                // Insert the new category card into the grid
-                document.getElementById('categoryGrid').insertAdjacentHTML('beforeend', newCategoryHTML);
+                    // Insert the new category card into the grid
+                    document.getElementById('categoryGrid').insertAdjacentHTML('beforeend', newCategoryHTML);
 
-                // Close the modal
-                document.getElementById('createCategoryModal').classList.add('hidden');
+                    // Close the modal
+                    document.getElementById('createCategoryModal').classList.add('hidden');
 
-                // Clear the form
-                document.getElementById('categoryForm').reset();
+                    // Clear the form
+                    document.getElementById('categoryForm').reset();
+                } else {
+                    console.error('Invalid data received from server:', newCategory);
+                    alert('Failed to save category. Please try again.');
+                }
             } else {
                 alert('Failed to save category. Please try again.');
             }
@@ -165,5 +179,32 @@
             console.error('Error:', error);
             alert('Error occurred while saving the category.');
         }
+    });
+
+    // Open modal and load Edit form dynamically
+    function openEditModal(categoryId) {
+        // Make an AJAX request to load the Edit form
+        fetch(`/Category/Edit/${categoryId}`)
+            .then(response => response.text()) // Fetch the form HTML content
+            .then(html => {
+                // Inject the fetched HTML into the modal's content area
+                document.getElementById('editFormContainer').innerHTML = html;
+
+                // Show the modal by removing the hidden class
+                document.getElementById('editCategoryModal').classList.remove('hidden');
+            })
+            .catch(error => {
+                console.error('Error loading edit form:', error);
+            });
+    }
+
+    // Close the create modal
+    document.getElementById('closeCreateModal').addEventListener('click', function () {
+        document.getElementById('createCategoryModal').classList.add('hidden');
+    });
+
+    // Close the edit modal
+    document.getElementById('closeEditModal').addEventListener('click', function () {
+        document.getElementById('editCategoryModal').classList.add('hidden');
     });
 </script>
