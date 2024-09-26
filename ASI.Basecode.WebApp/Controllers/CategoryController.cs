@@ -3,6 +3,7 @@ using ASI.Basecode.WebApp.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ASI.Basecode.WebApp.Controllers
@@ -26,15 +27,22 @@ namespace ASI.Basecode.WebApp.Controllers
             return View(categories);
         }
 
-        // GET: /Category/Create
-        public IActionResult Create()
+        // GET: /Category/GetCategory/{id}
+        [HttpGet]
+        public async Task<IActionResult> GetCategory(int id)
         {
-            return View();
+            var category = await _categoryService.GetCategoryByIdAsync(id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+            return Json(category);
         }
 
+        // POST: /Category/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([FromBody] CategoryModel category)
+        public async Task<IActionResult> Create(CategoryModel category)
         {
             if (ModelState.IsValid)
             {
@@ -54,22 +62,10 @@ namespace ASI.Basecode.WebApp.Controllers
             }
 
             // Return a bad request if model validation fails
-            return BadRequest("Failed to create category.");
+            return BadRequest(new { success = false, message = "Failed to create category.", errors = ModelState.Values.SelectMany(v => v.Errors) });
         }
 
-
-        // GET: /Category/Edit/{id}
-        [HttpGet]
-        public async Task<IActionResult> Edit(int id)
-        {
-            var category = await _categoryService.GetCategoryByIdAsync(id);
-            if (category == null)
-            {
-                return NotFound();
-            }
-            return PartialView("Edit", category); // Ensuring "Edit.cshtml" is rendered
-        }
-
+        // POST: /Category/Edit/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, CategoryModel category)
@@ -99,24 +95,14 @@ namespace ASI.Basecode.WebApp.Controllers
                 }
             }
 
-            return BadRequest(new { success = false, message = "Invalid category data." });
-        }
-
-        // GET: /Category/Delete/{id}
-        public async Task<IActionResult> Delete(int id)
-        {
-            var category = await _categoryService.GetCategoryByIdAsync(id);
-            if (category == null)
-            {
-                return NotFound();
-            }
-            return View(category);
+            // Return validation errors
+            return BadRequest(new { success = false, message = "Invalid category data.", errors = ModelState.Values.SelectMany(v => v.Errors) });
         }
 
         // POST: /Category/Delete/{id}
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             var category = await _context.Categories.FindAsync(id);
             if (category == null)

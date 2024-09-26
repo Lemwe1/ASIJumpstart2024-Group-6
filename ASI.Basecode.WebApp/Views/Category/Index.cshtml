@@ -26,7 +26,7 @@
     }
 
     <!-- Create New Category Card (Click to open the modal) -->
-    <div id="newCategoryCard" class="bg-gray-200 p-6 rounded-lg shadow-lg flex items-center justify-center border-dashed border-2 border-gray-400 cursor-pointer" onclick="openModal()">
+    <div id="newCategoryCard" class="bg-gray-200 p-6 rounded-lg shadow-lg flex items-center justify-center border-dashed border-2 border-gray-400 cursor-pointer" onclick="openCreateModal()">
         <i class="fas fa-plus text-4xl text-gray-400"></i>
     </div>
 </div>
@@ -50,12 +50,12 @@
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700">Type</label>
                     <div class="flex mt-2">
-                        <input type="radio" id="expense" name="Type" value="Expense" class="hidden peer" checked>
-                        <label for="expense" class="peer-checked:bg-blue-500 peer-checked:text-white px-6 py-2 border border-gray-300 cursor-pointer rounded-l-md">
+                        <input type="radio" id="createExpense" name="Type" value="Expense" class="hidden peer" checked>
+                        <label for="createExpense" class="peer-checked:bg-blue-500 peer-checked:text-white px-6 py-2 border border-gray-300 cursor-pointer rounded-l-md">
                             Expense
                         </label>
-                        <input type="radio" id="income" name="Type" value="Income" class="hidden peer">
-                        <label for="income" class="peer-checked:bg-blue-500 peer-checked:text-white px-6 py-2 border border-gray-300 cursor-pointer rounded-r-md">
+                        <input type="radio" id="createIncome" name="Type" value="Income" class="hidden peer">
+                        <label for="createIncome" class="peer-checked:bg-blue-500 peer-checked:text-white px-6 py-2 border border-gray-300 cursor-pointer rounded-r-md">
                             Income
                         </label>
                     </div>
@@ -63,14 +63,14 @@
 
                 <!-- Name Input -->
                 <div class="mb-6">
-                    <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
-                    <input type="text" name="Name" id="name" placeholder="Enter Name" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" required />
+                    <label for="createName" class="block text-sm font-medium text-gray-700">Name</label>
+                    <input type="text" name="Name" id="createName" placeholder="Enter Name" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" required />
                 </div>
 
                 <!-- Icon Input -->
                 <div class="mb-6">
-                    <label for="icon" class="block text-sm font-medium text-gray-700">Icon</label>
-                    <select name="Icon" id="icon" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    <label for="createIcon" class="block text-sm font-medium text-gray-700">Icon</label>
+                    <select name="Icon" id="createIcon" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                         <option value="">Select Icon</option>
                         <option value="fas fa-apple-alt">Apple (Food)</option>
                         <option value="fas fa-shopping-bag">Shopping Bag</option>
@@ -82,8 +82,8 @@
 
                 <!-- Color Picker -->
                 <div class="mb-6">
-                    <label for="colorPicker" class="block text-sm font-medium text-gray-700">Select Color</label>
-                    <input type="color" name="Color" id="colorPicker" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" required />
+                    <label for="createColorPicker" class="block text-sm font-medium text-gray-700">Select Color</label>
+                    <input type="color" name="Color" id="createColorPicker" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" required />
                 </div>
 
                 <!-- Confirm Button -->
@@ -99,79 +99,103 @@
 
 <!-- Edit Category Modal -->
 <div id="editCategoryModal" class="hidden fixed z-50 inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-1/3 relative">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-2xl font-bold">Edit Category</h2>
-            <button id="closeEditModal" class="text-gray-400 hover:text-gray-600" onclick="closeModal()">
+            <button id="closeEditModal" class="text-gray-400 hover:text-gray-600">
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <!-- The form content from Edit.cshtml will be injected here -->
-        <div id="editFormContainer">
-            <!-- Form content will be loaded here -->
-        </div>
+        <p class="mb-4 text-sm text-gray-500">Fill out all the fields below to edit the category.</p>
+
+        <!-- Edit Form -->
+        <form id="editCategoryForm">
+            @Html.AntiForgeryToken()
+            <!-- Hidden ID Field -->
+            <input type="hidden" name="Id" id="editId" />
+
+            <!-- Type Selector (Expense/Income) -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700">Type</label>
+                <div class="flex mt-2">
+                    <input type="radio" id="editExpense" name="Type" value="Expense" class="hidden peer">
+                    <label for="editExpense" class="peer-checked:bg-blue-500 peer-checked:text-white px-6 py-2 border border-gray-300 cursor-pointer rounded-l-md">
+                        Expense
+                    </label>
+                    <input type="radio" id="editIncome" name="Type" value="Income" class="hidden peer">
+                    <label for="editIncome" class="peer-checked:bg-blue-500 peer-checked:text-white px-6 py-2 border border-gray-300 cursor-pointer rounded-r-md">
+                        Income
+                    </label>
+                </div>
+            </div>
+
+            <!-- Name Input -->
+            <div class="mb-6">
+                <label for="editName" class="block text-sm font-medium text-gray-700">Name</label>
+                <input type="text" name="Name" id="editName" placeholder="Enter Name" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" required />
+            </div>
+
+            <!-- Icon Input -->
+            <div class="mb-6">
+                <label for="editIcon" class="block text-sm font-medium text-gray-700">Icon</label>
+                <select name="Icon" id="editIcon" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Select Icon</option>
+                    <option value="fas fa-apple-alt">Apple (Food)</option>
+                    <option value="fas fa-shopping-bag">Shopping Bag</option>
+                    <option value="fas fa-bolt">Bolt (Electricity)</option>
+                    <option value="fas fa-wallet">Wallet (Income)</option>
+                    <option value="fas fa-money-bill-wave">Money (Expense)</option>
+                </select>
+            </div>
+
+            <!-- Color Picker -->
+            <div class="mb-6">
+                <label for="editColorPicker" class="block text-sm font-medium text-gray-700">Select Color</label>
+                <input type="color" name="Color" id="editColorPicker" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" required />
+            </div>
+
+            <!-- Save and Delete Buttons -->
+            <div class="flex justify-between mt-6">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-md">
+                    Save
+                </button>
+                <button type="button" class="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-md" id="deleteButton">
+                    Delete
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
-
 <script>
     // Function to open the Create modal
-    function openModal() {
+    function openCreateModal() {
         document.getElementById('createCategoryModal').classList.remove('hidden');
     }
+
+    // Close the create modal
+    document.getElementById('closeCreateModal').addEventListener('click', function () {
+        document.getElementById('createCategoryModal').classList.add('hidden');
+    });
 
     // Handle form submission for creating a new category
     document.getElementById('categoryForm').addEventListener('submit', async function (event) {
         event.preventDefault(); // Prevent the form from submitting normally
 
-        const name = document.getElementById('name').value;
-        const type = document.querySelector('input[name="Type"]:checked').value;
-        const icon = document.getElementById('icon').value;
-        const color = document.getElementById('colorPicker').value;
-
-        // Prepare data to send to the server
-        const categoryData = { Name: name, Type: type, Icon: icon, Color: color };
-
-        // Get the Anti-Forgery Token
-        const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
+        const formData = new FormData(this);
 
         try {
             const response = await fetch('/Category/Create', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'RequestVerificationToken': csrfToken  // Include AntiForgeryToken if applicable
-                },
-                body: JSON.stringify(categoryData)
+                body: formData
             });
 
             if (response.ok) {
-                // Parse the response to get the newly created category
-                const newCategory = await response.json();
+                // Close the modal before refreshing the page
+                document.getElementById('createCategoryModal').classList.add('hidden');
 
-                // Check if the newCategory contains the correct data
-                if (newCategory && newCategory.name && newCategory.type && newCategory.icon && newCategory.color) {
-                    // Create the new category card HTML dynamically
-                    const newCategoryHTML = `
-                            <div class="p-6 rounded-lg shadow-lg text-white relative flex flex-col items-center justify-center" style="background-color: ${newCategory.color};">
-                                <i class="${newCategory.icon} text-6xl mb-4"></i>
-                                <h3 class="text-xl font-bold text-center">${newCategory.name}</h3>
-                                <p class="text-center">${newCategory.type}</p>
-                            </div>
-                        `;
-
-                    // Insert the new category card into the grid
-                    document.getElementById('categoryGrid').insertAdjacentHTML('beforeend', newCategoryHTML);
-
-                    // Close the modal
-                    document.getElementById('createCategoryModal').classList.add('hidden');
-
-                    // Clear the form
-                    document.getElementById('categoryForm').reset();
-                } else {
-                    console.error('Invalid data received from server:', newCategory);
-                    alert('Failed to save category. Please try again.');
-                }
+                // Refresh the page to show the newly added category
+                window.location.reload(); // This will reload the entire page and show the updated list
             } else {
                 alert('Failed to save category. Please try again.');
             }
@@ -181,30 +205,105 @@
         }
     });
 
-    // Open modal and load Edit form dynamically
-    function openEditModal(categoryId) {
-        // Make an AJAX request to load the Edit form
-        fetch(`/Category/Edit/${categoryId}`)
-            .then(response => response.text()) // Fetch the form HTML content
-            .then(html => {
-                // Inject the fetched HTML into the modal's content area
-                document.getElementById('editFormContainer').innerHTML = html;
+    // Function to open the Edit modal and populate the form with category data
+    async function openEditModal(categoryId) {
+        try {
+            const response = await fetch(`/Category/GetCategory/${categoryId}`);
+            if (response.ok) {
+                const category = await response.json();
 
-                // Show the modal by removing the hidden class
+                // Populate the edit form fields with category data
+                document.getElementById('editId').value = category.id;
+                document.getElementById('editName').value = category.name;
+                document.getElementById('editIcon').value = category.icon;
+                document.getElementById('editColorPicker').value = category.color;
+
+                // Set the Type radio buttons
+                if (category.type === 'Expense') {
+                    document.getElementById('editExpense').checked = true;
+                } else {
+                    document.getElementById('editIncome').checked = true;
+                }
+
+                // Show the edit modal
                 document.getElementById('editCategoryModal').classList.remove('hidden');
-            })
-            .catch(error => {
-                console.error('Error loading edit form:', error);
-            });
+            } else {
+                alert('Failed to load category data.');
+            }
+        } catch (error) {
+            console.error('Error loading category data:', error);
+            alert('Error occurred while loading the category data.');
+        }
     }
-
-    // Close the create modal
-    document.getElementById('closeCreateModal').addEventListener('click', function () {
-        document.getElementById('createCategoryModal').classList.add('hidden');
-    });
 
     // Close the edit modal
     document.getElementById('closeEditModal').addEventListener('click', function () {
         document.getElementById('editCategoryModal').classList.add('hidden');
+    });
+
+    // Handle form submission for editing a category
+    document.getElementById('editCategoryForm').addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const formData = new FormData(this);
+
+        // Debugging: Log the FormData entries
+        for (var pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1]);
+        }
+
+        try {
+            const id = formData.get('Id');
+            console.log('ID:', id);
+
+            const response = await fetch(`/Category/Edit/${id}`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                // Close the modal before refreshing the page
+                document.getElementById('editCategoryModal').classList.add('hidden');
+
+                // Refresh the page to show the updated category
+                window.location.reload();
+            } else {
+                alert('Failed to update category. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error updating category:', error);
+            alert('Error occurred while updating the category.');
+        }
+    });
+
+    // Handle category deletion
+    document.getElementById('deleteButton').addEventListener('click', async function () {
+        const id = document.getElementById('editId').value;
+
+        if (confirm('Are you sure you want to delete this category?')) {
+            // Create a FormData object
+            const formData = new FormData();
+            formData.append('__RequestVerificationToken', document.querySelector('#editCategoryForm input[name="__RequestVerificationToken"]').value);
+
+            try {
+                const response = await fetch(`/Category/Delete/${id}`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    // Close the modal before refreshing the page
+                    document.getElementById('editCategoryModal').classList.add('hidden');
+
+                    // Refresh the page to remove the deleted category
+                    window.location.reload();
+                } else {
+                    alert('Failed to delete category. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error deleting category:', error);
+                alert('Error occurred while deleting the category.');
+            }
+        }
     });
 </script>

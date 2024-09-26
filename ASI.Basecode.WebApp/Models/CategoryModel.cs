@@ -13,10 +13,10 @@ namespace ASI.Basecode.WebApp.Models
         [Required]
         public string Type { get; set; }
 
+        [Required]
         public string Icon { get; set; }
 
         [Required]
         public string Color { get; set; }
     }
-
 }

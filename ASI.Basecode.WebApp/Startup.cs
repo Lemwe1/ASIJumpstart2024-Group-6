@@ -84,10 +84,10 @@ namespace ASI.Basecode.WebApp
             services.AddMemoryCache();
 
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
-            );
 
+
+            services.AddDbContext<ApplicationDbContext>(options =>
+             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
 
             // Register SQL database configuration context as services.
