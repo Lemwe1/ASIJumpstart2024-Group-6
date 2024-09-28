@@ -45,32 +45,28 @@
 
             <!-- Form -->
             <form id="categoryForm">
-                @Html.AntiForgeryToken() <!-- Add anti-forgery token -->
+                @Html.AntiForgeryToken()
                 <!-- Type Selector (Expense/Income) -->
                 <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-700">Type</label>
-                    <div class="flex mt-2">
-                        <input type="radio" id="createExpense" name="Type" value="Expense" class="hidden peer" checked>
-                        <label for="createExpense" class="peer-checked:bg-blue-500 peer-checked:text-white px-6 py-2 border border-gray-300 cursor-pointer rounded-l-md">
-                            Expense
-                        </label>
-                        <input type="radio" id="createIncome" name="Type" value="Income" class="hidden peer">
-                        <label for="createIncome" class="peer-checked:bg-blue-500 peer-checked:text-white px-6 py-2 border border-gray-300 cursor-pointer rounded-r-md">
-                            Income
-                        </label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                    <div class="flex space-x-4">
+                        <button type="button" id="createExpenseButton" class="type-button px-4 py-2 border rounded-md">Expense</button>
+                        <button type="button" id="createIncomeButton" class="type-button px-4 py-2 border rounded-md">Income</button>
                     </div>
+                    <!-- Hidden input to store the selected type -->
+                    <input type="hidden" name="Type" id="createTypeInput" value="Expense" />
                 </div>
 
                 <!-- Name Input -->
                 <div class="mb-6">
                     <label for="createName" class="block text-sm font-medium text-gray-700">Name</label>
-                    <input type="text" name="Name" id="createName" placeholder="Enter Name" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" required />
+                    <input type="text" name="Name" id="createName" placeholder="Enter Name" class="mt-1 block w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500" required />
                 </div>
 
                 <!-- Icon Input -->
                 <div class="mb-6">
                     <label for="createIcon" class="block text-sm font-medium text-gray-700">Icon</label>
-                    <select name="Icon" id="createIcon" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    <select name="Icon" id="createIcon" class="mt-1 block w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500">
                         <option value="">Select Icon</option>
                         <option value="fas fa-apple-alt">Apple (Food)</option>
                         <option value="fas fa-shopping-bag">Shopping Bag</option>
@@ -83,7 +79,7 @@
                 <!-- Color Picker -->
                 <div class="mb-6">
                     <label for="createColorPicker" class="block text-sm font-medium text-gray-700">Select Color</label>
-                    <input type="color" name="Color" id="createColorPicker" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" required />
+                    <input type="color" name="Color" id="createColorPicker" class="mt-1 block w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500" required />
                 </div>
 
                 <!-- Confirm Button -->
@@ -116,29 +112,25 @@
 
             <!-- Type Selector (Expense/Income) -->
             <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700">Type</label>
-                <div class="flex mt-2">
-                    <input type="radio" id="editExpense" name="Type" value="Expense" class="hidden peer">
-                    <label for="editExpense" class="peer-checked:bg-blue-500 peer-checked:text-white px-6 py-2 border border-gray-300 cursor-pointer rounded-l-md">
-                        Expense
-                    </label>
-                    <input type="radio" id="editIncome" name="Type" value="Income" class="hidden peer">
-                    <label for="editIncome" class="peer-checked:bg-blue-500 peer-checked:text-white px-6 py-2 border border-gray-300 cursor-pointer rounded-r-md">
-                        Income
-                    </label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                <div class="flex space-x-4">
+                    <button type="button" id="editExpenseButton" class="type-button px-4 py-2 border rounded-md">Expense</button>
+                    <button type="button" id="editIncomeButton" class="type-button px-4 py-2 border rounded-md">Income</button>
                 </div>
+                <!-- Hidden input to store the selected type -->
+                <input type="hidden" name="Type" id="editTypeInput" />
             </div>
 
             <!-- Name Input -->
             <div class="mb-6">
                 <label for="editName" class="block text-sm font-medium text-gray-700">Name</label>
-                <input type="text" name="Name" id="editName" placeholder="Enter Name" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" required />
+                <input type="text" name="Name" id="editName" placeholder="Enter Name" class="mt-1 block w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500" required />
             </div>
 
             <!-- Icon Input -->
             <div class="mb-6">
                 <label for="editIcon" class="block text-sm font-medium text-gray-700">Icon</label>
-                <select name="Icon" id="editIcon" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                <select name="Icon" id="editIcon" class="mt-1 block w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500">
                     <option value="">Select Icon</option>
                     <option value="fas fa-apple-alt">Apple (Food)</option>
                     <option value="fas fa-shopping-bag">Shopping Bag</option>
@@ -151,7 +143,7 @@
             <!-- Color Picker -->
             <div class="mb-6">
                 <label for="editColorPicker" class="block text-sm font-medium text-gray-700">Select Color</label>
-                <input type="color" name="Color" id="editColorPicker" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" required />
+                <input type="color" name="Color" id="editColorPicker" class="mt-1 block w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500" required />
             </div>
 
             <!-- Save and Delete Buttons -->
@@ -171,11 +163,22 @@
     // Function to open the Create modal
     function openCreateModal() {
         document.getElementById('createCategoryModal').classList.remove('hidden');
+        // Set default type to Expense
+        setTypeSelection('create', 'Expense');
     }
 
     // Close the create modal
     document.getElementById('closeCreateModal').addEventListener('click', function () {
         document.getElementById('createCategoryModal').classList.add('hidden');
+    });
+
+    // Handle type selection for Create Modal
+    document.getElementById('createExpenseButton').addEventListener('click', function () {
+        setTypeSelection('create', 'Expense');
+    });
+
+    document.getElementById('createIncomeButton').addEventListener('click', function () {
+        setTypeSelection('create', 'Income');
     });
 
     // Handle form submission for creating a new category
@@ -218,12 +221,8 @@
                 document.getElementById('editIcon').value = category.icon;
                 document.getElementById('editColorPicker').value = category.color;
 
-                // Set the Type radio buttons
-                if (category.type === 'Expense') {
-                    document.getElementById('editExpense').checked = true;
-                } else {
-                    document.getElementById('editIncome').checked = true;
-                }
+                // Set the Type selection
+                setTypeSelection('edit', category.type);
 
                 // Show the edit modal
                 document.getElementById('editCategoryModal').classList.remove('hidden');
@@ -241,20 +240,23 @@
         document.getElementById('editCategoryModal').classList.add('hidden');
     });
 
+    // Handle type selection for Edit Modal
+    document.getElementById('editExpenseButton').addEventListener('click', function () {
+        setTypeSelection('edit', 'Expense');
+    });
+
+    document.getElementById('editIncomeButton').addEventListener('click', function () {
+        setTypeSelection('edit', 'Income');
+    });
+
     // Handle form submission for editing a category
     document.getElementById('editCategoryForm').addEventListener('submit', async function (event) {
         event.preventDefault();
 
         const formData = new FormData(this);
 
-        // Debugging: Log the FormData entries
-        for (var pair of formData.entries()) {
-            console.log(pair[0] + ': ' + pair[1]);
-        }
-
         try {
             const id = formData.get('Id');
-            console.log('ID:', id);
 
             const response = await fetch(`/Category/Edit/${id}`, {
                 method: 'POST',
@@ -306,4 +308,37 @@
             }
         }
     });
+
+    // Function to handle type selection and highlight the selected button
+    function setTypeSelection(modalType, selectedType) {
+        if (modalType === 'create') {
+            const expenseButton = document.getElementById('createExpenseButton');
+            const incomeButton = document.getElementById('createIncomeButton');
+            const typeInput = document.getElementById('createTypeInput');
+
+            typeInput.value = selectedType;
+
+            if (selectedType === 'Expense') {
+                expenseButton.classList.add('bg-blue-500', 'text-white');
+                incomeButton.classList.remove('bg-blue-500', 'text-white');
+            } else {
+                incomeButton.classList.add('bg-blue-500', 'text-white');
+                expenseButton.classList.remove('bg-blue-500', 'text-white');
+            }
+        } else if (modalType === 'edit') {
+            const expenseButton = document.getElementById('editExpenseButton');
+            const incomeButton = document.getElementById('editIncomeButton');
+            const typeInput = document.getElementById('editTypeInput');
+
+            typeInput.value = selectedType;
+
+            if (selectedType === 'Expense') {
+                expenseButton.classList.add('bg-blue-500', 'text-white');
+                incomeButton.classList.remove('bg-blue-500', 'text-white');
+            } else {
+                incomeButton.classList.add('bg-blue-500', 'text-white');
+                expenseButton.classList.remove('bg-blue-500', 'text-white');
+            }
+        }
+    }
 </script>
