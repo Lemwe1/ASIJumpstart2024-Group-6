@@ -6,29 +6,47 @@
 
 <h2 class="text-2xl font-bold mb-6">@ViewData["Title"]</h2>
 
-<!-- Grid Layout for Categories -->
-<div class="grid grid-cols-3 gap-6" id="categoryGrid">
-    <!-- Existing Categories -->
-    @foreach (var item in Model)
+<!-- Create New Category Card (Click to open the modal) -->
+<div class="mb-8">
+    <div id="newCategoryCard" class="bg-gray-200 p-6 rounded-lg shadow-lg flex items-center justify-center border-dashed border-2 border-gray-400 cursor-pointer w-32 h-32" onclick="openCreateModal()">
+        <i class="fas fa-plus text-4xl text-gray-400"></i>
+    </div>
+</div>
+
+<!-- Income Categories -->
+<h3 class="text-xl font-semibold mb-4">Income</h3>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8" id="incomeCategoryGrid">
+    @foreach (var item in Model.Where(c => c.Type == "Income"))
     {
         <div class="p-6 rounded-lg shadow-lg text-white relative flex flex-col items-center justify-center" style="background-color:@item.Color;">
-            <!-- Icon (Make it larger and center it) -->
+            <!-- Icon -->
             <i class="@item.Icon text-6xl mb-4"></i>
             <!-- Category Name -->
             <h3 class="text-xl font-bold text-center">@item.Name</h3>
-            <!-- Type -->
-            <p class="text-center">@item.Type</p>
             <!-- Edit Icon -->
             <a href="javascript:void(0);" onclick="openEditModal('@item.Id')" class="absolute top-2 right-2 text-white hover:text-gray-300">
                 <i class="fas fa-pencil-alt"></i>
             </a>
         </div>
     }
+</div>
 
-    <!-- Create New Category Card (Click to open the modal) -->
-    <div id="newCategoryCard" class="bg-gray-200 p-6 rounded-lg shadow-lg flex items-center justify-center border-dashed border-2 border-gray-400 cursor-pointer" onclick="openCreateModal()">
-        <i class="fas fa-plus text-4xl text-gray-400"></i>
-    </div>
+<!-- Expense Categories -->
+<h3 class="text-xl font-semibold mb-4">Expense</h3>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" id="expenseCategoryGrid">
+    @foreach (var item in Model.Where(c => c.Type == "Expense"))
+    {
+        <div class="p-6 rounded-lg shadow-lg text-white relative flex flex-col items-center justify-center" style="background-color:@item.Color;">
+            <!-- Icon -->
+            <i class="@item.Icon text-6xl mb-4"></i>
+            <!-- Category Name -->
+            <h3 class="text-xl font-bold text-center">@item.Name</h3>
+            <!-- Edit Icon -->
+            <a href="javascript:void(0);" onclick="openEditModal('@item.Id')" class="absolute top-2 right-2 text-white hover:text-gray-300">
+                <i class="fas fa-pencil-alt"></i>
+            </a>
+        </div>
+    }
 </div>
 
 <!-- Create Category Modal -->
