@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using ASI.Basecode.Data.Models;
 
+
 namespace ASI.Basecode.Data
 {
     public partial class AsiBasecodeDBContext : DbContext
@@ -17,7 +18,9 @@ namespace ASI.Basecode.Data
         {
         }
 
+        
         public virtual DbSet<MUser> MUsers { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -77,5 +80,8 @@ namespace ASI.Basecode.Data
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
+
     }
 }
+
