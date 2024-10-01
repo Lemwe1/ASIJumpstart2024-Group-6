@@ -10,5 +10,7 @@ namespace ASI.Basecode.WebApp.Models
 
         // Define DbSet for categories
         public DbSet<CategoryModel> Categories { get; set; }
+        public DbSet<DebitModel> Debits { get; set; }
+        public DbSet<LiabilityModel> Liabilities { get; set; }
     }
 }

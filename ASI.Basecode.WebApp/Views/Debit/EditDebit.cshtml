@@ -1,0 +1,23 @@
+﻿@model DebitModel
+<div class="container mx-auto p-6">
+    <h1 class="text-2xl font-bold">Edit Debit</h1>
+    <form asp-action="EditDebit" method="post" class="mt-4 space-y-4">
+        <input asp-for="Id" type="hidden" />
+        <div>
+            <label class="block">Name</label>
+            <input asp-for="Name" class="block w-full p-2 border" required />
+        </div>
+        <div>
+            <label class="block">Balance</label>
+            <input asp-for="Balance" type="number" class="block w-full p-2 border" required />
+        </div>
+        <div>
+            <label class="block">Color</label>
+            <input asp-for="Color" type="color" class="block w-full p-2 border" required />
+        </div>
+        <div class="flex space-x-4">
+            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Save</button>
+            <a href="@Url.Action("Index")" class="px-4 py-2 bg-gray-300 rounded">Cancel</a>
+        </div>
+    </form>
+</div>
