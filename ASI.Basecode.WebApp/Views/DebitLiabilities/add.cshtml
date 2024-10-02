@@ -1,0 +1,24 @@
+﻿@model DebitAccount
+
+<div class="p-4">
+    <h1 class="text-2xl font-bold">Add New Account</h1>
+
+    <form method="post">
+        <div class="mb-4">
+            <label class="block">Name</label>
+            <input asp-for="Name" class="border p-2 w-full" />
+        </div>
+
+        <div class="mb-4">
+            <label class="block">Icon</label>
+            <input asp-for="Icon" class="border p-2 w-full" />
+        </div>
+
+        <div class="mb-4">
+            <label class="block">Balance</label>
+            <input asp-for="Balance" class="border p-2 w-full" />
+        </div>
+
+        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg">Save</button>
+    </form>
+</div>

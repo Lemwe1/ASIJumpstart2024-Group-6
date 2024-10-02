@@ -2,15 +2,12 @@
 
 namespace ASI.Basecode.WebApp.Models
 {
-    public class DebitModel
+    public class Liability
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Icon { get; set; }
-        public decimal Balance { get; set; }
+        public decimal Amount { get; set; }
         public string Color { get; set; }
-        public bool IsBorrowed { get; set; }
     }
-
 
 }
