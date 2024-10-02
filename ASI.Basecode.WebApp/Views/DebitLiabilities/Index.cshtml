@@ -1,137 +1,194 @@
 ﻿@model DebitLiabilitiesViewModel
 
+@{
+    ViewData["Title"] = "Account Page";
+}
+
+<!-- Sidebar and Content -->
+<div class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <div class="w-64 bg-blue-100 shadow-lg flex flex-col">
+
+        <!-- SpendWise Title -->
+        <div class="p-4">
+            <h2 class="mt-2 ml-4 font-bold text-lg">
+                <span class="text-black">Spend</span><span class="text-blue-500">Wise</span>
+            </h2>
+        </div>
+
+        <!-- Profile Picture -->
+        <div class="p-4 text-center">
+            <img class="w-20 h-20 rounded-full mx-auto" src="~/images/profile-picture.jpg" alt="Profile Picture">
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 mb-4 pl-4">
+            <ul>
+                <li class="p-2">
+                    <a asp-controller="Home" asp-action="Index" class="flex items-center text-gray-700 hover:text-blue-500">
+                        <i class="fas fa-home mr-3"></i> Home
+                    </a>
+                </li>
+                <li class="p-2">
+                    <a asp-controller="DebitLiabilities" asp-action="Index" class="flex items-center text-gray-700 hover:text-blue-500 font-bold">
+                        <i class="fas fa-wallet mr-3"></i> Account
+                    </a>
+                </li>
+                <li class="p-2">
+                    <a asp-controller="Category" asp-action="Index" class="flex items-center text-gray-700 hover:text-blue-500">
+                        <i class="fas fa-layer-group mr-3"></i> Category
+                    </a>
+                </li>
+
+                <li class="p-2">
+                    <a asp-controller="Settings" asp-action="Index" class="flex items-center text-gray-700 hover:text-blue-500">
+                        <i class="fas fa-cog mr-3"></i> Settings
+                    </a>
+                </li>
+
+                <!-- Log out button with a bit of spacing -->
+                <li class="p-2 mt-4">
+                    <a href="#" class="flex items-center text-gray-700 hover:text-red-500">
+                        <i class="fas fa-sign-out-alt mr-3"></i> Log out
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Content -->
+    <div class="flex-1 p-6 bg-gray-50">
+
+        <!-- Add New Account Button and Account Title -->
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="font-bold text-lg">Account</h2>
+            <div class="ml-auto">
+                <button id="addAccountButton" class="px-4 py-2 bg-blue-500 text-white rounded-lg">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Net Worth Section -->
+        <div class="mb-6 bg-blue-500 text-white p-4 rounded-lg flex justify-between items-center">
+            <h2 class="text-2xl font-bold">Net Worth: -₱36,190.00</h2>
+            <div>
+                <p>Assets: ₱1,500.00</p>
+                <p>Liabilities: ₱1,500.00</p>
+            </div>
+        </div>
+
+        <!-- Debit Accounts Section -->
+        <div class="mb-6">
+            <h3 class="text-xl font-bold mb-4">Debit</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Debit Account Cards -->
+                <div class="p-4 bg-green-100 rounded-lg">
+                    <h3 class="font-bold text-lg">Cash</h3>
+                    <p>₱1,500.00</p>
+                </div>
+                <div class="p-4 bg-blue-100 rounded-lg">
+                    <h3 class="font-bold text-lg">GoTyme</h3>
+                    <p>₱1,500.00</p>
+                </div>
+                <div class="p-4 bg-red-100 rounded-lg">
+                    <h3 class="font-bold text-lg">BPI</h3>
+                    <p>₱1,500.00</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Borrowed Section -->
+        <div class="mb-6">
+            <h3 class="text-xl font-bold mb-4">Borrowed</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Borrowed Account Cards -->
+                <div class="p-4 bg-green-100 rounded-lg">
+                    <h3 class="font-bold text-lg">Iphone 14 Pro Max</h3>
+                    <p>₱1,500.00</p>
+                </div>
+                <div class="p-4 bg-blue-100 rounded-lg">
+                    <h3 class="font-bold text-lg">Air Pods Pro Gen2</h3>
+                    <p>₱1,500.00</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
 <!-- Add Account Modal -->
 <div id="addAccountModal" class="fixed z-50 inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-    <div class="bg-white p-6 rounded-lg max-w-md w-full">
+    <div class="bg-white p-6 rounded-lg max-w-md w-full" id="modalContent">
         <h2 class="text-xl font-bold mb-4">Add Account</h2>
-        <form id="addAccountForm">
-            <div class="mb-4">
-                <label class="block">Type</label>
-                <div class="flex space-x-4">
-                    <button type="button" class="w-full p-2 bg-gray-100 text-black" id="addDebitType">Debit</button>
-                    <button type="button" class="w-full p-2 bg-gray-100 text-black" id="addBorrowedType">Borrowed</button>
+
+        <!-- Start of scrollable content -->
+        <div class="modal-body max-h-96 overflow-y-auto p-4">
+            <form id="addAccountForm">
+                <div class="mb-4">
+                    <label class="block">Type</label>
+                    <div class="flex space-x-4">
+                        <button type="button" class="w-full p-2 bg-gray-100 text-black" id="addDebitType">Debit</button>
+                        <button type="button" class="w-full p-2 bg-gray-100 text-black" id="addBorrowedType">Borrowed</button>
+                    </div>
                 </div>
-            </div>
-            <div id="addFormFields">
-                <!-- Form fields will be dynamically loaded here based on type -->
-            </div>
-            <div class="text-right mt-4">
-                <button type="submit" class="px-4 py-2 bg-blue-500 text-white">Confirm</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Edit Account Modal -->
-<div id="editAccountModal" class="fixed z-50 inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-    <div class="bg-white p-6 rounded-lg max-w-md w-full">
-        <h2 class="text-xl font-bold mb-4">Edit Account</h2>
-        <form id="editAccountForm">
-            <div class="mb-4">
-                <label class="block">Type</label>
-                <div class="flex space-x-4">
-                    <button type="button" class="w-full p-2 bg-gray-100 text-black" id="editDebitType">Debit</button>
-                    <button type="button" class="w-full p-2 bg-gray-100 text-black" id="editBorrowedType">Borrowed</button>
+                <div id="addFormFields">
+                    <!-- Form fields will be dynamically loaded here based on type -->
                 </div>
-            </div>
-            <div id="editFormFields">
-                <!-- Form fields will be dynamically loaded here based on type -->
-            </div>
-            <div class="text-right mt-4">
-                <button type="submit" class="px-4 py-2 bg-blue-500 text-white">Save</button>
-                <button type="button" id="deleteAccount" class="px-4 py-2 bg-red-500 text-white">Delete</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-
-
-<div class="p-4">
-    <h1 class="text-2xl font-bold">Net Worth: ₱@Model.TotalNetWorth</h1>
-
-    <!-- Debit Accounts -->
-    <h2 class="text-xl font-semibold mt-4">Debit Accounts</h2>
-    <div class="grid grid-cols-3 gap-4">
-        @foreach (var account in Model.DebitAccounts)
-        {
-            <div class="p-4 bg-green-100 rounded-lg">
-                <h3 class="font-bold">@account.Name</h3>
-                <p>Balance: ₱@account.Balance</p>
-                <p><i class="@account.Icon"></i></p>
-                <a href="@Url.Action("Edit", new { id = account.Id })" class="text-blue-500">Edit</a> |
-                <a href="@Url.Action("Delete", new { id = account.Id })" class="text-red-500">Delete</a>
-            </div>
-        }
-    </div>
-
-    <!-- Liabilities -->
-    <h2 class="text-xl font-semibold mt-4">Liabilities</h2>
-    <div class="grid grid-cols-3 gap-4">
-        @foreach (var liability in Model.Liabilities)
-        {
-            <div class="p-4 bg-red-100 rounded-lg">
-                <h3 class="font-bold">@liability.Name</h3>
-                <p>Amount: ₱@liability.Amount</p>
-            </div>
-        }
-    </div>
-
-    <!-- Add Account Button -->
-    <div class="text-right">
-        <button id="addAccountButton" class="px-4 py-2 bg-blue-500 text-white rounded-lg">Add Account</button>
-    </div>
-
-    @foreach (var account in Model.DebitAccounts)
-    {
-        <div class="p-4 bg-green-100 rounded-lg">
-            <h3 class="font-bold">@account.Name</h3>
-            <p>Balance: ₱@account.Balance</p>
-            <p><i class="@account.Icon"></i></p>
-            <button class="editAccountButton text-blue-500">Edit</button>
+            </form>
         </div>
-    }
+        <!-- End of scrollable content -->
 
-
+        <div class="text-right mt-4">
+            <button type="submit" class="px-4 py-2 bg-blue-500 text-white">Confirm</button>
+        </div>
+    </div>
 </div>
 
+<!-- Styles for scrollable modal content -->
+<style>
+    .modal-body {
+        max-height: 400px; /* Set max height for modal body */
+        overflow-y: auto; /* Enable vertical scrolling */
+    }
+</style>
+
+<!-- JavaScript -->
 <script>
     // Modal Elements
     const addAccountModal = document.getElementById('addAccountModal');
-    const editAccountModal = document.getElementById('editAccountModal');
-
-    // Buttons to open modals
     const addAccountButton = document.getElementById('addAccountButton');
-    const editAccountButtons = document.querySelectorAll('.editAccountButton');
+    const modalContent = document.getElementById('modalContent');
 
-    // Close modals
-    function closeModal(modal) {
-        modal.classList.add('hidden');
-    }
-
-    // Open modals
-    function openModal(modal) {
-        modal.classList.remove('hidden');
-    }
-
-    // Open Add Account Modal
-    addAccountButton.addEventListener('click', () => {
-        openModal(addAccountModal);
-    });
-
-    // Open Edit Account Modal
-    editAccountButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            // Load the account data (implement logic to load account data here)
-            openModal(editAccountModal);
-        });
-    });
-
-    // Form fields handling for Add Account
+    // Form field elements
     const addFormFields = document.getElementById('addFormFields');
     const addDebitType = document.getElementById('addDebitType');
     const addBorrowedType = document.getElementById('addBorrowedType');
 
+    // Function to open modal
+    function openModal(modal) {
+        modal.classList.remove('hidden');
+    }
+
+    // Function to close modal
+    function closeModal(modal) {
+        modal.classList.add('hidden');
+    }
+
+    // Open the modal when the Add Account button is clicked
+    addAccountButton.addEventListener('click', () => {
+        openModal(addAccountModal);
+    });
+
+    // Close the modal if the background (not the modal content) is clicked
+    addAccountModal.addEventListener('click', (e) => {
+        if (e.target === addAccountModal) { // Only close if clicked outside modal content
+            closeModal(addAccountModal);
+        }
+    });
+
+    // Load fields for Debit type
     addDebitType.addEventListener('click', () => {
         addFormFields.innerHTML = `
                 <div class="mb-4">
@@ -144,7 +201,13 @@
                 </div>
                 <div class="mb-4">
                     <label class="block">Icon</label>
-                    <input type="text" class="border p-2 w-full" required />
+                    <select class="border p-2 w-full" required>
+                        <option value="fas fa-wallet">Wallet</option>
+                        <option value="fas fa-piggy-bank">Piggy Bank</option>
+                        <option value="fas fa-coins">Coins</option>
+                        <option value="fas fa-credit-card">Credit Card</option>
+                        <option value="fas fa-building">Building</option>
+                    </select>
                 </div>
                 <div class="mb-4">
                     <label class="block">Color</label>
@@ -153,6 +216,7 @@
             `;
     });
 
+    // Load fields for Borrowed type
     addBorrowedType.addEventListener('click', () => {
         addFormFields.innerHTML = `
                 <div class="mb-4">
@@ -166,10 +230,23 @@
                 <div class="mb-4">
                     <label class="block">Destination Account</label>
                     <select class="border p-2 w-full" required>
-                        <!-- Populate this dynamically -->
                         <option value="1">Account 1</option>
                         <option value="2">Account 2</option>
                     </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block">Icon</label>
+                    <select class="border p-2 w-full" required>
+                        <option value="fas fa-wallet">Wallet</option>
+                        <option value="fas fa-piggy-bank">Piggy Bank</option>
+                        <option value="fas fa-coins">Coins</option>
+                        <option value="fas fa-credit-card">Credit Card</option>
+                        <option value="fas fa-building">Building</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block">Color</label>
+                    <input type="color" class="border p-2 w-full" required />
                 </div>
                 <div class="mb-4">
                     <label class="block">Happening Date</label>
@@ -182,4 +259,3 @@
             `;
     });
 </script>
-
