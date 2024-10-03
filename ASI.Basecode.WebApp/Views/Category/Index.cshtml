@@ -1,6 +1,7 @@
 ﻿@model IEnumerable<ASI.Basecode.WebApp.Models.CategoryModel>
 
 @{
+    Layout = "_Layout";
     ViewData["Title"] = "Category List";
 }
 
@@ -16,7 +17,7 @@
     <!-- Include SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
-<body class="bg-white text-gray-900 transition-colors duration-300">
+<body class="text-gray-900 transition-colors duration-300">
     <!-- Dark Mode Toggle Button -->
     <button id="darkModeToggle" class="fixed top-6 right-6 bg-gray-200 text-gray-800 p-2 rounded-full focus:outline-none z-50">
         <!-- Icons for light and dark modes -->
@@ -24,9 +25,7 @@
     </button>
 
     <div class="flex min-h-screen">
-        <!-- Include the Navigation Partial View -->
-        @Html.Partial("_Navigation")
-
+       
         <!-- Main Content Area -->
         <div class="flex-1 p-6 bg-white">
             <h2 class="text-2xl font-bold mb-6">@ViewData["Title"]</h2>

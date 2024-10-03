@@ -1,13 +1,12 @@
 ﻿@using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
 
-
 <link rel="stylesheet" href="~/css/navigation.css" />
 
 <!-- Navigation Bar -->
-<div id="main-nav-cont" class="flex flex-col min-h-screen w-25">
+<div id="main-nav-cont" class="flex flex-col min-h-screen w-100">
     <!-- SpendWise Title -->
-    <div class="p-4  text-center">
+    <div class="p-4 text-center">
         <h2 class="mt-2 ml-4 font-medium text-3xl">
             <span class="text-black">Spend</span><span class="text-blue-500">Wise</span>
         </h2>
@@ -27,17 +26,17 @@
                 </a>
             </li>
             <li id="account-item">
-                <a asp-controller="Account" asp-action="Index" class="flex items-center @(ViewData["Title"].ToString() == "Account" ? "active" : "")">
+                <a asp-controller="Account" asp-action="Index" class="flex items-center @(ViewData["Title"].ToString() == "Account Page" ? "active" : "")">
                     <i class="fas fa-user mr-3"></i> Account
                 </a>
             </li>
             <li id="category-item">
-                <a asp-controller="Category" asp-action="Index" class="flex items-center @(ViewData["Title"].ToString() == "Category" ? "active" : "")">
+                <a asp-controller="Category" asp-action="Index" class="flex items-center @(ViewData["Title"].ToString() == "Category Page" ? "active" : "")">
                     <i class="fas fa-layer-group mr-3"></i> Category
                 </a>
             </li>
             <li id="settings-item">
-                <a asp-controller="Settings" asp-action="Index" class="flex items-center @(ViewData["Title"].ToString() == "Settings" ? "active" : "")">
+                <a asp-controller="Settings" asp-action="Index" class="flex items-center @(ViewData["Title"].ToString() == "Settings Page" ? "active" : "")">
                     <i class="fas fa-cog mr-3"></i> Settings
                 </a>
             </li>
