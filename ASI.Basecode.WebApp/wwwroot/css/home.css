@@ -1,3 +1,31 @@
 #home-content{
     background: #f8f8f8;
 }
+
+#addTransactionModal {
+    z-index: 99999;
+    display: none; /* Keep it hidden by default */
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+    /* Show modal when it has 'flex' class */
+    #addTransactionModal.flex {
+        display: flex; /* Change to flex when the modal is open */
+    }
+
+#addModalContent {
+    max-width: 600px;
+    width: 100%;
+    padding: 20px 40px;
+    background-color: white;
+    border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+    #addModalContent {
+        max-width: 90%;
+        padding: 20px;
+    }
+}
