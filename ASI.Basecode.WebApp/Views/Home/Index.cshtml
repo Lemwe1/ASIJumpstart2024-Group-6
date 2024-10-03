@@ -1,5 +1,5 @@
 ﻿@{
-     Layout = "_Layout";
+    Layout = "_Layout";
     ViewData["Title"] = "Home Page";
 }
 @section styles {
@@ -10,22 +10,27 @@
 <div class="flex min-h-screen">
     <!-- Main Content Area -->
     <div id="home-content" class="flex-1 p-6">
-        <!-- Dashboard Header --> 
+        <!-- Dashboard Header -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold">Dashboard</h2>
+        </div>
+
+        <!-- Search Bar -->
         <div class="flex justify-between items-center mb-8">
             <input type="text" placeholder="Search here..." class="w-1/3 p-2 border border-gray-300 rounded-lg">
         </div>
 
         <!-- Dashboard Cards -->
-        <div class="grid grid-cols-3  gap-6 mb-8">
-            <div class="bg-green-500 shadow-md  text-white p-6 rounded-lg">
+        <div class="grid grid-cols-3 gap-6 mb-8">
+            <div class="bg-green-500 shadow-md text-white p-6 rounded-lg">
                 <h3 class="text-xl font-bold">Current Balance</h3>
                 <p class="text-3xl">₱ 8,200</p>
             </div>
-            <div class="bg-red-500  shadow-md text-white p-6 rounded-lg">
+            <div class="bg-red-500 shadow-md text-white p-6 rounded-lg">
                 <h3 class="text-xl font-bold">Total Expenses</h3>
                 <p class="text-3xl">₱ 1,500</p>
             </div>
-            <div class="bg-blue-500  text-white p-6 rounded-lg">
+            <div class="bg-blue-500 text-white p-6 rounded-lg">
                 <h3 class="text-xl font-bold">Total Income</h3>
                 <p class="text-3xl">₱ 5,210</p>
             </div>
@@ -37,11 +42,11 @@
                 <h4 class="font-bold">Trends</h4>
                 <!-- Chart Placeholder -->
             </div>
-            <div class="bg-white p-6 shadow-md  rounded-lg">
+            <div class="bg-white p-6 shadow-md rounded-lg">
                 <h4 class="font-bold">Monthly Expense</h4>
                 <!-- Chart Placeholder -->
             </div>
-            <div class="bg-white p-6 shadow-md  rounded-lg">
+            <div class="bg-white p-6 shadow-md rounded-lg">
                 <h4 class="font-bold">Monthly Income</h4>
                 <!-- Chart Placeholder -->
             </div>
@@ -65,7 +70,7 @@
                     </div>
 
                     <button class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none">
-                        + Add 
+                        + Add
                     </button>
                 </div>
             </div>
