@@ -4,11 +4,11 @@ namespace ASI.Basecode.WebApp.Models
 {
     public class DebitAccount
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Icon { get; set; }
-        public decimal Balance { get; set; }
-        public string Color { get; set; }
+        public int DebitId { get; set; }
+        public string DebitName { get; set; }
+        public string DebitIcon { get; set; }
+        public decimal DebitBalance { get; set; }
+        public string DebitColor { get; set; }
     }
 
 }

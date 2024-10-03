@@ -4,10 +4,14 @@ namespace ASI.Basecode.WebApp.Models
 {
     public class Liability
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public decimal Amount { get; set; }
-        public string Color { get; set; }
+        public int LiabilityId { get; set; }
+        public string LiabilityName { get; set; }
+        public decimal LiabilityAmount { get; set; }
+        public string LiabilityColor { get; set; }
+        public string LiabilityIcon { get; set; }
+        public string LiabilityDest { get; set; }
+        public string LiabilityHappDate { get; set; }
+        public string LiabilityDueDate { get; set; }
     }
 
 }
