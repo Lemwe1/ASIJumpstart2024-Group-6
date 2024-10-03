@@ -1,0 +1,57 @@
+﻿@model IEnumerable<ASI.Basecode.WebApp.Models.CategoryModel>
+
+@section Styles {
+    <link href="~/css/Category.css" rel="stylesheet" />
+}
+
+<!-- Create Category Modal -->
+<div id="createCategoryModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 items-center justify-center hidden">
+    <div class="modal-content bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-auto darken-modal-content">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-bold text-black">Add Category</h2>
+            <button id="closeCreateModal" class="text-gray-400 hover:text-gray-600" aria-label="Close Create Category Modal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <p class="mb-4 text-sm text-gray-500">Fill out all the fields below to add a category.</p>
+
+        <!-- Form -->
+        <form id="categoryForm" asp-controller="Category" asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                <div class="flex space-x-4">
+                    <button type="button" id="createExpenseButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300">Expense</button>
+                    <button type="button" id="createIncomeButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300">Income</button>
+                </div>
+                <input type="hidden" name="Type" id="createTypeInput" value="Expense" />
+            </div>
+
+            <div class="mb-6">
+                <label for="createName" class="block text-sm font-medium text-gray-700">Name</label>
+                <input type="text" name="Name" id="createName" placeholder="Enter Name" class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500" required />
+            </div>
+
+            <div class="mb-6">
+                <label for="createIcon" class="block text-sm font-medium text-gray-700">Icon</label>
+                <select name="Icon" id="createIcon" class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Select Icon</option>
+                    <option value="fas fa-apple-alt">Apple (Food)</option>
+                    <option value="fas fa-shopping-bag">Shopping Bag</option>
+                    <option value="fas fa-bolt">Bolt (Electricity)</option>
+                    <option value="fas fa-wallet">Wallet (Income)</option>
+                    <option value="fas fa-money-bill-wave">Money (Expense)</option>
+                </select>
+            </div>
+
+            <div class="mb-6">
+                <label for="createColorPicker" class="block text-sm font-medium text-gray-700">Select Color</label>
+                <input type="color" name="Color" id="createColorPicker" class="mt-1 block w-full h-12 border rounded-md bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500" required />
+            </div>
+
+            <div class="mt-6">
+                <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 rounded-md">Confirm</button>
+            </div>
+        </form>
+    </div>
+</div>

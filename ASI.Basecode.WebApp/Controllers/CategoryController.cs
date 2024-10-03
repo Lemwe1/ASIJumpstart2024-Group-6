@@ -1,8 +1,8 @@
 ﻿using ASI.Basecode.WebApp.Models;
 using ASI.Basecode.WebApp.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,19 +10,17 @@ namespace ASI.Basecode.WebApp.Controllers
 {
     public class CategoryController : Controller
     {
-        private readonly ApplicationDbContext _context;  // Injected context
         private readonly CategoryService _categoryService;
 
-        public CategoryController(ApplicationDbContext context, CategoryService categoryService)
+        public CategoryController(CategoryService categoryService)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
             _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
         }
 
         // GET: /Category/
         public async Task<IActionResult> Index()
         {
-            ViewData["Title"] = "Category"; // Setting the title for the page
+            ViewData["Title"] = "Category List";
             var categories = await _categoryService.GetCategoriesAsync();
             return View(categories);
         }
@@ -34,9 +32,9 @@ namespace ASI.Basecode.WebApp.Controllers
             var category = await _categoryService.GetCategoryByIdAsync(id);
             if (category == null)
             {
-                return NotFound();
+                return NotFound(new { success = false, message = "Category not found." });
             }
-            return Json(category);
+            return Json(new { success = true, data = category });
         }
 
         // POST: /Category/Create
@@ -44,25 +42,23 @@ namespace ASI.Basecode.WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CategoryModel category)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                // Add the category to the database
-                _context.Categories.Add(category);
-                await _context.SaveChangesAsync();
-
-                // Return the new category data to the client
-                return Json(new
-                {
-                    id = category.Id,
-                    name = category.Name,
-                    type = category.Type,
-                    icon = category.Icon,
-                    color = category.Color
-                });
+                var errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
+                Console.WriteLine("Model errors: " + string.Join(", ", errors));
+                return BadRequest(new { success = false, message = "Invalid data", errors });
             }
 
-            // Return a bad request if model validation fails
-            return BadRequest(new { success = false, message = "Failed to create category.", errors = ModelState.Values.SelectMany(v => v.Errors) });
+            try
+            {
+                await _categoryService.AddCategoryAsync(category);
+                return Json(new { success = true, message = "Category created successfully." });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating category: {ex.Message}");
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
         }
 
         // POST: /Category/Edit/{id}
@@ -70,33 +66,33 @@ namespace ASI.Basecode.WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, CategoryModel category)
         {
-            if (id != category.Id)
+            if (id != category.CategoryId)
             {
                 return BadRequest(new { success = false, message = "Invalid category ID." });
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var existingCategory = await _context.Categories.AsNoTracking().FirstOrDefaultAsync(c => c.Id == category.Id);
-                if (existingCategory == null)
-                {
-                    return NotFound(new { success = false, message = "Category not found." });
-                }
-
-                try
-                {
-                    _context.Entry(category).State = EntityState.Modified;
-                    await _context.SaveChangesAsync();
-                    return Json(new { success = true, message = "Category updated successfully." });
-                }
-                catch (Exception ex)
-                {
-                    return StatusCode(500, new { success = false, message = ex.Message });
-                }
+                var errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
+                Console.WriteLine("Model errors: " + string.Join(", ", errors));
+                return BadRequest(new { success = false, message = "Invalid data", errors });
             }
 
-            // Return validation errors
-            return BadRequest(new { success = false, message = "Invalid category data.", errors = ModelState.Values.SelectMany(v => v.Errors) });
+            try
+            {
+                await _categoryService.UpdateCategoryAsync(category);
+                return Json(new { success = true, message = "Category updated successfully." });
+            }
+            catch (KeyNotFoundException knfEx)
+            {
+                Console.WriteLine(knfEx.Message);
+                return NotFound(new { success = false, message = knfEx.Message });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating category: {ex.Message}");
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
         }
 
         // POST: /Category/Delete/{id}
@@ -104,16 +100,21 @@ namespace ASI.Basecode.WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
+            try
             {
-                return NotFound();
+                await _categoryService.DeleteCategoryAsync(id);
+                return Json(new { success = true, message = "Category deleted successfully." });
             }
-
-            _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
-
-            return Json(new { success = true });
+            catch (KeyNotFoundException knfEx)
+            {
+                Console.WriteLine(knfEx.Message);
+                return NotFound(new { success = false, message = knfEx.Message });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting category: {ex.Message}");
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
         }
     }
 }

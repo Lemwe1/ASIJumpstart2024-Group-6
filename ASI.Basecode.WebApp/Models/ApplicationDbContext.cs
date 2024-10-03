@@ -9,6 +9,6 @@ namespace ASI.Basecode.WebApp.Models
         }
 
         // Define DbSet for categories
-        public DbSet<CategoryModel> Categories { get; set; }
+        public DbSet<CategoryModel> M_Category { get; set; }
     }
 }

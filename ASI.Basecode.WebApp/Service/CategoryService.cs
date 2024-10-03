@@ -1,9 +1,8 @@
 ﻿using ASI.Basecode.WebApp.Models;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System;
 
 namespace ASI.Basecode.WebApp.Services
 {
@@ -18,33 +17,50 @@ namespace ASI.Basecode.WebApp.Services
 
         public async Task<List<CategoryModel>> GetCategoriesAsync()
         {
-            return await _context.Categories.ToListAsync();
+            return await _context.M_Category.ToListAsync();
         }
 
         public async Task AddCategoryAsync(CategoryModel category)
         {
-            _context.Categories.Add(category);
+            _context.M_Category.Add(category);
             await _context.SaveChangesAsync();
         }
 
         public async Task<CategoryModel> GetCategoryByIdAsync(int id)
         {
-            return await _context.Categories.FindAsync(id);
+            // Use AsNoTracking if fetching for display purposes only
+            return await _context.M_Category.AsNoTracking().FirstOrDefaultAsync(c => c.CategoryId == id);
         }
 
         public async Task UpdateCategoryAsync(CategoryModel category)
         {
-            _context.Categories.Update(category);
-            await _context.SaveChangesAsync();
+            var existingCategory = await _context.M_Category.FindAsync(category.CategoryId);
+            if (existingCategory != null)
+            {
+                existingCategory.Name = category.Name;
+                existingCategory.Type = category.Type;
+                existingCategory.Icon = category.Icon;
+                existingCategory.Color = category.Color;
+
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                throw new KeyNotFoundException($"Category with ID {category.CategoryId} not found.");
+            }
         }
 
         public async Task DeleteCategoryAsync(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
+            var category = await _context.M_Category.FindAsync(id);
             if (category != null)
             {
-                _context.Categories.Remove(category);
+                _context.M_Category.Remove(category);
                 await _context.SaveChangesAsync();
+            }
+            else
+            {
+                throw new KeyNotFoundException($"Category with ID {id} not found.");
             }
         }
     }
