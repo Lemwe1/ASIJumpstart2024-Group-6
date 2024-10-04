@@ -19,13 +19,13 @@ namespace ASI.Basecode.WebApp.Controllers
             // Sample Data (Replace with Database later)
             _debitAccounts = new List<DebitAccount>
         {
-            new DebitAccount { Id = 1, Name = "Cash", Icon = "fas fa-money-bill", Balance = 5000, Color = "green" },
-            new DebitAccount { Id = 2, Name = "BPI", Icon = "fas fa-bank", Balance = 3000, Color = "blue" }
+            new DebitAccount { DebitId = 1, DebitName = "Cash", DebitIcon = "fas fa-money-bill", DebitBalance = 5000, DebitColor = "green" },
+            new DebitAccount { DebitId = 2, DebitName = "BPI", DebitIcon = "fas fa-bank", DebitBalance = 3000, DebitColor = "blue" }
         };
 
             _liabilities = new List<Liability>
         {
-            new Liability { Id = 1, Name = "Loan", Amount = 2000, Color = "red" }
+            new Liability { LiabilityId = 1, LiabilityName = "Loan", LiabilityAmount = 2000, LiabilityColor = "red" }
         };
         }
 
@@ -37,7 +37,7 @@ namespace ASI.Basecode.WebApp.Controllers
             {
                 DebitAccounts = _debitAccounts,
                 Liabilities = _liabilities,
-                TotalNetWorth = _debitAccounts.Sum(a => a.Balance) - _liabilities.Sum(l => l.Amount)
+                TotalNetWorth = _debitAccounts.Sum(a => a.DebitBalance) - _liabilities.Sum(l => l.LiabilityAmount)
             };
             return View(viewModel);
         }
@@ -59,18 +59,18 @@ namespace ASI.Basecode.WebApp.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            var account = _debitAccounts.FirstOrDefault(a => a.Id == id);
+            var account = _debitAccounts.FirstOrDefault(a => a.DebitId == id);
             return View(account);
         }
 
         [HttpPost]
         public IActionResult Edit(DebitAccount account)
         {
-            var existingAccount = _debitAccounts.FirstOrDefault(a => a.Id == account.Id);
+            var existingAccount = _debitAccounts.FirstOrDefault(a => a.DebitId == account.DebitId);
             if (existingAccount != null)
             {
-                existingAccount.Name = account.Name;
-                existingAccount.Balance = account.Balance;
+                existingAccount.DebitName = account.DebitName;
+                existingAccount.DebitBalance = account.DebitBalance;
                 // Update other fields
             }
             return RedirectToAction("Index");
@@ -78,7 +78,7 @@ namespace ASI.Basecode.WebApp.Controllers
 
         public IActionResult Delete(int id)
         {
-            var account = _debitAccounts.FirstOrDefault(a => a.Id == id);
+            var account = _debitAccounts.FirstOrDefault(a => a.DebitId == id);
             if (account != null)
             {
                 _debitAccounts.Remove(account);

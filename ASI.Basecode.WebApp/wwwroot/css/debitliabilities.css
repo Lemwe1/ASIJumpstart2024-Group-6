@@ -1,0 +1,5 @@
+﻿/* Styles for the scrollable modal content */
+.modal-body {
+    max-height: 400px; /* Set max height for modal body */
+    overflow-y: auto; /* Enable vertical scrolling */
+}
