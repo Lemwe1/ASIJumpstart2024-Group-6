@@ -10,7 +10,7 @@ namespace ASI.Basecode.WebApp.Controllers
     /// <summary>
     /// Home Controller
     /// </summary>
-    public class HomeController : ControllerBase<HomeController>
+    public class SettingsController : ControllerBase<HomeController>
     {
         /// <summary>
         /// Constructor
@@ -20,7 +20,7 @@ namespace ASI.Basecode.WebApp.Controllers
         /// <param name="configuration"></param>
         /// <param name="localizer"></param>
         /// <param name="mapper"></param>
-        public HomeController(IHttpContextAccessor httpContextAccessor,
+        public SettingsController(IHttpContextAccessor httpContextAccessor,
                               ILoggerFactory loggerFactory,
                               IConfiguration configuration,
                               IMapper mapper = null) : base(httpContextAccessor, loggerFactory, configuration, mapper)
@@ -28,9 +28,12 @@ namespace ASI.Basecode.WebApp.Controllers
 
         }
 
+
         public IActionResult Index()
         {
-            return View();
+            ViewData["Title"] = "Settings Page"; 
+            return View(); 
         }
+
     }
 }

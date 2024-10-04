@@ -1,5 +1,59 @@
-﻿/* Styles for the scrollable modal content */
-.modal-body {
+﻿/* Style for modal body */
+#modalContent .modal-body {
     max-height: 400px; /* Set max height for modal body */
     overflow-y: auto; /* Enable vertical scrolling */
+}
+
+/* Add New Account Button */
+#addAccountButton {
+    padding: 0.5rem 1rem;
+    background-color: #3b82f6;
+    color: #fff;
+    border-radius: 0.5rem;
+}
+
+/* Section headers */
+#debitSectionTitle,
+#borrowedSectionTitle {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+/* Net Worth Section */
+#netWorthSection {
+    background-color: #3b82f6;
+    color: #fff;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Account Cards */
+#debitAccounts .accountCard,
+#borrowedAccounts .accountCard {
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+
+#debitAccounts .cashCard {
+    background-color: #d1fae5;
+}
+
+#debitAccounts .goTymeCard {
+    background-color: #bfdbfe;
+}
+
+#debitAccounts .bpiCard {
+    background-color: #fecaca;
+}
+
+#borrowedAccounts .iphoneCard {
+    background-color: #d1fae5;
+}
+
+#borrowedAccounts .airPodsCard {
+    background-color: #bfdbfe;
 }
