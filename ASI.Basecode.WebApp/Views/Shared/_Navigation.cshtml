@@ -2,11 +2,10 @@
 @inject IHttpContextAccessor HttpContextAccessor
 
 <!-- Navigation Bar -->
-<div id="main-nav-cont" class="flex flex-col min-h-screen w-80">
-    <!-- Adjusted width to 80 -->
+<div id="main-nav-cont" class="flex flex-col min-h-screen w-64"> <!-- Changed w-80 to w-64 -->
     <!-- SpendWise Title -->
     <div class="p-4 text-center">
-        <h2 class="mt-2 ml-4 font-medium text-3xl">
+        <h2 class="mt-2 font-medium text-3xl"> <!-- Removed ml-4 for center alignment -->
             <span class="text-black">Spend</span><span class="text-blue-500">Wise</span>
         </h2>
     </div>
@@ -17,31 +16,30 @@
     </div>
 
     <!-- Navigation -->
-    <nav id="navigation-content" class="flex-1 pl-10 mt-3">
-        <!-- Removed left padding -->
-        <ul class="mr-0">
-            <!-- Removed margin -->
-            <li id="home-item">
-                <a asp-controller="Home" asp-action="Index" class="flex items-center my-3 py-3 px-4 rounded-l hover:bg-gray-100 @(ViewData["Title"].ToString() == "Home Page" ? "active" : "")">
+    <nav id="navigation-content" class="flex-1 pl-4 lg:pl-6 mt-3 overflow-y-auto"> <!-- Adjusted padding -->
+        <!-- Responsive padding -->
+        <ul class="w-full">
+            <li class="my-2">
+                <a asp-controller="Home" asp-action="Index" class="flex items-center my-3 py-3 px-4 rounded-l hover:bg-gray-100 @(ViewData["Title"].ToString() == "Home Page" ? "active bg-gray-100" : "")">
                     <i class="fas fa-home mr-3"></i> Home
                 </a>
             </li>
-            <li id="account-item">
-                <a asp-controller="DebitLiabilities" asp-action="Index" class="flex items-center my-3 py-3 px-4 rounded-l hover:bg-gray-100 @(ViewData["Title"].ToString() == "Account Page" ? "active" : "")">
+            <li class="my-2">
+                <a asp-controller="DebitLiabilities" asp-action="Index" class="flex items-center my-3 py-3 px-4 rounded-l hover:bg-gray-100 @(ViewData["Title"].ToString() == "Account Page" ? "active bg-gray-100" : "")">
                     <i class="fas fa-user mr-3"></i> Account
                 </a>
             </li>
-            <li id="category-item">
-                <a asp-controller="Category" asp-action="Index" class="flex items-center my-3 py-3 px-4 rounded-l hover:bg-gray-100 @(ViewData["Title"].ToString() == "Category Page" ? "active" : "")">
+            <li class="my-2">
+                <a asp-controller="Category" asp-action="Index" class="flex items-center my-3 py-3 px-4 rounded-l hover:bg-gray-100 @(ViewData["Title"].ToString() == "Category Page" ? "active bg-gray-100" : "")">
                     <i class="fas fa-layer-group mr-3"></i> Category
                 </a>
             </li>
-            <li id="settings-item">
-                <a asp-controller="Settings" asp-action="Index" class="flex items-center my-3 py-3 px-4 rounded-l hover:bg-gray-100 @(ViewData["Title"].ToString() == "Settings Page" ? "active" : "")">
+            <li class="my-2">
+                <a asp-controller="Settings" asp-action="Index" class="flex items-center my-3 py-3 px-4 rounded-l hover:bg-blue-100 @(ViewData["Title"].ToString() == "Settings Page" ? "active bg-gray-100" : "")">
                     <i class="fas fa-cog mr-3"></i> Settings
                 </a>
             </li>
-            <li class="mt-4" id="logout-item">
+            <li class="mt-4 my-2">
                 <a href="#" class="flex items-center my-3 py-3 px-4 rounded-l hover:bg-gray-100">
                     <i class="fas fa-sign-out-alt mr-3"></i> Log out
                 </a>
@@ -49,3 +47,4 @@
         </ul>
     </nav>
 </div>
+

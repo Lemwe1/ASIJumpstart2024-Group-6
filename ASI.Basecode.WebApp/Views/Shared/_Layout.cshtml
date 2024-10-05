@@ -1,4 +1,4 @@
-﻿﻿@using static ASI.Basecode.Resources.Views.Screen
+﻿@using static ASI.Basecode.Resources.Views.Screen
 
 <!DOCTYPE html>
 <html lang="en">
@@ -17,7 +17,7 @@
     @RenderSection("Styles", required: false)
 </head>
 <body>
-    <div class="flex min-h-screen ">
+    <div class="flex min-h-screen">
         @* Conditionally render navigation based on the controller/action *@
         @{
             var controller = ViewContext.RouteData.Values["controller"].ToString();
@@ -26,9 +26,33 @@
 
         @if (controller != "Account" || (action != "Login" && action != "Register"))
         {
-            <nav class="bg-white w-80">
+            <!-- Hamburger Menu Icon for small screens -->
+            <div class="lg:hidden p-4 bg-white" >
+                <button id="menu-toggle" class="text-black">
+                    <i class="fas fa-bars fa-2x"></i>
+                </button>
+            </div>
+
+            <!-- Sidebar Navigation (Visible on larger screens) -->
+            <nav id="sidebar-nav" class="bg-white w-64 hidden lg:flex">
                 @Html.Partial("_Navigation")
             </nav>
+
+            <!-- Sidebar Menu (hidden on larger screens, shown on toggle for smaller screens) -->
+            <div id="sidebar-menu" class="fixed inset-y-0 left-0 bg-gray-800 bg-opacity-75 z-50 hidden lg:hidden overflow-y-auto">
+                <div class="flex flex-col min-h-full bg-white w-64">
+                    <!-- Adjusted width -->
+                    <div class="flex justify-between items-center p-4">
+                        <button id="close-menu" class="text-black">
+                            <i class="fas fa-times fa-2x"></i>
+                        </button>
+                    </div>
+                    <nav class="flex-1 overflow-y-auto w-full">
+                        @Html.Partial("_Navigation")
+                    </nav>
+                </div>
+            </div>
+
         }
 
         <main role="main" class="flex-1">
@@ -44,13 +68,25 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Configure Toastr options
-        toastr.options = {
-            positionClass: "toast-top-center", // Set the notification position to center
-            timeOut: 3000,
-            closeButton: true,
-            progressBar: true
-        };
+                // Configure Toastr options
+                toastr.options = {
+                    positionClass: "toast-top-center",
+                    timeOut: 3000,
+                    closeButton: true,
+                    progressBar: true
+                };
+
+                // Menu toggle for smaller screens
+                document.getElementById('menu-toggle').addEventListener('click', function () {
+                    const sidebarMenu = document.getElementById('sidebar-menu');
+                    sidebarMenu.classList.toggle('hidden'); // Toggle visibility of sidebar
+                });
+
+                // Close button functionality
+                document.getElementById('close-menu').addEventListener('click', function () {
+                    const sidebarMenu = document.getElementById('sidebar-menu');
+                    sidebarMenu.classList.add('hidden'); // Hide sidebar when close button is clicked
+                });
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
