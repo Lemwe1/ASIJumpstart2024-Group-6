@@ -1,0 +1,64 @@
+﻿/* index.css */
+
+/* Modal Content Styles */
+.modal-content {
+    z-index: 10;
+}
+
+/* Dark Mode Overrides for Modal Content */
+.dark .darken-modal-content {
+    background-color: #f7fafc; /* Tailwind's gray-100 */
+    color: #2d3748; /* Tailwind's gray-800 */
+}
+
+
+.category-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    /* Hover effect: scale up and add shadow */
+    .category-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+/* Dark Mode Overrides */
+.dark .category-card {
+    filter: brightness(0.9);
+}
+
+/* Add Category Button Styles */
+#newCategoryCard {
+    transition: border-color 0.3s ease;
+}
+
+    #newCategoryCard:hover {
+        border-color: #a0aec0; /* Tailwind's gray-400 */
+    }
+
+/* Icon Styles within Category Cards */
+.category-card i {
+    transition: color 0.3s ease;
+}
+
+.category-card:hover i {
+    color: #cbd5e0; /* Tailwind's gray-400 */
+}
+
+/* Edit Icon Styles */
+.category-card a {
+    /* Transition for opacity */
+    transition: opacity 0.3s ease;
+    opacity: 0.8;
+}
+
+    .category-card a:hover {
+        opacity: 1;
+    }
+
+/* Responsive Grid Adjustments */
+@media (max-width: 768px) {
+    .grid-cols-3 {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+}

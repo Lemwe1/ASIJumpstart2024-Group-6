@@ -11,6 +11,7 @@ namespace ASI.Basecode.WebApp.Controllers
 {
     public class DebitLiabilitiesController : Controller
     {
+<<<<<<< HEAD
         private List<DebitAccount> _debitAccounts = new List<DebitAccount>();
         private List<Liability> _liabilities = new List<Liability>();
 
@@ -88,3 +89,22 @@ namespace ASI.Basecode.WebApp.Controllers
     }
 
 }
+=======
+      
+
+        public DebitLiabilitiesController()
+        {
+
+        }
+
+        
+
+        public IActionResult Index()
+        {
+           
+            return View();
+        }
+    }
+
+}
+>>>>>>> 51c208272ba491f3a0cb176cd8638b9aa32ac5d7

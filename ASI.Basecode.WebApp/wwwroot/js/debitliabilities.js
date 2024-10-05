@@ -99,4 +99,8 @@ addBorrowedType.addEventListener('click', () => {
             <input type="date" class="border p-2 w-full" required />
         </div>
     `;
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> 51c208272ba491f3a0cb176cd8638b9aa32ac5d7

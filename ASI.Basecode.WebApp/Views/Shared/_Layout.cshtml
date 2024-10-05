@@ -1,4 +1,4 @@
-﻿@using static ASI.Basecode.Resources.Views.Screen
+﻿﻿@using static ASI.Basecode.Resources.Views.Screen
 
 <!DOCTYPE html>
 <html lang="en">
@@ -17,9 +17,7 @@
     @RenderSection("Styles", required: false)
 </head>
 <body>
-    @Html.Partial("_Header")
-
-    <div class="flex min-h-screen">
+    <div class="flex min-h-screen ">
         @* Conditionally render navigation based on the controller/action *@
         @{
             var controller = ViewContext.RouteData.Values["controller"].ToString();
@@ -33,7 +31,7 @@
             </nav>
         }
 
-        <main role="main" class="flex-1 ">
+        <main role="main" class="flex-1">
             @RenderBody()
         </main>
     </div>

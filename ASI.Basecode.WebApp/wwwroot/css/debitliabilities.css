@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 ﻿/* Style for modal body */
+=======
+/* Style for modal body */
+>>>>>>> 51c208272ba491f3a0cb176cd8638b9aa32ac5d7
 #modalContent .modal-body {
     max-height: 400px; /* Set max height for modal body */
     overflow-y: auto; /* Enable vertical scrolling */
@@ -12,6 +16,7 @@
     border-radius: 0.5rem;
 }
 
+<<<<<<< HEAD
 /* Section headers */
 #debitSectionTitle,
 #borrowedSectionTitle {
@@ -19,6 +24,8 @@
     font-weight: bold;
     margin-bottom: 1rem;
 }
+=======
+>>>>>>> 51c208272ba491f3a0cb176cd8638b9aa32ac5d7
 
 /* Net Worth Section */
 #netWorthSection {

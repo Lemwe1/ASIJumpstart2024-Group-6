@@ -87,7 +87,8 @@ namespace ASI.Basecode.WebApp
 
 
             services.AddDbContext<ApplicationDbContext>(options =>
-             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
+                 .EnableSensitiveDataLogging());
 
 
             // Register SQL database configuration context as services.
