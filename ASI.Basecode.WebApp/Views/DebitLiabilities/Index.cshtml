@@ -1,0 +1,100 @@
+﻿
+
+@{
+    ViewData["Title"] = "Account Page";
+}
+
+@section styles {
+    <link rel="stylesheet" href="~/css/debitliabilities.css">
+}
+
+@section scripts {
+    <script src="~/js/debitliabilities.js"></script>
+}
+
+<!-- Content -->
+<div class="flex-1 p-6 bg-gray-50">
+
+    <!-- Add New Account Button and Account Title -->
+    <div class="flex justify-between items-center mb-6">
+        <h2 id="accountPageTitle" class="font-bold text-lg">Account</h2>
+        <div class="ml-auto">
+            <button id="addAccountButton">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Net Worth Section -->
+    <div id="netWorthSection" class="mb-6">
+        <h2 class="text-2xl font-bold">Net Worth: -₱36,190.00</h2>
+        <div>
+            <p>Assets: ₱1,500.00</p>
+            <p>Liabilities: ₱1,500.00</p>
+        </div>
+    </div>
+
+    <!-- Debit Accounts Section -->
+    <div id="debitSection" class="mb-6">
+        <h3 id="debitSectionTitle">Debit</h3>
+        <div id="debitAccounts" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Debit Account Cards -->
+            <div class="accountCard cashCard">
+                <h3 class="font-bold text-lg">Cash</h3>
+                <p>₱1,500.00</p>
+            </div>
+            <div class="accountCard goTymeCard">
+                <h3 class="font-bold text-lg">GoTyme</h3>
+                <p>₱1,500.00</p>
+            </div>
+            <div class="accountCard bpiCard">
+                <h3 class="font-bold text-lg">BPI</h3>
+                <p>₱1,500.00</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Borrowed Section -->
+    <div id="borrowedSection" class="mb-6">
+        <h3 id="borrowedSectionTitle">Borrowed</h3>
+        <div id="borrowedAccounts" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Borrowed Account Cards -->
+            <div class="accountCard iphoneCard">
+                <h3 class="font-bold text-lg">Iphone 14 Pro Max</h3>
+                <p>₱1,500.00</p>
+            </div>
+            <div class="accountCard airPodsCard">
+                <h3 class="font-bold text-lg">Air Pods Pro Gen2</h3>
+                <p>₱1,500.00</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Account Modal -->
+<div id="addAccountModal" class="fixed z-50 inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white p-6 rounded-lg max-w-md w-full" id="modalContent">
+        <h2 class="text-xl font-bold mb-4">Add Account</h2>
+
+        <!-- Start of scrollable content -->
+        <div class="modal-body max-h-96 overflow-y-auto p-4">
+            <form id="addAccountForm">
+                <div class="mb-4">
+                    <label class="block">Type</label>
+                    <div class="flex space-x-4">
+                        <button type="button" class="w-full p-2 bg-gray-100 text-black" id="addDebitType">Debit</button>
+                        <button type="button" class="w-full p-2 bg-gray-100 text-black" id="addBorrowedType">Borrowed</button>
+                    </div>
+                </div>
+                <div id="addFormFields">
+                    <!-- Form fields will be dynamically loaded here based on type -->
+                </div>
+            </form>
+        </div>
+        <!-- End of scrollable content -->
+
+        <div class="text-right mt-4">
+            <button type="submit" class="px-4 py-2 bg-blue-500 text-white">Confirm</button>
+        </div>
+    </div>
+</div>

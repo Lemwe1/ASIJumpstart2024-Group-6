@@ -1,4 +1,4 @@
-﻿@using static ASI.Basecode.Resources.Views.Screen
+﻿﻿@using static ASI.Basecode.Resources.Views.Screen
 
 <!DOCTYPE html>
 <html lang="en">
@@ -11,14 +11,27 @@
     <link rel="stylesheet" href="~/css/main.css" />
     <link rel="stylesheet" href="~/css/style.css" />
     <link rel="stylesheet" href="~/css/output.css">
+    <link rel="stylesheet" href="~/css/navigation.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     @RenderSection("Styles", required: false)
 </head>
 <body>
-    @Html.Partial("_Header")
-    <div>
-        <main role="main">
+    <div class="flex min-h-screen ">
+        @* Conditionally render navigation based on the controller/action *@
+        @{
+            var controller = ViewContext.RouteData.Values["controller"].ToString();
+            var action = ViewContext.RouteData.Values["action"].ToString();
+        }
+
+        @if (controller != "Account" || (action != "Login" && action != "Register"))
+        {
+            <nav class="bg-white w-80">
+                @Html.Partial("_Navigation")
+            </nav>
+        }
+
+        <main role="main" class="flex-1">
             @RenderBody()
         </main>
     </div>

@@ -1,67 +1,108 @@
-﻿@{
+﻿﻿@{
+    Layout = "_Layout";
     ViewData["Title"] = "Home Page";
+}
+@section styles {
+    <link rel="stylesheet" href="~/css/home.css" />
 }
 
 <!-- Sidebar and Content -->
 <div class="flex min-h-screen">
-
-    <!-- Sidebar -->
-    <div class="w-64 bg-blue-100 shadow-lg flex flex-col">
-
-        <!-- SpendWise Title -->
-        <div class="p-4">
-            <h2 class="mt-2 ml-4 font-bold text-lg">
-                <span class="text-black">Spend</span><span class="text-blue-500">Wise</span>
-            </h2>
+    <!-- Main Content Area -->
+    <div id="home-content" class="flex-1 p-6">
+        <!-- Dashboard Header -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold">Dashboard</h2>
         </div>
 
-        <!-- Profile Picture -->
-        <div class="p-4 text-center">
-            <img class="w-20 h-20 rounded-full mx-auto" src="~/images/profile-picture.jpg" alt="Profile Picture">
+        <!-- Search Bar -->
+        <div class="flex justify-between items-center mb-8">
+            <input type="text" placeholder="Search here..." class="w-1/3 p-2 border border-gray-300 rounded-lg">
         </div>
 
-        <!-- Navigation -->
-        <nav class="flex-1 mb-4 pl-4">
-            <!-- Same padding-left as SpendWise title for alignment -->
-            <ul>
-                <li class="p-2">
-                    <a asp-controller="Home" asp-action="Index" class="flex items-center text-gray-700 hover:text-blue-500 @(ViewData["Title"].ToString() == "Home Page" ? "font-bold" : "")">
-                        <i class="fas fa-home mr-3"></i> Home
-                    </a>
-                </li>
-                <li class="p-2">
-                    <a asp-controller="Account" asp-action="Index" class="flex items-center text-gray-700 hover:text-blue-500 @(ViewData["Title"].ToString() == "Account" ? "font-bold" : "")">
-                        <i class="fas fa-user mr-3"></i> Account
-                    </a>
-                </li>
-                <li class="p-2">
-                    <a asp-controller="Category" asp-action="Index" class="flex items-center text-gray-700 hover:text-blue-500 @(ViewData["Title"].ToString() == "Category" ? "font-bold" : "")">
-                        <i class="fas fa-layer-group mr-3"></i> Category
-                    </a>
-                </li>
+        <!-- Dashboard Cards -->
+        <div class="grid grid-cols-3 gap-6 mb-8">
+            <div class="bg-green-500 shadow-md text-white p-6 rounded-lg">
+                <h3 class="text-xl font-bold">Current Balance</h3>
+                <p class="text-3xl">₱ 8,200</p>
+            </div>
+            <div class="bg-red-500 shadow-md text-white p-6 rounded-lg">
+                <h3 class="text-xl font-bold">Total Expenses</h3>
+                <p class="text-3xl">₱ 1,500</p>
+            </div>
+            <div class="bg-blue-500 text-white p-6 rounded-lg">
+                <h3 class="text-xl font-bold">Total Income</h3>
+                <p class="text-3xl">₱ 5,210</p>
+            </div>
+        </div>
 
-                <li class="p-2">
-                    <a asp-controller="Settings" asp-action="Index" class="flex items-center text-gray-700 hover:text-blue-500 @(ViewData["Title"].ToString() == "Settings" ? "font-bold" : "")">
-                        <i class="fas fa-cog mr-3"></i> Settings
-                    </a>
-                </li>
+        <!-- Trends and Monthly Charts -->
+        <div class="grid grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 shadow-md rounded-lg">
+                <h4 class="font-bold">Trends</h4>
+                <!-- Chart Placeholder -->
+            </div>
+            <div class="bg-white p-6 shadow-md rounded-lg">
+                <h4 class="font-bold">Monthly Expense</h4>
+                <!-- Chart Placeholder -->
+            </div>
+            <div class="bg-white p-6 shadow-md rounded-lg">
+                <h4 class="font-bold">Monthly Income</h4>
+                <!-- Chart Placeholder -->
+            </div>
+        </div>
 
-                <!-- Log out button with a bit of spacing -->
-                <li class="p-2 mt-4">
-                    <a href="#" class="flex items-center text-gray-700 hover:text-red-500">
-                        <i class="fas fa-sign-out-alt mr-3"></i> Log out
-                    </a>
-                </li>
-            </ul>
-        </nav>
+        <!-- Transactions Table -->
+        <div class="bg-white p-6 shadow-md rounded-lg">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Transactions</h2>
+
+                <div class="flex items-center space-x-4">
+                    <div>
+                        <label for="category-filter" class="text-gray-700 font-semibold mr-2">Filter by category:</label>
+                        <select id="category-filter" class="border border-gray-300 rounded-lg px-4 py-2">
+                            <option value="all">All</option>
+                            <option value="food">Food</option>
+                            <option value="transport">Transport</option>
+                            <option value="entertainment">Entertainment</option>
+                            <!-- Add more categories as needed -->
+                        </select>
+                    </div>
+
+                    <button id="openAddTransactionModal" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none">
+                        + Add
+                    </button>
+                </div>
+            </div>
+
+            <table class="min-w-full table-auto">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="px-4 py-2">Category</th>
+                        <th class="px-4 py-2">Description</th>
+                        <th class="px-4 py-2">Amount</th>
+                        <th class="px-4 py-2">Account</th>
+                        <th class="px-4 py-2">Date</th>
+                        <th class="px-4 py-2">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="border px-4 py-2">Food</td>
+                        <td class="border px-4 py-2">Dinner</td>
+                        <td class="border px-4 py-2">₱ 100.00</td>
+                        <td class="border px-4 py-2">Cash</td>
+                        <td class="border px-4 py-2">10-22-25</td>
+                        <td class="border px-4 py-2">
+                            <button class="bg-blue-500 text-white px-3 py-1 rounded-lg">Edit</button>
+                        </td>
+                    </tr>
+                    <!-- More rows as needed -->
+                </tbody>
+            </table>
+        </div>
     </div>
-
-    <!-- Content -->
-    <div class="flex-1 p-6 bg-white">
-        <div class="text-center">
-            <h1 class="text-4xl font-bold">Welcome</h1>
-            <p class="mt-4 text-lg">Learn about <a class="text-blue-500 underline" href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-        </div>
-    </div>
-
 </div>
+
+<!-- Modal Structure -->
+<script src="~/js/home.js" asp-append-version="true"></script>

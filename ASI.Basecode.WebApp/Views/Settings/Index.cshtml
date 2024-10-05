@@ -1,0 +1,66 @@
+﻿﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Settings Page";
+}
+
+@section styles {
+    <link rel="stylesheet" href="~/css/settings.css" />
+}
+
+<!-- Sidebar and Content -->
+<div class="flex min-h-screen">
+    <!-- Main Content Area -->
+    <div id="settings-content" class="flex-1 p-6">
+        <!-- Use an ID if needed for specific CSS targeting -->
+        <!-- Settings Header -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold">Settings</h2>
+        </div>
+
+        <!-- Email Address Section -->
+        <div class="bg-white p-6 shadow-md rounded-lg mb-6">
+            <h3 class="text-lg font-semibold mb-4">Email Address</h3>
+            <div class="flex justify-between items-center">
+                <p class="mb-0">Your email address is <strong>sample@gmail.com</strong></p>
+                <button class="text-blue-500 underline hover:text-blue-700 focus:outline-none">
+                    Change
+                </button>
+            </div>
+        </div>
+
+        <!-- Change Password Section -->
+        <div class="bg-white p-6 shadow-md rounded-lg mb-6">
+            <h3 class="text-lg font-semibold mb-4">Password</h3>
+            <form>
+                <div class="grid grid-cols-3 gap-4 mb-4">
+                    <div class="mb-4">
+                        <label for="current-password" class="block text-gray-700">Current Password:</label>
+                        <input type="password" id="current-password" name="current-password" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Enter current password" required />
+                    </div>
+                    <div class="mb-4">
+                        <label for="new-password" class="block text-gray-700">New Password:</label>
+                        <input type="password" id="new-password" name="new-password" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Enter new password" required />
+                    </div>
+                    <div class="mb-4">
+                        <label for="confirm-password" class="block text-gray-700">Confirm Password:</label>
+                        <input type="password" id="confirm-password" name="confirm-password" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Confirm new password" required />
+                    </div>
+                </div>
+                <div class="flex justify-end">
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none">
+                        Save Password
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Dark Mode Toggle Section -->
+        <div class="bg-white p-6 shadow-md rounded-lg mb-6">
+            <h3 class="text-xl font-bold mb-4">Switch to Dark Mode</h3>
+            <div class="flex items-center">
+                <label for="dark-mode" class="text-gray-700 mr-2">Dark Theme:</label>
+                <input type="checkbox" id="dark-mode" class="form-checkbox h-5 w-5 text-blue-600" />
+            </div>
+        </div>
+    </div>
+</div>
