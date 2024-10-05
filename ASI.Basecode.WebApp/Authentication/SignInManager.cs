@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using static ASI.Basecode.Resources.Constants.Enums;
+using MUser = ASI.Basecode.Data.Models.MUser;
 
 namespace ASI.Basecode.WebApp.Authentication
 {
