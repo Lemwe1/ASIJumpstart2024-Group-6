@@ -92,7 +92,7 @@ namespace ASI.Basecode.WebApp
 
 
             // Register SQL database configuration context as services.
-            services.AddDbContext<AsiBasecodeDBContext>(options =>
+            services.AddDbContext<AsiBasecodeDbContext>(options =>
             {
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection"),
