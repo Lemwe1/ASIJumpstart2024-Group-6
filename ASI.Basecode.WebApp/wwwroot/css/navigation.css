@@ -1,6 +1,7 @@
-    #main-nav-cont {
-        background-color: #fff;
-    }
+#main-nav-cont {
+    background-color: #fff;
+    transition: transform 0.3s ease; /* Smooth transition for showing/hiding the sidebar */
+}
 
     #navigation-content {
         width: 100%;
