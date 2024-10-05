@@ -10,7 +10,7 @@
 }
 
 :root {
-    --background-color1: #fafaff;
+    --background-color1: #f8f8f8;
     --background-color2: #ffffff;
     --background-color3: #ededed;
     --background-color4: #cad7fda4;
@@ -22,7 +22,7 @@
 }
 
 body {
-    background-color: var(--background-color4);
+    background-color: var(--background-color1);
     max-width: 100%;
     overflow-x: hidden;
 }

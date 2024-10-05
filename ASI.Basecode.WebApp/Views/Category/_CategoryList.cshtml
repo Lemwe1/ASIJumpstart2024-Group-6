@@ -5,7 +5,11 @@
 }
 
 <!-- Container with padding -->
-<div class="container mx-auto p-6 mt-8">
+<div class="container mx-auto p-6 mt-2">
+    <!-- Search Bar -->
+    <div class="flex justify-between items-center mb-8">
+        <input type="text" placeholder="Search here..." class="w-1/3 p-2 border border-gray-300 rounded-lg">
+    </div>
     <h2 class="text-2xl font-bold mb-6">@ViewData["Title"]</h2>
 
     <!-- Add Category Button -->
@@ -18,6 +22,7 @@
     <!-- Income Categories -->
     @if (Model.Any(c => c.Type == "Income"))
     {
+        
         <h3 class="text-xl font-semibold mb-8">Income</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
             @foreach (var item in Model.Where(c => c.Type == "Income"))
