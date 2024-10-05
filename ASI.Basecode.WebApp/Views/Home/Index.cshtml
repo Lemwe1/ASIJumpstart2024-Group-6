@@ -1,4 +1,4 @@
-﻿﻿@{
+﻿@{
     Layout = "_Layout";
     ViewData["Title"] = "Home Page";
 }
@@ -11,7 +11,7 @@
     <!-- Main Content Area -->
     <div id="home-content" class="flex-1 p-6">
         <!-- Dashboard Header -->
-        <div class="mb-8">
+        <div class="my-8">
             <h2 class="text-2xl font-bold">Dashboard</h2>
         </div>
 
@@ -105,4 +105,65 @@
 </div>
 
 <!-- Modal Structure -->
+<div id="addTransactionModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 items-center justify-center hidden z-50">
+    <div id="addModalContent" class="modal-content bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-auto p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-bold">Add Transaction</h2>
+            <button id="closeTransactionModal" class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <p class="text-gray-600 mb-4">Fill out all the fields below to add a transaction</p>
+
+        <form id="transactionForm">
+            <!-- Amount Field -->
+            <div class="mb-6">
+                <label for="transactionAmount" class="block text-sm font-medium text-gray-700">Amount</label>
+                <input type="number" id="transactionAmount" name="Amount" placeholder="Enter amount" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900" />
+            </div>
+
+            <!-- Type Field -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700">Type</label>
+                <div class="flex space-x-4 mt-2">
+                    <button type="button" id="createExpenseButton" class="type-button px-4 py-2 border rounded-md bg-blue-500 text-white">Expense</button>
+                    <button type="button" id="createIncomeButton" class="type-button px-4 py-2 border rounded-md bg-white text-gray-700">Income</button>
+                </div>
+            </div>
+
+            <!-- Category Field -->
+            <div class="mb-6">
+                <label for="transactionCategory" class="block text-sm font-medium text-gray-700">Category</label>
+                <select id="transactionCategory" name="Category" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900">
+                    <option value="" disabled selected>Select category</option>
+                    <option value="food">Food</option>
+                    <option value="transport">Transport</option>
+                    <option value="entertainment">Entertainment</option>
+                    <!-- Add more categories as needed -->
+                </select>
+            </div>
+
+            <!-- Date Field -->
+            <div class="mb-6">
+                <label for="transactionDate" class="block text-sm font-medium text-gray-700">Date</label>
+                <input type="date" id="transactionDate" name="Date" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900" />
+            </div>
+
+            <!-- Note Field -->
+            <div class="mb-6">
+                <label for="transactionNote" class="block text-sm font-medium text-gray-700">Note</label>
+                <textarea id="transactionNote" name="Note" placeholder="Enter note" rows="4" class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900"></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="mt-6">
+                <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 rounded-md">
+                    Confirm
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script src="~/js/home.js" asp-append-version="true"></script>

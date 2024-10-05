@@ -28,10 +28,6 @@ namespace ASI.Basecode.WebApp.Controllers
 
         }
 
-        /// <summary>
-        /// Returns Home View.
-        /// </summary>
-        /// <returns> Home View </returns>
         public IActionResult Index()
         {
             return View();

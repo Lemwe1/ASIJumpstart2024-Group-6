@@ -16,7 +16,7 @@
     </div>
 
     <!-- Income Categories -->
-    <h3 class="text-xl font-semibold mb-4">Income</h3>
+    <h3 class="text-xl font-semibold mb-8">Income</h3>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
         @foreach (var item in Model.Where(c => c.Type == "Income"))
         {
@@ -34,7 +34,7 @@
     </div>
 
     <!-- Expense Categories -->
-    <h3 class="text-xl font-semibold mb-4">Expense</h3>
+    <h3 class="text-xl font-semibold mb-8">Expense</h3>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         @foreach (var item in Model.Where(c => c.Type == "Expense"))
         {

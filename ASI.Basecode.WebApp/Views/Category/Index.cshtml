@@ -8,14 +8,14 @@
     <link href="~/css/Category.css" rel="stylesheet" />
 }
 
-<body class="bg-white text-gray-900 transition-colors duration-300">
+<body class="bg-gray-50 text-gray-900 transition-colors duration-300">
     <!-- Dark Mode Toggle Button -->
     <button id="darkModeToggle" class="fixed top-6 right-6 bg-gray-200 text-gray-800 p-2 rounded-full focus:outline-none z-50">
         <i id="darkModeIcon" class="fas fa-moon"></i>
     </button>
     @Html.Partial("_CategoryList")
-    @Html.Partial("Create") 
-    @Html.Partial("_EditCategory") 
+    @Html.Partial("Create")
+    @Html.Partial("_EditCategory")
     <!-- Include SweetAlert2 JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -24,5 +24,5 @@
     <script src="~/js/categoryModal.js"></script>
     <script src="~/js/categoryServer.js"></script>
 
-    
+
 </body>

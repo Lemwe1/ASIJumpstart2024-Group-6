@@ -12,13 +12,6 @@
     border-radius: 0.5rem;
 }
 
-/* Section headers */
-#debitSectionTitle,
-#borrowedSectionTitle {
-    font-size: 1.25rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-}
 
 /* Net Worth Section */
 #netWorthSection {
