@@ -1,70 +1,245 @@
-﻿@using ASI.Basecode.Services.ServiceModels
-@model             ASI.Basecode.Services.ServiceModels.LoginViewModel
+﻿@using static ASI.Basecode.Resources.Views.Screen
+@using static ASI.Basecode.Resources.Views.Account
+@using ASI.Basecode.Services.ServiceModels
+@model ASI.Basecode.Services.ServiceModels.RegisterViewModel
 @{
     ViewBag.LoginView = true;
     ViewData["Title"] = "Register Page";
 }
-@section styles {
-    <link rel="stylesheet" href="~/css/login.css" />
-}
-<div class="container py-5 h-100 register-box">
-    <div class="row d-flex justify-content-center align-items-center h-100">
-        <div class="col-xl-10">
-            <div class="card rounded-3 text-black">
-                <div class="row g-0">
-                    <div class="card-body p-md-5 mx-md-4">
 
-                        <div class="text-center">
-                            <img src="https://www.alliance.com.ph/images/asi-logo-invert.svg"
-                                 style="width: 185px;" alt="logo">
-                        </div>
+<div class="flex h-screen bg-gray-50 dark:bg-gray-900 relative">
+    <div class="hidden lg:flex lg:w-1/2">
+        <img src="~/img/spendwise-banner.svg" alt="Banner" class="w-full h-full object-cover" />
+    </div>
 
-                        <form method="post" action="/Account/Register">
-                            <div class="form-outline mb-4">
-                                <label class="form-label" for="userId">UserId</label>
-                                <input type="text" id="userId" class="form-control"
-                                       asp-for="UserId" placeholder="Enter userid" />
-                                <span asp-validation-for="UserId" class="text-danger"></span>
-                            </div>
-                            <div class="form-outline mb-4">
-                                <label class="form-label" for="name">Name</label>
-                                <input type="text" id="name" class="form-control"
-                                       asp-for="Name" placeholder="Enter name" />
-                                <span asp-validation-for="Name" class="text-danger"></span>
-                            </div>
-                            <div class="form-outline mb-4">
-                                <label class="form-label" for="password">Password</label>
-                                <input type="password" id="password" class="form-control"
-                                       asp-for="Password" placeholder="Enter password" />
-                                <span asp-validation-for="Password" class="text-danger"></span>
-                            </div>
-                            <div class="form-outline mb-4">
-                                <label class="form-label" for="confirmpassword">Confirm Password</label>
-                                <input type="password" id="confirmpassword" class="form-control" 
-                                       asp-for="ConfirmPassword" placeholder="Confirm Password" />
-                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                            </div>
-                            <div class="text-center pt-1 mb-5 pb-1 d-flex flex-column align-items-center">
-                                <button class="btn btn-primary btn-block login-btn gradient-custom-2 mb-3" type="submit">
-                                    Register
-                                </button>
-                                <a asp-controller="Account" asp-action="Login">
-                                    &#8592 Back
-                                </a>
-                            </div>
-                        </form>
-                    </div>
+    <div class="flex items-center justify-center w-full lg:w-1/2 p-6">
+        <div class="relative rounded-lg shadow dark:bg-gray-800 w-full max-w-md lg:max-w-lg mx-auto min-h-[400px] sm:min-h-[450px] md:min-h-[500px] lg:min-h-[600px] flex flex-col p-8 space-y-4">
+
+            <!-- Moved overlay inside the card container -->
+            <div id="form-overlay" class="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+                <div class="flex flex-col items-center space-y-4">
+                    <!-- Loading Spinner -->
+                    <div id="loading-spinner" class="hidden animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-white"></div>
+                    <!-- Success Icon -->
+                    <svg id="success-icon" class="hidden w-12 h-12 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <!-- Failure Icon -->
+                    <svg id="failure-icon" class="hidden w-12 h-12 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                 </div>
+            </div>
+
+            <div class="flex justify-between items-center mb-4">
+                <img src="~/img/logo.svg" class="w-48 mx-auto" alt="logo">
+            </div>
+
+            <!-- Heading -->
+            <h2 class="text-center text-2xl font-bold text-gray-900 dark:text-white mb-4">Register</h2>
+
+            <!-- Error message container -->
+            <div id="error-message" class="hidden text-center text-red-500 dark:text-red-400 text-sm font-semibold"></div>
+            <!-- Success message container -->
+            <div id="success-message" class="hidden text-center text-green-500 dark:text-green-400 text-sm font-semibold"></div>
+
+            <form id="registerForm" class="space-y-4">
+                <!-- User Code -->
+                <div>
+                    <label asp-for="UserCode" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+                    <input type="text" asp-for="UserCode" placeholder="Enter User Code"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
+                    <span asp-validation-for="UserCode" class="text-danger"></span>
+                </div>
+
+                <!-- First Name -->
+                <div>
+                    <label asp-for="FirstName" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+                    <input type="text" asp-for="FirstName" placeholder="Enter First Name"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+
+                <!-- Last Name -->
+                <div>
+                    <label asp-for="LastName" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+                    <input type="text" asp-for="LastName" placeholder="Enter Last Name"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label asp-for="Email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+                    <input type="email" asp-for="Email" placeholder="Enter Email"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label asp-for="Password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+                    <input type="password" asp-for="Password" placeholder="Enter Password"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <!-- Confirm Password -->
+                <div>
+                    <label asp-for="ConfirmPassword" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+                    <input type="password" asp-for="ConfirmPassword" placeholder="Confirm Password"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                    Register
+                </button>
+
+                <div class="text-center">
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-outline-danger">@BackToLogin</a>
+                </div>
+            </form>
+
+            <!-- Theme Toggle Positioned at Top Right -->
+            <div class="absolute top-4 right-4 cursor-pointer">
+                <button id="theme-toggle" class="text-gray-500 dark:text-gray-300 focus:outline-none">
+                    <svg id="sun-icon" class="w-6 h-6 hidden" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 2a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5A.75.75 0 0110 2zm0 16a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5a.75.75 0 01-.75-.75zm8.7-7.3a.75.75 0 010 1.5h-1.5a.75.75 0 010-1.5h1.5zM2 10a.75.75 0 01.75-.75H4.25a.75.75 0 010 1.5H2.75A.75.75 0 012 10zm12.07 7.07a.75.75 0 011.06-1.06l1.06 1.06a.75.75 0 01-1.06 1.06l-1.06-1.06zM4.93 4.93a.75.75 0 011.06-1.06L7.06 4.93a.75.75 0 01-1.06 1.06L4.93 5.99zM16.07 4.93a.75.75 0 011.06-1.06l1.06 1.06a.75.75 0 01-1.06 1.06L16.07 4.93zM4.93 16.07a.75.75 0 011.06 0l1.06-1.06a.75.75 0 00-1.06-1.06L4.93 15.01a.75.75 0 000 1.06zM10 5.75a4.25 4.25 0 110 8.5 4.25 4.25 0 010-8.5zm0 1.5a2.75 2.75 0 100 5.5 2.75 2.75 0 000-5.5z" />
+                    </svg>
+                    <svg id="moon-icon" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 2a8 8 0 017.463 10.84c-.152.593-.608.91-1.2.91a1.19 1.19 0 01-.75-.255 7.9 7.9 0 00-5.513-2.127 7.91 7.91 0 00-2.126 5.514 1.188 1.188 0 01-.255.75 1.189 1.189 0 01-.91.451A8 8 0 0110 2zM2 10a8 8 0 0016 0A8 8 0 002 10z" />
+                    </svg>
+                </button>
             </div>
         </div>
     </div>
 </div>
+
+
 @section scripts {
-    <script>
-        // Check for error message and display Toastr notification
-        var errorMessage = '@TempData["ErrorMessage"]';
-        if (errorMessage) {
-            toastr.error(errorMessage);
+   <script>
+document.getElementById('registerForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent form from submitting the usual way
+
+    const overlay = document.getElementById('form-overlay');
+    const spinner = document.getElementById('loading-spinner');
+    const successIcon = document.getElementById('success-icon');
+    const failureIcon = document.getElementById('failure-icon');
+    const successMessageDiv = document.getElementById('success-message');
+    const errorMessageDiv = document.getElementById('error-message');
+
+    // Reset all icons, spinner, and messages to initial hidden state
+    spinner.classList.add('hidden');
+    successIcon.classList.add('hidden');
+    failureIcon.classList.add('hidden');
+    successMessageDiv.classList.add('hidden');
+    errorMessageDiv.classList.add('hidden'); // Hide the error message
+    overlay.classList.remove('hidden'); // Show the overlay
+
+    // Show loading spinner
+    spinner.classList.remove('hidden');
+
+    // Prepare the form data
+    const formData = new FormData(this);
+
+    // Send an AJAX request to the register endpoint
+    fetch('/Account/Register', {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Hide loading spinner
+        spinner.classList.add('hidden');
+
+        if (data.success) {
+            successIcon.classList.remove('hidden');
+            successMessageDiv.textContent = data.message; // Show success message from the response
+            successMessageDiv.classList.remove('hidden'); // Display the success message
+
+            // Redirect after showing success message for 2 seconds
+            setTimeout(function() {
+                window.location.href = "/Account/Login"; // Redirect to login page
+            }, 2000);
+        } else {
+            failureIcon.classList.remove('hidden');
+            errorMessageDiv.textContent = data.message; // Show error message from the response
+            errorMessageDiv.classList.remove('hidden'); // Display the error message
+            setTimeout(function() {
+                overlay.classList.add('hidden');
+                failureIcon.classList.add('hidden');
+            }, 2000);
         }
-    </script>
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        spinner.classList.add('hidden');
+        failureIcon.classList.remove('hidden');
+        setTimeout(function() {
+            overlay.classList.add('hidden');
+            failureIcon.classList.add('hidden');
+        }, 2000);
+    });
+});
+
+// Check for success message and display Toastr notification
+var successMessage = '@TempData["SuccessMessage"]';
+if (successMessage) {
+    toastr.success(successMessage);
 }
+
+// Check for error message and display Toastr notification
+var errorMessage = '@TempData["ErrorMessage"]';
+if (errorMessage) {
+    toastr.error(errorMessage);
+}
+
+// Theme toggle logic
+const toggle = document.getElementById('theme-toggle');
+const sunIcon = document.getElementById('sun-icon');
+const moonIcon = document.getElementById('moon-icon');
+
+// Check if user has a previously saved theme preference
+const savedTheme = localStorage.getItem('theme') || 'light';
+if (savedTheme === 'dark') {
+    document.body.classList.add('dark');
+    sunIcon.classList.remove('hidden');
+    moonIcon.classList.add('hidden');
+}
+
+// Toggle between dark and light mode
+toggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+
+    // Toggle icon visibility
+    sunIcon.classList.toggle('hidden');
+    moonIcon.classList.toggle('hidden');
+
+    // Save the theme preference in local storage
+    const theme = document.body.classList.contains('dark') ? 'dark' : 'light';
+    localStorage.setItem('theme', theme);
+});
+</script>
+
+   <style>
+    #theme-toggle {
+        transition: color 0.3s;
+    }
+
+    #form-overlay {
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    #loading-spinner,
+    #success-icon,
+    #failure-icon {
+        transition: visibility 0.3s, opacity 0.3s ease-in-out;
+    }
+
+    #error-message {
+        margin-top: -1rem; /* Center the error message */
+    }
+</style>
+}
+

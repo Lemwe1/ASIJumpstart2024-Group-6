@@ -19,7 +19,6 @@ namespace ASI.Basecode.Data
 
         public virtual DbSet<MCategory> MCategories { get; set; }
         public virtual DbSet<MDebitLiab> MDebitLiabs { get; set; }
-        public virtual DbSet<MRole> MRoles { get; set; }
         public virtual DbSet<MTransaction> MTransactions { get; set; }
         public virtual DbSet<MUser> MUsers { get; set; }
 
@@ -28,7 +27,7 @@ namespace ASI.Basecode.Data
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=localhost;Database=AsiBasecodeDb;Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer("Server=(localdb)\\MSSqlLocalDb;Database=AsiBasecodeDb;Integrated Security=True;Trusted_Connection=True");
             }
         }
 
@@ -37,7 +36,7 @@ namespace ASI.Basecode.Data
             modelBuilder.Entity<MCategory>(entity =>
             {
                 entity.HasKey(e => e.CategoryId)
-                    .HasName("PK__M_Catego__19093A0B9AA08103");
+                    .HasName("PK__M_Catego__19093A0B66626202");
 
                 entity.ToTable("M_Category");
 
@@ -55,64 +54,39 @@ namespace ASI.Basecode.Data
             modelBuilder.Entity<MDebitLiab>(entity =>
             {
                 entity.HasKey(e => e.DeLiId)
-                    .HasName("PK__M_DebitL__B2BE78F2677E7F5E");
+                    .HasName("PK__M_DebitL__B2BE78F21867EB6F");
 
                 entity.ToTable("M_DebitLiab");
 
                 entity.Property(e => e.DeLiBalance).HasColumnType("decimal(10, 2)");
 
-                entity.Property(e => e.DeLiColor)
-                    .HasMaxLength(20)
-                    .IsUnicode(false);
+                entity.Property(e => e.DeLiColor).HasMaxLength(20);
 
-                entity.Property(e => e.DeLiDest)
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
+                entity.Property(e => e.DeLiDest).HasMaxLength(255);
 
                 entity.Property(e => e.DeLiDue).HasColumnType("datetime");
 
                 entity.Property(e => e.DeLiHapp).HasColumnType("datetime");
 
-                entity.Property(e => e.DeLiIcon)
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
+                entity.Property(e => e.DeLiIcon).HasMaxLength(255);
 
                 entity.Property(e => e.DeLiType)
                     .IsRequired()
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-            });
-
-            modelBuilder.Entity<MRole>(entity =>
-            {
-                entity.HasKey(e => e.RoleId);
-
-                entity.ToTable("M_ROLE");
-
-                entity.Property(e => e.RoleId).ValueGeneratedNever();
-
-                entity.Property(e => e.RoleName)
-                    .IsRequired()
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
+                    .HasMaxLength(50);
             });
 
             modelBuilder.Entity<MTransaction>(entity =>
             {
                 entity.HasKey(e => e.TransactionId)
-                    .HasName("PK__M_Transa__55433A6B99CE5180");
+                    .HasName("PK__M_Transa__55433A6B73C58A00");
 
                 entity.ToTable("M_Transaction");
 
                 entity.Property(e => e.Amount).HasColumnType("decimal(10, 2)");
 
-                entity.Property(e => e.Description)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
+                entity.Property(e => e.Description).HasMaxLength(100);
 
-                entity.Property(e => e.Note)
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
+                entity.Property(e => e.Note).HasMaxLength(255);
 
                 entity.Property(e => e.TransactionDate).HasColumnType("date");
 
@@ -120,13 +94,13 @@ namespace ASI.Basecode.Data
                     .WithMany(p => p.MTransactions)
                     .HasForeignKey(d => d.CategoryId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__M_Transac__Categ__619B8048");
+                    .HasConstraintName("FK__M_Transac__Categ__2E1BDC42");
 
                 entity.HasOne(d => d.DeLi)
                     .WithMany(p => p.MTransactions)
                     .HasForeignKey(d => d.DeLiId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__M_Transac__DeLiI__628FA481");
+                    .HasConstraintName("FK__M_Transac__DeLiI__2F10007B");
             });
 
             modelBuilder.Entity<MUser>(entity =>

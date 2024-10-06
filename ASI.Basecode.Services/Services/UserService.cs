@@ -59,12 +59,18 @@ namespace ASI.Basecode.Services.Services
         /// <param name="model">The model.</param>
         public void Add(UserViewModel model)
         {
-            var newModel = new MUser();
-            newModel.UserCode = model.UserCode;
-            newModel.FirstName = model.FirstName;
-            newModel.LastName = model.LastName;
-            newModel.Password = PasswordManager.EncryptPassword(model.Password);
-            newModel.UserRole = 1;
+            var newModel = new MUser
+            {
+                UserCode = model.UserCode,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Mail = model.Mail,
+                Password = PasswordManager.EncryptPassword(model.Password),  // Encrypt the password
+                UserRole = 1,  // Assuming 1 is for regular users
+                InsDt = DateTime.Now,
+                UpdDt = DateTime.Now,
+                Deleted = false
+            };
 
             _userRepository.AddUser(newModel);
         }

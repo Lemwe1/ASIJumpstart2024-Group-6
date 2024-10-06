@@ -31,8 +31,8 @@ namespace ASI.Basecode.WebApp.Controllers
 
         public IActionResult Index()
         {
-            ViewData["Title"] = "Settings Page";
-            return View();
+            ViewData["Title"] = "Settings Page"; 
+            return View(); 
         }
 
     }

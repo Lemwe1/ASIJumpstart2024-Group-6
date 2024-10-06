@@ -11,6 +11,7 @@ namespace Basecode.Data.Repositories
 
         protected AsiBasecodeDbContext Context => (AsiBasecodeDbContext)UnitOfWork.Database;
 
+
         public BaseRepository(IUnitOfWork unitOfWork)
         {
             if (unitOfWork == null) throw new ArgumentNullException(nameof(unitOfWork));

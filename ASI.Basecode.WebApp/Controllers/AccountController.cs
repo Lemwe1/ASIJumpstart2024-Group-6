@@ -3,16 +3,14 @@ using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.Manager;
 using ASI.Basecode.Services.ServiceModels;
 using ASI.Basecode.WebApp.Authentication;
-using ASI.Basecode.WebApp.Models;
 using ASI.Basecode.WebApp.Mvc;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
-using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using static ASI.Basecode.Resources.Constants.Enums;
 
@@ -22,38 +20,17 @@ namespace ASI.Basecode.WebApp.Controllers
     {
         private readonly SessionManager _sessionManager;
         private readonly SignInManager _signInManager;
-        private readonly TokenValidationParametersFactory _tokenValidationParametersFactory;
-        private readonly TokenProviderOptionsFactory _tokenProviderOptionsFactory;
-        private readonly IConfiguration _appConfiguration;
         private readonly IUserService _userService;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AccountController"/> class.
-        /// </summary>
-        /// <param name="signInManager">The sign in manager.</param>
-        /// <param name="localizer">The localizer.</param>
-        /// <param name="userService">The user service.</param>
-        /// <param name="httpContextAccessor">The HTTP context accessor.</param>
-        /// <param name="loggerFactory">The logger factory.</param>
-        /// <param name="configuration">The configuration.</param>
-        /// <param name="mapper">The mapper.</param>
-        /// <param name="tokenValidationParametersFactory">The token validation parameters factory.</param>
-        /// <param name="tokenProviderOptionsFactory">The token provider options factory.</param>
         public AccountController(
-                            SignInManager signInManager,
-                            IHttpContextAccessor httpContextAccessor,
-                            ILoggerFactory loggerFactory,
-                            IConfiguration configuration,
-                            IMapper mapper,
-                            IUserService userService,
-                            TokenValidationParametersFactory tokenValidationParametersFactory,
-                            TokenProviderOptionsFactory tokenProviderOptionsFactory) : base(httpContextAccessor, loggerFactory, configuration, mapper)
+                             SignInManager signInManager,
+                             IHttpContextAccessor httpContextAccessor,
+                             ILoggerFactory loggerFactory,
+                             IConfiguration configuration,
+                             IUserService userService) : base(httpContextAccessor, loggerFactory, configuration)
         {
             this._sessionManager = new SessionManager(this._session);
             this._signInManager = signInManager;
-            this._tokenProviderOptionsFactory = tokenProviderOptionsFactory;
-            this._tokenValidationParametersFactory = tokenValidationParametersFactory;
-            this._appConfiguration = configuration;
             this._userService = userService;
         }
 
@@ -68,7 +45,7 @@ namespace ASI.Basecode.WebApp.Controllers
             TempData["returnUrl"] = System.Net.WebUtility.UrlDecode(HttpContext.Request.Query["ReturnUrl"]);
             this._sessionManager.Clear();
             this._session.SetString("SessionId", System.Guid.NewGuid().ToString());
-            return this.View();
+            return this.View(new LoginViewModel());  // Pass LoginViewModel to view
         }
 
         /// <summary>
@@ -79,61 +56,87 @@ namespace ASI.Basecode.WebApp.Controllers
         /// <returns> Created response view </returns>
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(Models.LoginViewModel model, string returnUrl)
+        public async Task<JsonResult> Login(LoginViewModel model)
         {
-            this._session.SetString("HasSession", "Exist");
+            if (!ModelState.IsValid)
+            {
+                return Json(new { success = false, message = "Please provide valid credentials." });
+            }
 
             MUser user = null;
-
-            //User user = new() { Id = 0, UserId = "0", Name = "Name", Password = "Password" };
-
-            //await this._signInManager.SignInAsync(user);
-            //this._session.SetString("UserName", model.UserId);
-
-            //return RedirectToAction("Index", "Home");
             var loginResult = _userService.AuthenticateUser(model.UserCode, model.Password, ref user);
+
             if (loginResult == LoginResult.Success)
             {
-                // 認証OK
+                // Sign in the user
                 await this._signInManager.SignInAsync(user);
                 this._session.SetString("UserName", string.Join(" ", user.FirstName, user.LastName));
-                return RedirectToAction("Index", "Home");
-            }
+
+                // Return success response to the front-end
+                return Json(new { success = true, message = "Login successful! Redirecting..."});
+                }
             else
             {
-                // 認証NG
-                TempData["ErrorMessage"] = "Incorrect UserId or Password";
-                return View();
+                return Json(new { success = false, message = "Incorrect Username or Password" });
             }
-            //return View();
         }
+
 
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Register()
         {
-            return View();
+            return View(new RegisterViewModel());  // Pass RegisterViewModel to view
         }
 
-        //[HttpPost]
-        //[AllowAnonymous]
-        //public IActionResult Register(Services.ServiceModels.LoginViewModel model)
-        //{
-        //    try
-        //    {
-        //        //_userService.AddUser(model);
-        //        return RedirectToAction("Login", "Account");
-        //    }
-        //    catch (InvalidDataException ex)
-        //    {
-        //        TempData["ErrorMessage"] = ex.Message;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        TempData["ErrorMessage"] = Resources.Messages.Errors.ServerError;
-        //    }
-        //    return View();
-        //}
+        [HttpPost]
+        [AllowAnonymous]
+        public JsonResult Register(RegisterViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                // Return a JSON response indicating failure and validation error
+                return Json(new { success = false, message = "Please fill in all required fields." });
+            }
+
+            if (model.Password != model.ConfirmPassword)
+            {
+                // Return a JSON response indicating failure due to password mismatch
+                return Json(new { success = false, message = "Passwords do not match." });
+            }
+
+            // Check if the user code is already taken
+            if (_userService.RetrieveAll(null, model.UserCode).Any())
+            {
+                // Return a JSON response indicating failure due to existing user code
+                return Json(new { success = false, message = "UserCode is already taken." });
+            }
+
+            try
+            {
+                var newUser = new UserViewModel
+                {
+                    UserCode = model.UserCode,
+                    Password = model.Password, // Password will be encrypted in UserService.Add()
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Mail = model.Email
+                };
+
+                // Add the new user
+                _userService.Add(newUser);
+
+                // Return a JSON response indicating success
+                return Json(new { success = true, message = "Registration successful! Redirecting to login..." });
+            }
+            catch (Exception ex)
+            {
+                // Return a JSON response indicating failure due to an exception
+                return Json(new { success = false, message = "An error occurred while creating the account. Please try again later." });
+            }
+        }
+
+
 
         /// <summary>
         /// Sign Out current account and return login view.
