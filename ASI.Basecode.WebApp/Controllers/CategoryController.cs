@@ -1,4 +1,5 @@
-﻿using ASI.Basecode.WebApp.Models;
+﻿using ASI.Basecode.Data.Models;
+using ASI.Basecode.WebApp.Models;
 using ASI.Basecode.WebApp.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -21,8 +22,22 @@ namespace ASI.Basecode.WebApp.Controllers
         public async Task<IActionResult> Index()
         {
             ViewData["Title"] = "Category List";
+
+            // Retrieve list of MCategory from the service
             var categories = await _categoryService.GetCategoriesAsync();
-            return View(categories);
+
+            // Map MCategory to CategoryViewModel
+            var categoryViewModels = categories.Select(category => new CategoryViewModel
+            {
+                CategoryId = category.CategoryId,
+                Name = category.Name,
+                Type = category.Type,
+                Icon = category.Icon,
+                Color = category.Color
+            }).ToList();
+
+            // Pass the ViewModel to the view
+            return View(categoryViewModels);
         }
 
         // GET: /Category/GetCategory/{id}
@@ -34,29 +49,47 @@ namespace ASI.Basecode.WebApp.Controllers
             {
                 return NotFound(new { success = false, message = "Category not found." });
             }
-            return Json(new { success = true, data = category });
+
+            // Map MCategory to CategoryViewModel
+            var categoryViewModel = new CategoryViewModel
+            {
+                CategoryId = category.CategoryId,
+                Name = category.Name,
+                Type = category.Type,
+                Icon = category.Icon,
+                Color = category.Color
+            };
+
+            return Json(new { success = true, data = categoryViewModel });
         }
 
         // POST: /Category/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CategoryModel category)
+        public async Task<IActionResult> Create(CategoryViewModel categoryViewModel)
         {
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
-                Console.WriteLine("Model errors: " + string.Join(", ", errors));
                 return BadRequest(new { success = false, message = "Invalid data", errors });
             }
 
             try
             {
+                // Map CategoryViewModel to MCategory
+                var category = new MCategory
+                {
+                    Name = categoryViewModel.Name,
+                    Type = categoryViewModel.Type,
+                    Icon = categoryViewModel.Icon,
+                    Color = categoryViewModel.Color
+                };
+
                 await _categoryService.AddCategoryAsync(category);
                 return Json(new { success = true, message = "Category created successfully." });
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error creating category: {ex.Message}");
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
@@ -64,9 +97,9 @@ namespace ASI.Basecode.WebApp.Controllers
         // POST: /Category/Edit/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, CategoryModel category)
+        public async Task<IActionResult> Edit(int id, CategoryViewModel categoryViewModel)
         {
-            if (id != category.CategoryId)
+            if (id != categoryViewModel.CategoryId)
             {
                 return BadRequest(new { success = false, message = "Invalid category ID." });
             }
@@ -74,23 +107,30 @@ namespace ASI.Basecode.WebApp.Controllers
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
-                Console.WriteLine("Model errors: " + string.Join(", ", errors));
                 return BadRequest(new { success = false, message = "Invalid data", errors });
             }
 
             try
             {
+                // Map CategoryViewModel to MCategory
+                var category = new MCategory
+                {
+                    CategoryId = categoryViewModel.CategoryId,
+                    Name = categoryViewModel.Name,
+                    Type = categoryViewModel.Type,
+                    Icon = categoryViewModel.Icon,
+                    Color = categoryViewModel.Color
+                };
+
                 await _categoryService.UpdateCategoryAsync(category);
                 return Json(new { success = true, message = "Category updated successfully." });
             }
             catch (KeyNotFoundException knfEx)
             {
-                Console.WriteLine(knfEx.Message);
                 return NotFound(new { success = false, message = knfEx.Message });
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error updating category: {ex.Message}");
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
@@ -107,12 +147,10 @@ namespace ASI.Basecode.WebApp.Controllers
             }
             catch (KeyNotFoundException knfEx)
             {
-                Console.WriteLine(knfEx.Message);
                 return NotFound(new { success = false, message = knfEx.Message });
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error deleting category: {ex.Message}");
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }

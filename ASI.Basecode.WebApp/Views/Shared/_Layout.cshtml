@@ -6,6 +6,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
+
+    <!-- Add Favicon -->
+    <link rel="icon" type="image/x-icon" href="~/img/peso.ico" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/main.css" />
@@ -68,25 +71,25 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-                // Configure Toastr options
-                toastr.options = {
-                    positionClass: "toast-top-center",
-                    timeOut: 3000,
-                    closeButton: true,
-                    progressBar: true
-                };
+        // Configure Toastr options
+        toastr.options = {
+            positionClass: "toast-top-center",
+            timeOut: 3000,
+            closeButton: true,
+            progressBar: true
+        };
 
-                // Menu toggle for smaller screens
-                document.getElementById('menu-toggle').addEventListener('click', function () {
-                    const sidebarMenu = document.getElementById('sidebar-menu');
-                    sidebarMenu.classList.toggle('hidden'); // Toggle visibility of sidebar
-                });
+        // Menu toggle for smaller screens
+        document.getElementById('menu-toggle').addEventListener('click', function () {
+            const sidebarMenu = document.getElementById('sidebar-menu');
+            sidebarMenu.classList.toggle('hidden'); // Toggle visibility of sidebar
+        });
 
-                // Close button functionality
-                document.getElementById('close-menu').addEventListener('click', function () {
-                    const sidebarMenu = document.getElementById('sidebar-menu');
-                    sidebarMenu.classList.add('hidden'); // Hide sidebar when close button is clicked
-                });
+        // Close button functionality
+        document.getElementById('close-menu').addEventListener('click', function () {
+            const sidebarMenu = document.getElementById('sidebar-menu');
+            sidebarMenu.classList.add('hidden'); // Hide sidebar when close button is clicked
+        });
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

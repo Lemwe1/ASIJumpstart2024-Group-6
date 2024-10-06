@@ -85,7 +85,7 @@ namespace ASI.Basecode.WebApp
 
             services.AddMemoryCache();
 
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<AsiBasecodeDbContext>(options =>
              options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
                  .EnableSensitiveDataLogging());
 

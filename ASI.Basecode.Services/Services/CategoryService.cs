@@ -1,40 +1,40 @@
-﻿using ASI.Basecode.WebApp.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using ASI.Basecode.Data;
+using ASI.Basecode.Data.Models;
+using Microsoft.EntityFrameworkCore; // Ensure this is included
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System;
 
 namespace ASI.Basecode.WebApp.Services
 {
     public class CategoryService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly AsiBasecodeDbContext _context;
 
-        public CategoryService(ApplicationDbContext context)
+        public CategoryService(AsiBasecodeDbContext context)
         {
             _context = context;
         }
 
-        public async Task<List<CategoryModel>> GetCategoriesAsync()
+        public async Task<List<MCategory>> GetCategoriesAsync()
         {
-            return await _context.M_Category.ToListAsync();
+            return await _context.MCategories.ToListAsync(); // ToListAsync requires Microsoft.EntityFrameworkCore
         }
 
-        public async Task AddCategoryAsync(CategoryModel category)
+        public async Task AddCategoryAsync(MCategory category)
         {
-            _context.M_Category.Add(category);
+            _context.MCategories.Add(category);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<CategoryModel> GetCategoryByIdAsync(int id)
+        public async Task<MCategory> GetCategoryByIdAsync(int id)
         {
-            // Use AsNoTracking if fetching for display purposes only
-            return await _context.M_Category.AsNoTracking().FirstOrDefaultAsync(c => c.CategoryId == id);
+            return await _context.MCategories.AsNoTracking() // AsNoTracking requires Microsoft.EntityFrameworkCore
+                                .FirstOrDefaultAsync(c => c.CategoryId == id);
         }
 
-        public async Task UpdateCategoryAsync(CategoryModel category)
+        public async Task UpdateCategoryAsync(MCategory category)
         {
-            var existingCategory = await _context.M_Category.FindAsync(category.CategoryId);
+            var existingCategory = await _context.MCategories.FindAsync(category.CategoryId);
             if (existingCategory != null)
             {
                 existingCategory.Name = category.Name;
@@ -52,10 +52,10 @@ namespace ASI.Basecode.WebApp.Services
 
         public async Task DeleteCategoryAsync(int id)
         {
-            var category = await _context.M_Category.FindAsync(id);
+            var category = await _context.MCategories.FindAsync(id);
             if (category != null)
             {
-                _context.M_Category.Remove(category);
+                _context.MCategories.Remove(category);
                 await _context.SaveChangesAsync();
             }
             else
