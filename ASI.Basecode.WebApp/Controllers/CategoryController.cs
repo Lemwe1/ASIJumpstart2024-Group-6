@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace ASI.Basecode.WebApp.Controllers
@@ -23,8 +24,15 @@ namespace ASI.Basecode.WebApp.Controllers
         {
             ViewData["Title"] = "Category List";
 
-            // Retrieve list of MCategory from the service
-            var categories = await _categoryService.GetCategoriesAsync();
+            // Get user ID
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            // Retrieve list of MCategory from the service for the specific user
+            var categories = await _categoryService.GetCategoriesAsync(userId);
 
             // Map MCategory to CategoryViewModel
             var categoryViewModels = categories.Select(category => new CategoryViewModel
@@ -44,7 +52,14 @@ namespace ASI.Basecode.WebApp.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCategory(int id)
         {
-            var category = await _categoryService.GetCategoryByIdAsync(id);
+            // Get user ID
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var category = await _categoryService.GetCategoryByIdAsync(id, userId);
             if (category == null)
             {
                 return NotFound(new { success = false, message = "Category not found." });
@@ -71,11 +86,18 @@ namespace ASI.Basecode.WebApp.Controllers
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
-                return BadRequest(new { success = false, message = "Invalid data", errors });
+                return BadRequest(new { success = false, message = "Please Fill Up Everything", errors });
             }
 
             try
             {
+                // Get user ID
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized();
+                }
+
                 // Map CategoryViewModel to MCategory
                 var category = new MCategory
                 {
@@ -85,7 +107,7 @@ namespace ASI.Basecode.WebApp.Controllers
                     Color = categoryViewModel.Color
                 };
 
-                await _categoryService.AddCategoryAsync(category);
+                await _categoryService.AddCategoryAsync(category, userId);
                 return Json(new { success = true, message = "Category created successfully." });
             }
             catch (Exception ex)
@@ -112,6 +134,13 @@ namespace ASI.Basecode.WebApp.Controllers
 
             try
             {
+                // Get user ID
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized();
+                }
+
                 // Map CategoryViewModel to MCategory
                 var category = new MCategory
                 {
@@ -122,7 +151,7 @@ namespace ASI.Basecode.WebApp.Controllers
                     Color = categoryViewModel.Color
                 };
 
-                await _categoryService.UpdateCategoryAsync(category);
+                await _categoryService.UpdateCategoryAsync(category, userId);
                 return Json(new { success = true, message = "Category updated successfully." });
             }
             catch (KeyNotFoundException knfEx)
@@ -142,7 +171,14 @@ namespace ASI.Basecode.WebApp.Controllers
         {
             try
             {
-                await _categoryService.DeleteCategoryAsync(id);
+                // Get user ID
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized();
+                }
+
+                await _categoryService.DeleteCategoryAsync(id, userId);
                 return Json(new { success = true, message = "Category deleted successfully." });
             }
             catch (KeyNotFoundException knfEx)

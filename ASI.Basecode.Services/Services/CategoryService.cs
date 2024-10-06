@@ -1,7 +1,9 @@
 ﻿using ASI.Basecode.Data;
 using ASI.Basecode.Data.Models;
-using Microsoft.EntityFrameworkCore; // Ensure this is included
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ASI.Basecode.WebApp.Services
@@ -15,26 +17,55 @@ namespace ASI.Basecode.WebApp.Services
             _context = context;
         }
 
-        public async Task<List<MCategory>> GetCategoriesAsync()
+        // Get categories by UserId
+        public async Task<List<MCategory>> GetCategoriesAsync(string userId)
         {
-            return await _context.MCategories.ToListAsync(); // ToListAsync requires Microsoft.EntityFrameworkCore
+            if (!int.TryParse(userId, out int userIdInt))
+            {
+                throw new ArgumentException("Invalid user ID");
+            }
+
+            return await _context.MCategories
+                                 .Where(c => c.UserId == userIdInt)
+                                 .ToListAsync();
         }
 
-        public async Task AddCategoryAsync(MCategory category)
+        // Add a new category for a specific user
+        public async Task AddCategoryAsync(MCategory category, string userId)
         {
+            if (!int.TryParse(userId, out int userIdInt))
+            {
+                throw new ArgumentException("Invalid user ID");
+            }
+
+            category.UserId = userIdInt; // Assign the category to the user
             _context.MCategories.Add(category);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<MCategory> GetCategoryByIdAsync(int id)
+        // Get category by Id and UserId
+        public async Task<MCategory> GetCategoryByIdAsync(int id, string userId)
         {
-            return await _context.MCategories.AsNoTracking() // AsNoTracking requires Microsoft.EntityFrameworkCore
-                                .FirstOrDefaultAsync(c => c.CategoryId == id);
+            if (!int.TryParse(userId, out int userIdInt))
+            {
+                throw new ArgumentException("Invalid user ID");
+            }
+
+            return await _context.MCategories
+                                 .AsNoTracking()
+                                 .FirstOrDefaultAsync(c => c.CategoryId == id && c.UserId == userIdInt);
         }
 
-        public async Task UpdateCategoryAsync(MCategory category)
+        // Update a category for a specific user
+        public async Task UpdateCategoryAsync(MCategory category, string userId)
         {
-            var existingCategory = await _context.MCategories.FindAsync(category.CategoryId);
+            if (!int.TryParse(userId, out int userIdInt))
+            {
+                throw new ArgumentException("Invalid user ID");
+            }
+
+            var existingCategory = await _context.MCategories
+                                                 .FirstOrDefaultAsync(c => c.CategoryId == category.CategoryId && c.UserId == userIdInt);
             if (existingCategory != null)
             {
                 existingCategory.Name = category.Name;
@@ -46,13 +77,20 @@ namespace ASI.Basecode.WebApp.Services
             }
             else
             {
-                throw new KeyNotFoundException($"Category with ID {category.CategoryId} not found.");
+                throw new KeyNotFoundException($"Category with ID {category.CategoryId} not found for user {userId}.");
             }
         }
 
-        public async Task DeleteCategoryAsync(int id)
+        // Delete a category by Id and UserId
+        public async Task DeleteCategoryAsync(int id, string userId)
         {
-            var category = await _context.MCategories.FindAsync(id);
+            if (!int.TryParse(userId, out int userIdInt))
+            {
+                throw new ArgumentException("Invalid user ID");
+            }
+
+            var category = await _context.MCategories
+                                         .FirstOrDefaultAsync(c => c.CategoryId == id && c.UserId == userIdInt);
             if (category != null)
             {
                 _context.MCategories.Remove(category);
@@ -60,7 +98,7 @@ namespace ASI.Basecode.WebApp.Services
             }
             else
             {
-                throw new KeyNotFoundException($"Category with ID {id} not found.");
+                throw new KeyNotFoundException($"Category with ID {id} not found for user {userId}.");
             }
         }
     }

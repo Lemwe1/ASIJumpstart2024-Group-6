@@ -22,6 +22,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
+    <Compile Update="Views\Category.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Category.resx</DependentUpon>
+    </Compile>
     <Compile Update="Views\Screen.Designer.cs">
       <DependentUpon>Screen.resx</DependentUpon>
       <DesignTime>True</DesignTime>
@@ -56,6 +61,10 @@
     <EmbeddedResource Update="Views\Button.resx">
       <LastGenOutput>Button.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\Category.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Category.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="Views\Screen.resx">
       <LastGenOutput>Screen.Designer.cs</LastGenOutput>

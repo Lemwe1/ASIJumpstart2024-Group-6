@@ -15,7 +15,9 @@ namespace ASI.Basecode.Data.Models
         public string Type { get; set; }
         public string Icon { get; set; }
         public string Color { get; set; }
+        public int UserId { get; set; }
 
+        public virtual MUser User { get; set; }
         public virtual ICollection<MTransaction> MTransactions { get; set; }
     }
 }
