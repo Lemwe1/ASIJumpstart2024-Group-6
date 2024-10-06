@@ -27,7 +27,7 @@ namespace ASI.Basecode.Data
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=localhost;Database=AsiBasecodeDb;Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer("Server=(localdb)\\MSSqlLocalDb;Database=AsiBasecodeDb;Integrated Security=True;Trusted_Connection=True");
             }
         }
 
@@ -132,8 +132,13 @@ namespace ASI.Basecode.Data
                     .IsUnicode(false);
 
                 entity.Property(e => e.Password)
+                    .IsRequired()
                     .HasMaxLength(512)
                     .IsUnicode(false);
+
+                entity.Property(e => e.PasswordResetExpiration).HasColumnType("datetime");
+
+                entity.Property(e => e.PasswordResetToken).HasMaxLength(1000);
 
                 entity.Property(e => e.Remarks).HasMaxLength(500);
 
@@ -153,17 +158,7 @@ namespace ASI.Basecode.Data
                     .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                // Add new properties for password reset functionality
-                entity.Property(e => e.PasswordResetToken)
-                    .HasMaxLength(1000)
-                    .IsUnicode(false);  // Assuming token is string and not too large
-
-                entity.Property(e => e.PasswordResetExpiration)
-                    .HasColumnType("datetime")
-                    .IsRequired(false);  // It's nullable, so we set it as optional
             });
-
 
             OnModelCreatingPartial(modelBuilder);
         }

@@ -174,7 +174,6 @@ namespace ASI.Basecode.WebApp.Controllers
 
             _logger.LogDebug($"Generated token length: {token.Length}");
 
-
             // Store the token with an expiration date (e.g., 24 hours)
             user.PasswordResetToken = token;
             user.PasswordResetExpiration = DateTime.Now.AddHours(24);
@@ -184,20 +183,20 @@ namespace ASI.Basecode.WebApp.Controllers
             // Generate a reset link
             var resetLink = Url.Action("ResetPassword", "Account", new { token = user.PasswordResetToken }, Request.Scheme);
 
-
             // Send reset link via email
             var emailBody = $"Click <a href='{resetLink}'>here</a> to reset your password.";
             _emailService.SendEmailAsync(user.Mail, "Password Reset", emailBody);
 
-            ViewBag.SuccessMessage = "Password reset link has been sent to your email.";
-            return View();
+            // Redirect to the login page after successful email sending
+            TempData["SuccessMessage"] = "Password reset link has been sent to your email.";
+            return RedirectToAction("Login", "Account");
         }
+
 
         [HttpGet]
         [AllowAnonymous]
         public IActionResult ResetPassword(string token)
         {
-            // Ensure the token is passed correctly
             if (string.IsNullOrEmpty(token))
             {
                 ViewBag.ErrorMessage = "Invalid password reset token.";
@@ -206,9 +205,8 @@ namespace ASI.Basecode.WebApp.Controllers
 
             // Pass the token to the view by initializing the ResetPasswordViewModel
             var model = new ResetPasswordViewModel { Token = token };
-            return View(model);  // Return the view with the model
+            return View(model);  // Ensure the model is passed to the view
         }
-
 
         [HttpPost]
         [AllowAnonymous]
@@ -219,7 +217,6 @@ namespace ASI.Basecode.WebApp.Controllers
                 return View(model);  // Return the view with validation messages
             }
 
-            // Retrieve the user by the token
             var user = _userService.GetByResetToken(model.Token);
             if (user == null || user.PasswordResetExpiration < DateTime.Now)
             {
@@ -238,6 +235,7 @@ namespace ASI.Basecode.WebApp.Controllers
             ViewBag.SuccessMessage = "Password has been reset successfully. You can now log in.";
             return View();
         }
+
 
         /// <summary>
         /// Sign Out current account and return login view.
