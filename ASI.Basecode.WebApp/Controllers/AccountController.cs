@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using static ASI.Basecode.Resources.Constants.Enums;
@@ -55,31 +56,31 @@ namespace ASI.Basecode.WebApp.Controllers
         /// <returns> Created response view </returns>
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl)
+        public async Task<JsonResult> Login(LoginViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                TempData["ErrorMessage"] = "Please provide valid credentials.";
-                return View(model);  // Return with the same model in case of errors
+                return Json(new { success = false, message = "Please provide valid credentials." });
             }
-
-            this._session.SetString("HasSession", "Exist");
 
             MUser user = null;
             var loginResult = _userService.AuthenticateUser(model.UserCode, model.Password, ref user);
+
             if (loginResult == LoginResult.Success)
             {
                 // Sign in the user
                 await this._signInManager.SignInAsync(user);
                 this._session.SetString("UserName", string.Join(" ", user.FirstName, user.LastName));
-                return RedirectToAction("Index", "Home");
-            }
+
+                // Return success response to the front-end
+                return Json(new { success = true, message = "Login successful! Redirecting..."});
+                }
             else
             {
-                TempData["ErrorMessage"] = "Incorrect UserId or Password";
-                return View(model);
+                return Json(new { success = false, message = "Incorrect Username or Password" });
             }
         }
+
 
         [HttpGet]
         [AllowAnonymous]
@@ -90,25 +91,25 @@ namespace ASI.Basecode.WebApp.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public IActionResult Register(RegisterViewModel model)
+        public JsonResult Register(RegisterViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                TempData["ErrorMessage"] = "Please fill in all required fields.";
-                return View(model);  // Return with the same model in case of errors
+                // Return a JSON response indicating failure and validation error
+                return Json(new { success = false, message = "Please fill in all required fields." });
             }
 
             if (model.Password != model.ConfirmPassword)
             {
-                TempData["ErrorMessage"] = "Passwords do not match.";
-                return View(model);
+                // Return a JSON response indicating failure due to password mismatch
+                return Json(new { success = false, message = "Passwords do not match." });
             }
 
             // Check if the user code is already taken
             if (_userService.RetrieveAll(null, model.UserCode).Any())
             {
-                TempData["ErrorMessage"] = "UserCode is already taken.";
-                return View(model);
+                // Return a JSON response indicating failure due to existing user code
+                return Json(new { success = false, message = "UserCode is already taken." });
             }
 
             try
@@ -125,15 +126,17 @@ namespace ASI.Basecode.WebApp.Controllers
                 // Add the new user
                 _userService.Add(newUser);
 
-                TempData["SuccessMessage"] = "Registration successful. Please log in.";
-                return RedirectToAction("Login");
+                // Return a JSON response indicating success
+                return Json(new { success = true, message = "Registration successful! Redirecting to login..." });
             }
-            catch
+            catch (Exception ex)
             {
-                TempData["ErrorMessage"] = "An error occurred while creating the account.";
-                return View(model);
+                // Return a JSON response indicating failure due to an exception
+                return Json(new { success = false, message = "An error occurred while creating the account. Please try again later." });
             }
         }
+
+
 
         /// <summary>
         /// Sign Out current account and return login view.

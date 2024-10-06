@@ -12,7 +12,26 @@
         <img src="~/img/spendwise-banner.svg" alt="Banner" class="w-full h-full object-cover" />
     </div>
     <div class="flex items-center justify-center w-full lg:w-1/2 p-6">
-        <div class="rounded-lg shadow dark:bg-gray-800 w-full max-w-md lg:max-w-lg mx-auto min-h-[400px] sm:min-h-[450px] md:min-h-[500px] lg:min-h-[600px] flex flex-col p-8 space-y-4">
+        <div class="relative rounded-lg shadow dark:bg-gray-800 w-full max-w-md lg:max-w-lg mx-auto min-h-[400px] sm:min-h-[450px] md:min-h-[500px] lg:min-h-[600px] flex flex-col p-8 space-y-4">
+
+            
+
+            <!-- Moved overlay inside the card container -->
+            <div id="form-overlay" class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+                <div class="flex flex-col items-center space-y-4">
+                    <!-- Loading Spinner -->
+                    <div id="loading-spinner" class="hidden animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-white"></div>
+                    <!-- Success Icon -->
+                    <svg id="success-icon" class="hidden w-12 h-12 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <!-- Failure Icon -->
+                    <svg id="failure-icon" class="hidden w-12 h-12 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </div>
+            </div>
+
             <div class="flex justify-between items-center mb-4">
                 <img src="~/img/logo.svg" class="w-48 mx-auto" alt="logo">
             </div>
@@ -20,17 +39,22 @@
             <!-- Heading -->
             <h2 class="text-center text-2xl font-bold text-gray-900 dark:text-white mb-4">Login</h2>
 
-            <form method="post" action="/Account/Login" id="loginForm" class="space-y-4">
+            <!-- Error message container -->
+            <div id="error-message" class="hidden text-center text-red-500 dark:text-red-400 text-sm font-semibold"></div>
+             <!-- Success message container -->
+            <div id="success-message" class="hidden text-center text-green-500 dark:text-green-400 text-sm font-semibold"></div>
+
+            <form id="loginForm" class="space-y-4">
                 <div>
-                    <label asp-for="UserCode" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="form2Example11"></label>
-                    <input type="text" id="form2Example11" asp-for="UserCode" placeholder="Enter User Code"
-                           class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
+                    <label asp-for="UserCode" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
+                    <input type="text" id="form2Example11" asp-for="UserCode" placeholder="Enter Username"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
                     <span asp-validation-for="UserCode" class="text-danger"></span>
                 </div>
                 <div>
-                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="form2Example22">@Password</label>
+                    <label asp-for="Password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
                     <input type="password" id="form2Example22" asp-for="Password" placeholder="Enter password"
-                           class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
+                        class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
                 <div class="flex items-center justify-between">
@@ -40,7 +64,7 @@
                     </div>
                     <a href="#!" class="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500">@ForgotPass</a>
                 </div>
-                <button type="submit" class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                <button type="submit" id="submitButton" class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
                     @Login
                 </button>
                 <div class="text-center">
@@ -48,46 +72,147 @@
                     <a asp-controller="Account" asp-action="Register" class="btn btn-outline-danger">@CreateNew</a>
                 </div>
             </form>
-        </div>
-    </div>
 
-    <!-- Theme Toggle Positioned at Top Right -->
-    <div class="absolute top-4 right-4 cursor-pointer" id="theme-toggle">
-        <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v2m0 16v2m10-10h-2M4 12H2m15.364 7.364l-1.414-1.414M5.636 5.636l-1.414 1.414M18.364 5.636l1.414 1.414M5.636 18.364l1.414-1.414M12 6a6 6 0 100 12 6 6 0 000-12z" />
-        </svg>
-        <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-gray-300 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21.752 15.002A10.002 10.002 0 0113.82 22c-4.124 0-7.554-2.644-9.006-6.335a7.515 7.515 0 01-1.185-.465C1.962 14.878 0 12.493 0 10.002 0 5.582 5.373 2 12 2c1.13 0 2.242.122 3.345.354A9.002 9.002 0 0020 12.144a9.002 9.002 0 01-1.248 2.858z" />
-        </svg>
+            <!-- Theme Toggle -->
+            <div class="absolute top-4 right-4 cursor-pointer">
+                <button id="theme-toggle" class="text-gray-500 dark:text-gray-300 focus:outline-none">
+                    <svg id="sun-icon" class="w-6 h-6 hidden" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 2a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5A.75.75 0 0110 2zm0 16a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5a.75.75 0 01-.75-.75zm8.7-7.3a.75.75 0 010 1.5h-1.5a.75.75 0 010-1.5h1.5zM2 10a.75.75 0 01.75-.75H4.25a.75.75 0 010 1.5H2.75A.75.75 0 012 10zm12.07 7.07a.75.75 0 011.06-1.06l1.06 1.06a.75.75 0 01-1.06 1.06l-1.06-1.06zM4.93 4.93a.75.75 0 011.06-1.06L7.06 4.93a.75.75 0 01-1.06 1.06L4.93 5.99zM16.07 4.93a.75.75 0 011.06-1.06l1.06 1.06a.75.75 0 01-1.06 1.06L16.07 4.93zM4.93 16.07a.75.75 0 011.06 0l1.06-1.06a.75.75 0 00-1.06-1.06L4.93 15.01a.75.75 0 000 1.06zM10 5.75a4.25 4.25 0 110 8.5 4.25 4.25 0 010-8.5zm0 1.5a2.75 2.75 0 100 5.5 2.75 2.75 0 000-5.5z" />
+                    </svg>
+                    <svg id="moon-icon" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 2a8 8 0 017.463 10.84c-.152.593-.608.91-1.2.91a1.19 1.19 0 01-.75-.255 7.9 7.9 0 00-5.513-2.127 7.91 7.91 0 00-2.126 5.514 1.188 1.188 0 01-.255.75 1.189 1.189 0 01-.91.451A8 8 0 0110 2zM2 10a8 8 0 0016 0A8 8 0 002 10z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
 @section scripts {
-    <script>
-        // Check for error message and display Toastr notification
-        var errorMessage = '@TempData["ErrorMessage"]';
-        if (errorMessage) {
-            toastr.error(errorMessage);
+   <script>
+document.getElementById('loginForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent form from submitting the usual way
+
+    const overlay = document.getElementById('form-overlay');
+    const spinner = document.getElementById('loading-spinner');
+    const successIcon = document.getElementById('success-icon');
+    const failureIcon = document.getElementById('failure-icon');
+    const successMessageDiv = document.getElementById('success-message');
+    const errorMessageDiv = document.getElementById('error-message');
+
+    // Reset all icons, spinner, and messages to initial hidden state
+    spinner.classList.add('hidden');
+    successIcon.classList.add('hidden');
+    failureIcon.classList.add('hidden');
+    successMessageDiv.classList.add('hidden');
+    errorMessageDiv.classList.add('hidden'); // Hide the error message
+    overlay.classList.remove('hidden'); // Show the overlay
+
+    // Show loading spinner
+    spinner.classList.remove('hidden');
+
+    // Prepare the form data
+    const formData = new FormData(this);
+
+    // Send an AJAX request to the login endpoint
+    fetch('/Account/Login', {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Hide loading spinner
+        spinner.classList.add('hidden');
+
+        if (data.success) {
+            successIcon.classList.remove('hidden');
+            successMessageDiv.textContent = data.message; // Show success message from the response
+            successMessageDiv.classList.remove('hidden'); // Display the success message
+
+            // Redirect after showing success message for 2 seconds
+            setTimeout(function() {
+                window.location.href = "/Home/Index"; // Redirect to home page
+            }, 2000);
+        } else {
+            failureIcon.classList.remove('hidden');
+            errorMessageDiv.textContent = data.message; // Show error message from the response
+            errorMessageDiv.classList.remove('hidden'); // Display the error message
+            setTimeout(function() {
+                overlay.classList.add('hidden');
+                failureIcon.classList.add('hidden');
+            }, 2000);
         }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        spinner.classList.add('hidden');
+        failureIcon.classList.remove('hidden');
+        setTimeout(function() {
+            overlay.classList.add('hidden');
+            failureIcon.classList.add('hidden');
+        }, 2000);
+    });
+});
 
-        // Toggle theme
-        const toggle = document.getElementById('theme-toggle');
-        const sunIcon = document.getElementById('sun-icon');
-        const moonIcon = document.getElementById('moon-icon');
 
-        toggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark');
+// Check for success message and display Toastr notification
+var successMessage = '@TempData["SuccessMessage"]';
+if (successMessage) {
+    toastr.success(successMessage);
+}
 
-            // Toggle icon visibility
-            sunIcon.classList.toggle('hidden');
-            moonIcon.classList.toggle('hidden');
-        });
-    </script>
+// Check for error message and display Toastr notification
+var errorMessage = '@TempData["ErrorMessage"]';
+if (errorMessage) {
+    toastr.error(errorMessage);
+}
 
-    <style>
-        /* Additional styles for transition effects */
-        #theme-toggle {
-            transition: color 0.3s;
-        }
-    </style>
+
+// Theme toggle logic
+const toggle = document.getElementById('theme-toggle');
+const sunIcon = document.getElementById('sun-icon');
+const moonIcon = document.getElementById('moon-icon');
+
+// Check if user has a previously saved theme preference
+const savedTheme = localStorage.getItem('theme') || 'light';
+if (savedTheme === 'dark') {
+    document.body.classList.add('dark');
+    sunIcon.classList.remove('hidden');
+    moonIcon.classList.add('hidden');
+}
+
+// Toggle between dark and light mode
+toggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+
+    // Toggle icon visibility
+    sunIcon.classList.toggle('hidden');
+    moonIcon.classList.toggle('hidden');
+
+    // Save the theme preference in local storage
+    const theme = document.body.classList.contains('dark') ? 'dark' : 'light';
+    localStorage.setItem('theme', theme);
+});
+</script>
+
+   <style>
+    #theme-toggle {
+        transition: color 0.3s;
+    }
+
+    #form-overlay {
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    #loading-spinner,
+    #success-icon,
+    #failure-icon {
+        transition: visibility 0.3s, opacity 0.3s ease-in-out;
+    }
+
+    #error-message {
+        margin-top: -1rem; /* Center the error message */
+    }
+</style>
+
 }
