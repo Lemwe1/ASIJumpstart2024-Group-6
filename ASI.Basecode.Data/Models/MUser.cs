@@ -21,5 +21,7 @@ namespace ASI.Basecode.Data.Models
         public string Mail { get; set; }
         public int? UserRole { get; set; }
         public string Remarks { get; set; }
+        public string PasswordResetToken { get; set; }
+        public DateTime? PasswordResetExpiration { get; set; }
     }
 }

@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ASI.Basecode.Services.ServiceModels
 {
@@ -28,10 +25,16 @@ namespace ASI.Basecode.Services.ServiceModels
         [Required(ErrorMessage = "Password is required")]
         public string Password { get; set; }
 
-        // Add the Mail/Email property
+        // Email
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid Email Address")]
         public string Mail { get; set; }  // You can rename this to Email if preferred
+
+        // Add Password Reset Token
+        public string PasswordResetToken { get; set; }
+
+        // Add Password Reset Expiration
+        public DateTime? PasswordResetExpiration { get; set; }
     }
 
     public class UserListViewModel

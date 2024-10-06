@@ -132,7 +132,7 @@ namespace ASI.Basecode.Data
                     .IsUnicode(false);
 
                 entity.Property(e => e.Password)
-                    .HasMaxLength(50)
+                    .HasMaxLength(512)
                     .IsUnicode(false);
 
                 entity.Property(e => e.Remarks).HasMaxLength(500);
@@ -153,7 +153,17 @@ namespace ASI.Basecode.Data
                     .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                // Add new properties for password reset functionality
+                entity.Property(e => e.PasswordResetToken)
+                    .HasMaxLength(1000)
+                    .IsUnicode(false);  // Assuming token is string and not too large
+
+                entity.Property(e => e.PasswordResetExpiration)
+                    .HasColumnType("datetime")
+                    .IsRequired(false);  // It's nullable, so we set it as optional
             });
+
 
             OnModelCreatingPartial(modelBuilder);
         }

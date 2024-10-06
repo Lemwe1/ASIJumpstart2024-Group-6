@@ -30,6 +30,7 @@ namespace ASI.Basecode.WebApp.Controllers
 
         public IActionResult Index()
         {
+            ViewData["Title"] = "Home Page"; // Set the title for the home page
             return View();
         }
     }

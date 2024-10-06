@@ -53,6 +53,18 @@ namespace ASI.Basecode.Services.Services
             return model;
         }
 
+        public MUser GetByEmail(string email)
+        {
+            // Retrieve user by email from the repository
+            return _userRepository.GetUsers().SingleOrDefault(u => u.Mail == email && !u.Deleted);
+        }
+
+        public MUser GetByResetToken(string token)
+        {
+            // Retrieve user by reset token from the repository
+            return _userRepository.GetUsers().SingleOrDefault(u => u.PasswordResetToken == token && u.PasswordResetExpiration > DateTime.Now && !u.Deleted);
+        }
+
         /// <summary>
         /// Adds the specified model.
         /// </summary>
@@ -79,16 +91,23 @@ namespace ASI.Basecode.Services.Services
         /// Updates the specified model.
         /// </summary>
         /// <param name="model">The model.</param>
-        public void Update(UserViewModel model)
+        public void Update(MUser model)
         {
-            var existingData = _userRepository.GetUsers().Where(s => s.Deleted != true && s.UserId == model.Id).FirstOrDefault();
-            existingData.UserCode = model.UserCode;
-            existingData.FirstName = model.FirstName;
-            existingData.LastName = model.LastName;
-            existingData.Password = PasswordManager.EncryptPassword(model.Password);
+            var existingData = _userRepository.GetUsers().FirstOrDefault(s => !s.Deleted && s.UserId == model.UserId);
+            if (existingData != null)
+            {
+                existingData.UserCode = model.UserCode;
+                existingData.FirstName = model.FirstName;
+                existingData.LastName = model.LastName;
+                existingData.Password = PasswordManager.EncryptPassword(model.Password);  // Ensure the password is encrypted
+                existingData.PasswordResetToken = model.PasswordResetToken;
+                existingData.PasswordResetExpiration = model.PasswordResetExpiration;
 
-            _userRepository.UpdateUser(existingData);
+                _userRepository.UpdateUser(existingData);  // Call the repository to update the user in the database
+            }
         }
+
+
 
         /// <summary>
         /// Deletes the specified identifier.

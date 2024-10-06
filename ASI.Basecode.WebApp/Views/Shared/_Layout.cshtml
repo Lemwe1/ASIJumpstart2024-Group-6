@@ -24,10 +24,10 @@
             var action = ViewContext.RouteData.Values["action"].ToString();
         }
 
-        @if (controller != "Account" || (action != "Login" && action != "Register"))
+        @if (controller != "Account" || (action != "Login" && action != "Register" && action != "ForgotPassword" && action != "ResetPassword"))
         {
             <!-- Hamburger Menu Icon for small screens -->
-            <div class="lg:hidden p-4 bg-white" >
+            <div class="lg:hidden p-4 bg-white">
                 <button id="menu-toggle" class="text-black">
                     <i class="fas fa-bars fa-2x"></i>
                 </button>
@@ -52,13 +52,13 @@
                     </nav>
                 </div>
             </div>
-
         }
 
         <main role="main" class="flex-1">
             @RenderBody()
         </main>
     </div>
+
 
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
