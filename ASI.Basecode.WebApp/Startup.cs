@@ -1,6 +1,8 @@
 ﻿using ASI.Basecode.Data;
 using ASI.Basecode.Resources.Constants;
+using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.Manager;
+using ASI.Basecode.Services.Services;
 using ASI.Basecode.WebApp.Authentication;
 using ASI.Basecode.WebApp.Extensions.Configuration;
 using ASI.Basecode.WebApp.Models;
@@ -83,9 +85,6 @@ namespace ASI.Basecode.WebApp
 
             services.AddMemoryCache();
 
-
-
-
             services.AddDbContext<AsiBasecodeDbContext>(options =>
              options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
                  .EnableSensitiveDataLogging());
@@ -105,6 +104,9 @@ namespace ASI.Basecode.WebApp
 
             // Registering the CategoryService
             services.AddScoped<CategoryService>();
+
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IEmailService, EmailService>();
 
             //Configuration
             services.Configure<TokenAuthentication>(Configuration.GetSection("TokenAuthentication"));
