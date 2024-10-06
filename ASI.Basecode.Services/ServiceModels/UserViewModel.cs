@@ -16,17 +16,22 @@ namespace ASI.Basecode.Services.ServiceModels
 
         public string Description { get; set; }
 
-        [Required(ErrorMessage = "This is required")]
+        [Required(ErrorMessage = "UserCode is required")]
         public string UserCode { get; set; }
 
-        [Required(ErrorMessage = "This is required")]
+        [Required(ErrorMessage = "FirstName is required")]
         public string FirstName { get; set; }
 
-        [Required(ErrorMessage = "This is required")]
+        [Required(ErrorMessage = "LastName is required")]
         public string LastName { get; set; }
 
-        [Required(ErrorMessage = "This is required")]
+        [Required(ErrorMessage = "Password is required")]
         public string Password { get; set; }
+
+        // Add the Mail/Email property
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Invalid Email Address")]
+        public string Mail { get; set; }  // You can rename this to Email if preferred
     }
 
     public class UserListViewModel

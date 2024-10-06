@@ -1,64 +1,98 @@
-﻿@using ASI.Basecode.Services.ServiceModels
-@model             ASI.Basecode.Services.ServiceModels.LoginViewModel
+﻿@using static ASI.Basecode.Resources.Views.Screen
+@using static ASI.Basecode.Resources.Views.Account
+@using ASI.Basecode.Services.ServiceModels
+@model ASI.Basecode.Services.ServiceModels.RegisterViewModel
 @{
     ViewBag.LoginView = true;
     ViewData["Title"] = "Register Page";
 }
-@section styles {
-    <link rel="stylesheet" href="~/css/login.css" />
-}
-<div class="container py-5 h-100 register-box">
-    <div class="row d-flex justify-content-center align-items-center h-100">
-        <div class="col-xl-10">
-            <div class="card rounded-3 text-black">
-                <div class="row g-0">
-                    <div class="card-body p-md-5 mx-md-4">
 
-                        <div class="text-center">
-                            <img src="https://www.alliance.com.ph/images/asi-logo-invert.svg"
-                                 style="width: 185px;" alt="logo">
-                        </div>
+<div class="flex h-screen bg-gray-50 dark:bg-gray-900 relative">
+    <div class="hidden lg:flex lg:w-1/2">
+        <img src="~/img/spendwise-banner.svg" alt="Banner" class="w-full h-full object-cover" />
+    </div>
 
-                        <form method="post" action="/Account/Register">
-                            <div class="form-outline mb-4">
-                                <label class="form-label" for="userId">UserId</label>
-                                <input type="text" id="userId" class="form-control"
-                                       asp-for="UserId" placeholder="Enter userid" />
-                                <span asp-validation-for="UserId" class="text-danger"></span>
-                            </div>
-                            <div class="form-outline mb-4">
-                                <label class="form-label" for="name">Name</label>
-                                <input type="text" id="name" class="form-control"
-                                       asp-for="Name" placeholder="Enter name" />
-                                <span asp-validation-for="Name" class="text-danger"></span>
-                            </div>
-                            <div class="form-outline mb-4">
-                                <label class="form-label" for="password">Password</label>
-                                <input type="password" id="password" class="form-control"
-                                       asp-for="Password" placeholder="Enter password" />
-                                <span asp-validation-for="Password" class="text-danger"></span>
-                            </div>
-                            <div class="form-outline mb-4">
-                                <label class="form-label" for="confirmpassword">Confirm Password</label>
-                                <input type="password" id="confirmpassword" class="form-control" 
-                                       asp-for="ConfirmPassword" placeholder="Confirm Password" />
-                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                            </div>
-                            <div class="text-center pt-1 mb-5 pb-1 d-flex flex-column align-items-center">
-                                <button class="btn btn-primary btn-block login-btn gradient-custom-2 mb-3" type="submit">
-                                    Register
-                                </button>
-                                <a asp-controller="Account" asp-action="Login">
-                                    &#8592 Back
-                                </a>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+    <div class="flex items-center justify-center w-full lg:w-1/2 p-6">
+        <div class="rounded-lg shadow dark:bg-gray-800 w-full max-w-md lg:max-w-lg mx-auto min-h-[400px] sm:min-h-[450px] md:min-h-[500px] lg:min-h-[600px] flex flex-col p-8 space-y-4">
+            
+            <div class="flex justify-between items-center mb-4">
+                <img src="~/img/logo.svg" class="w-48 mx-auto" alt="logo">
             </div>
+
+            <!-- Heading -->
+            <h2 class="text-center text-2xl font-bold text-gray-900 dark:text-white mb-4">Register</h2>
+
+            <form method="post" action="/Account/Register" id="registerForm" class="space-y-4">
+                <!-- User Code -->
+                <div>
+                    <label asp-for="UserCode" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+                    <input type="text" asp-for="UserCode" placeholder="Enter User Code"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
+                    <span asp-validation-for="UserCode" class="text-danger"></span>
+                </div>
+
+                <!-- First Name -->
+                <div>
+                    <label asp-for="FirstName" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+                    <input type="text" asp-for="FirstName" placeholder="Enter First Name"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+
+                <!-- Last Name -->
+                <div>
+                    <label asp-for="LastName" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+                    <input type="text" asp-for="LastName" placeholder="Enter Last Name"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label asp-for="Email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+                    <input type="email" asp-for="Email" placeholder="Enter Email"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label asp-for="Password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+                    <input type="password" asp-for="Password" placeholder="Enter Password"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <!-- Confirm Password -->
+                <div>
+                    <label asp-for="ConfirmPassword" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+                    <input type="password" asp-for="ConfirmPassword" placeholder="Confirm Password"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                    Register
+                </button>
+
+                <div class="text-center">
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-outline-danger">@BackToLogin</a>
+                </div>
+            </form>
         </div>
     </div>
+
+    <!-- Theme Toggle Positioned at Top Right -->
+    <div class="absolute top-4 right-4 cursor-pointer" id="theme-toggle">
+        <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v2m0 16v2m10-10h-2M4 12H2m15.364 7.364l-1.414-1.414M5.636 5.636l-1.414 1.414M18.364 5.636l1.414 1.414M5.636 18.364l1.414-1.414M12 6a6 6 0 100 12 6 6 0 000-12z" />
+        </svg>
+        <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-gray-300 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21.752 15.002A10.002 10.002 0 0113.82 22c-4.124 0-7.554-2.644-9.006-6.335a7.515 7.515 0 01-1.185-.465C1.962 14.878 0 12.493 0 10.002 0 5.582 5.373 2 12 2c1.13 0 2.242.122 3.345.354A9.002 9.002 0 0020 12.144a9.002 9.002 0 01-1.248 2.858z" />
+        </svg>
+    </div>
 </div>
+
 @section scripts {
     <script>
         // Check for error message and display Toastr notification
@@ -66,5 +100,25 @@
         if (errorMessage) {
             toastr.error(errorMessage);
         }
+
+                // Toggle theme
+                const toggle = document.getElementById('theme-toggle');
+                const sunIcon = document.getElementById('sun-icon');
+                const moonIcon = document.getElementById('moon-icon');
+
+                toggle.addEventListener('click', () => {
+                    document.body.classList.toggle('dark');
+
+                    // Toggle icon visibility
+                    sunIcon.classList.toggle('hidden');
+                    moonIcon.classList.toggle('hidden');
+                });
     </script>
+
+    <style>
+        /* Additional styles for transition effects */
+        #theme-toggle {
+            transition: color 0.3s;
+        }
+    </style>
 }

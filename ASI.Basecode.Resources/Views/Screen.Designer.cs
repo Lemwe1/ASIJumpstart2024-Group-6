@@ -61,6 +61,15 @@ namespace ASI.Basecode.Resources.Views {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Back to Login.
+        /// </summary>
+        public static string BackToLogin {
+            get {
+                return ResourceManager.GetString("BackToLogin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ©2023 Alliance Software Inc. All rights reserved..
         /// </summary>
         public static string Copyright {

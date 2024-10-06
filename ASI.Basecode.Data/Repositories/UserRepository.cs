@@ -32,7 +32,7 @@ namespace ASI.Basecode.Data.Repositories
             user.UserId = maxId;
             user.UpdDt = DateTime.Now;
             this.GetDbSet<MUser>().Add(user);
-            UnitOfWork.SaveChanges();
+            UnitOfWork.SaveChanges();  // Persist the user to the database
         }
 
         public void UpdateUser(MUser user)

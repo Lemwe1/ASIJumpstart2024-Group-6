@@ -141,4 +141,7 @@
   <data name="UserId" xml:space="preserve">
     <value>UserId</value>
   </data>
+  <data name="BackToLogin" xml:space="preserve">
+    <value>Back to Login</value>
+  </data>
 </root>
