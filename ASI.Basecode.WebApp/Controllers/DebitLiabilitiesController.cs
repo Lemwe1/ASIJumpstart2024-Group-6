@@ -20,47 +20,53 @@ namespace ASI.Basecode.WebApp.Controllers
         // GET: /DebitLiabilities/
         public async Task<IActionResult> Index()
         {
+            // Get the logged-in user's ID
+            int userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "UserId").Value);
+
+            // Fetch the debit liabilities belonging to the logged-in user
             var debitLiabilities = await _debitLiabilitiesService.GetDebitLiabilitiesAsync();
 
-            // Calculate the total debit and total liabilities
-            var totalDebit = debitLiabilities.Where(x => x.DeLiType == "debit").Sum(x => x.DeLiBalance);
-            var totalLiabilities = debitLiabilities.Where(x => x.DeLiType == "borrowed").Sum(x => x.DeLiBalance);
+            // Filter the list after awaiting the async method
+            var userDebitLiabilities = debitLiabilities.Where(x => x.UserId == userId).ToList();
 
-            // Calculate net worth
+            // Calculate totals
+            var totalDebit = userDebitLiabilities.Where(x => x.DeLiType == "debit").Sum(x => x.DeLiBalance);
+            var totalLiabilities = userDebitLiabilities.Where(x => x.DeLiType == "borrowed").Sum(x => x.DeLiBalance);
             var netWorth = totalDebit - totalLiabilities;
 
-            // Pass the values to the view using ViewBag or ViewData
             ViewBag.TotalDebit = totalDebit;
             ViewBag.TotalLiabilities = totalLiabilities;
             ViewBag.NetWorth = netWorth;
 
-            return View(debitLiabilities);
+            return View(userDebitLiabilities);
         }
-
 
         // POST: /DebitLiabilities/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([FromBody] MDebitLiab model)
         {
-            Console.WriteLine("Request received");  // Log that the request was received
+            Console.WriteLine("Request received");
 
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
-                Console.WriteLine($"ModelState errors: {string.Join(", ", errors)}");  // Log ModelState errors
+                Console.WriteLine($"ModelState errors: {string.Join(", ", errors)}");
                 return BadRequest(new { success = false, message = "Invalid data", errors });
             }
 
             if (string.IsNullOrEmpty(model.DeLiType))
             {
-                Console.WriteLine("DeLiType is required.");  // Log missing DeLiType
+                Console.WriteLine("DeLiType is required.");
                 return BadRequest(new { success = false, message = "DeLiType is required." });
             }
 
             try
             {
-                Console.WriteLine("Creating new Debit Liability");  // Log success step
+                Console.WriteLine("Creating new Debit Liability");
+
+                // Get the currently logged-in user's ID (adjust as necessary for your authentication setup)
+                int userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "UserId").Value);
 
                 var newDebitLiab = new MDebitLiab
                 {
@@ -70,7 +76,8 @@ namespace ASI.Basecode.WebApp.Controllers
                     DeLiBalance = model.DeLiBalance,
                     DeLiName = model.DeLiName,
                     DeLiHapp = model.DeLiHapp,
-                    DeLiDue = model.DeLiDue
+                    DeLiDue = model.DeLiDue,
+                    UserId = userId // Set the UserId to the logged-in user's ID
                 };
 
                 await _debitLiabilitiesService.AddDebitLiabilityAsync(newDebitLiab);
@@ -78,11 +85,10 @@ namespace ASI.Basecode.WebApp.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");  // Log the exception
+                Console.WriteLine($"Error: {ex.Message}");
                 return StatusCode(500, new { success = false, message = $"Server error: {ex.Message}" });
             }
         }
-
 
         // POST: /DebitLiabilities/Edit/{id}
         [HttpPost]

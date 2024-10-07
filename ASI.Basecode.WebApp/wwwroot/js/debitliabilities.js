@@ -293,7 +293,7 @@ document.getElementById('addAccountForm').addEventListener('submit', async (e) =
 
         const result = await response.json();
         if (result.success) {
-            alert(result.message);
+           // alert(result.message);
 
             // Close the modal
             closeModal(addAccountModal);
@@ -305,11 +305,11 @@ document.getElementById('addAccountForm').addEventListener('submit', async (e) =
 
         } else {
             console.error(result.errors);
-            alert(result.message);
+            //alert(result.message);
         }
     } catch (error) {
         console.error('Error saving account:', error);
-        alert('Error saving account');
+        //alert('Error saving account');
     }
 });
 

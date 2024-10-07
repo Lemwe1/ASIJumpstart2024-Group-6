@@ -64,8 +64,6 @@ namespace ASI.Basecode.Data
                     .IsRequired()
                     .HasMaxLength(20);
 
-                entity.Property(e => e.DeLiDest).HasMaxLength(255);
-
                 entity.Property(e => e.DeLiDue).HasColumnType("datetime");
 
                 entity.Property(e => e.DeLiHapp).HasColumnType("datetime");
@@ -81,6 +79,12 @@ namespace ASI.Basecode.Data
                 entity.Property(e => e.DeLiType)
                     .IsRequired()
                     .HasMaxLength(50);
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.MDebitLiabs)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_M_DebitLiab_UserId");
             });
 
             modelBuilder.Entity<MTransaction>(entity =>
