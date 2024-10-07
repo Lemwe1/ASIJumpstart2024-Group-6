@@ -7,7 +7,9 @@ namespace ASI.Basecode.Data.Models
     {
         public MUser()
         {
+            MCategories = new HashSet<MCategory>();
             MDebitLiabs = new HashSet<MDebitLiab>();
+            MTransactions = new HashSet<MTransaction>();
         }
 
         public int UserId { get; set; }
@@ -29,6 +31,8 @@ namespace ASI.Basecode.Data.Models
         public string PasswordResetToken { get; set; }
         public DateTime? PasswordResetExpiration { get; set; }
 
+        public virtual ICollection<MCategory> MCategories { get; set; }
         public virtual ICollection<MDebitLiab> MDebitLiabs { get; set; }
+        public virtual ICollection<MTransaction> MTransactions { get; set; }
     }
 }

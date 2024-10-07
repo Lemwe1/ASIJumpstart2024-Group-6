@@ -19,6 +19,7 @@ namespace ASI.Basecode.Data
 
         public virtual DbSet<MCategory> MCategories { get; set; }
         public virtual DbSet<MDebitLiab> MDebitLiabs { get; set; }
+        public virtual DbSet<MRole> MRoles { get; set; }
         public virtual DbSet<MTransaction> MTransactions { get; set; }
         public virtual DbSet<MUser> MUsers { get; set; }
 
@@ -27,7 +28,7 @@ namespace ASI.Basecode.Data
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Addr=NI¥O\\SQLEXPRESS;database=AsiBasecodeDb;Integrated Security=False;Trusted_Connection=True");
+                optionsBuilder.UseSqlServer("Data Source=DESKTOP-90VPBGF\\SQLEXPRESS;Database=AsiBasecodeDb;Trusted_Connection=True;");
             }
         }
 
@@ -36,7 +37,7 @@ namespace ASI.Basecode.Data
             modelBuilder.Entity<MCategory>(entity =>
             {
                 entity.HasKey(e => e.CategoryId)
-                    .HasName("PK__M_Catego__19093A0B8E1E94F1");
+                    .HasName("PK__M_Catego__19093A0B5AF64C2D");
 
                 entity.ToTable("M_Category");
 
@@ -49,12 +50,18 @@ namespace ASI.Basecode.Data
                     .HasMaxLength(100);
 
                 entity.Property(e => e.Type).IsRequired();
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.MCategories)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_MCategory_MUser_UserId");
             });
 
             modelBuilder.Entity<MDebitLiab>(entity =>
             {
                 entity.HasKey(e => e.DeLiId)
-                    .HasName("PK__M_DebitL__B2BE78F23571057B");
+                    .HasName("PK__M_DebitL__B2BE78F24FEF129A");
 
                 entity.ToTable("M_DebitLiab");
 
@@ -87,10 +94,24 @@ namespace ASI.Basecode.Data
                     .HasConstraintName("FK_M_DebitLiab_UserId");
             });
 
+            modelBuilder.Entity<MRole>(entity =>
+            {
+                entity.HasKey(e => e.RoleId);
+
+                entity.ToTable("M_ROLE");
+
+                entity.Property(e => e.RoleId).ValueGeneratedNever();
+
+                entity.Property(e => e.RoleName)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+            });
+
             modelBuilder.Entity<MTransaction>(entity =>
             {
                 entity.HasKey(e => e.TransactionId)
-                    .HasName("PK__M_Transa__55433A6BF2A6D7D5");
+                    .HasName("PK__M_Transa__55433A6B991FCE31");
 
                 entity.ToTable("M_Transaction");
 
@@ -102,17 +123,27 @@ namespace ASI.Basecode.Data
 
                 entity.Property(e => e.TransactionDate).HasColumnType("date");
 
+                entity.Property(e => e.TransactionType)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
                 entity.HasOne(d => d.Category)
                     .WithMany(p => p.MTransactions)
                     .HasForeignKey(d => d.CategoryId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__M_Transac__Categ__4E88ABD4");
+                    .HasConstraintName("fk_category_id");
 
                 entity.HasOne(d => d.DeLi)
                     .WithMany(p => p.MTransactions)
                     .HasForeignKey(d => d.DeLiId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__M_Transac__DeLiI__4F7CD00D");
+                    .HasConstraintName("fk_deli_id");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.MTransactions)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("fk_user_id");
             });
 
             modelBuilder.Entity<MUser>(entity =>
