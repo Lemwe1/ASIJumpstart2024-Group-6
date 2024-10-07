@@ -43,3 +43,11 @@ CREATE TABLE M_Transaction (
     CONSTRAINT fk_deli_id FOREIGN KEY (DeLiId) REFERENCES M_DebitLiab(DeLiId),
     CONSTRAINT fk_user_id FOREIGN KEY (UserId) REFERENCES M_User(UserId)
 );
+
+
+
+
+-----------------------
+For Scaffolding
+
+Scaffold-DbContext "{Addr=(LocalDB)\MSSQLLocalDB;database=AsiBasecodeDb;Integrated Security=False;Trusted_Connection=True}" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -ContextDir . -F
