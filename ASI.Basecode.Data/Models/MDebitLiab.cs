@@ -15,10 +15,12 @@ namespace ASI.Basecode.Data.Models
         public decimal DeLiBalance { get; set; }
         public string DeLiIcon { get; set; }
         public string DeLiColor { get; set; }
-        public string DeLiDest { get; set; }
         public DateTime? DeLiHapp { get; set; }
         public DateTime? DeLiDue { get; set; }
+        public string DeLiName { get; set; }
+        public int UserId { get; set; }
 
+        public virtual MUser User { get; set; }
         public virtual ICollection<MTransaction> MTransactions { get; set; }
     }
 }

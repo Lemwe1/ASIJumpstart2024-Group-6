@@ -105,6 +105,8 @@ namespace ASI.Basecode.WebApp
             // Registering the CategoryService
             services.AddScoped<CategoryService>();
 
+            services.AddScoped<DebitLiabilitiesService>();
+
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IEmailService, EmailService>();
 
