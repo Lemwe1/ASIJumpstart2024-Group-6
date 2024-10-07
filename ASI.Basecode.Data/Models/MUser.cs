@@ -5,6 +5,11 @@ namespace ASI.Basecode.Data.Models
 {
     public partial class MUser
     {
+        public MUser()
+        {
+            MDebitLiabs = new HashSet<MDebitLiab>();
+        }
+
         public int UserId { get; set; }
         public string InsBy { get; set; }
         public DateTime InsDt { get; set; }
@@ -23,5 +28,7 @@ namespace ASI.Basecode.Data.Models
         public string Remarks { get; set; }
         public string PasswordResetToken { get; set; }
         public DateTime? PasswordResetExpiration { get; set; }
+
+        public virtual ICollection<MDebitLiab> MDebitLiabs { get; set; }
     }
 }
