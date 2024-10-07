@@ -2,7 +2,6 @@
 
 FOR QUERY:
 
-
 CREATE TABLE M_Category (
     CategoryId INT PRIMARY KEY IDENTITY(1,1),
     Name NVARCHAR(100) NOT NULL,
@@ -12,6 +11,8 @@ CREATE TABLE M_Category (
     UserId INT NOT NULL,
     CONSTRAINT FK_MCategory_MUser_UserId FOREIGN KEY (UserId) REFERENCES M_User(UserId)
 ); 
+
+
 CREATE TABLE M_DebitLiab (
     DeLiId INT PRIMARY KEY IDENTITY(1,1),
     DeLiType NVARCHAR(50) NOT NULL,
@@ -24,6 +25,9 @@ CREATE TABLE M_DebitLiab (
     UserId INT NOT NULL,
     CONSTRAINT FK_M_DebitLiab_UserId FOREIGN KEY (UserId) REFERENCES M_User(UserId)
 );
+
+
+
 CREATE TABLE M_Transaction (
     TransactionId INT PRIMARY KEY IDENTITY(1,1),
     CategoryId INT NOT NULL,
