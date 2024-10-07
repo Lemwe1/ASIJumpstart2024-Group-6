@@ -27,7 +27,7 @@ namespace ASI.Basecode.Data
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=(localdb)\\MSSqlLocalDb;Database=AsiBasecodeDb;Integrated Security=True;Trusted_Connection=True");
+                optionsBuilder.UseSqlServer("Addr=NI¥O\\SQLEXPRESS;database=AsiBasecodeDb;Integrated Security=False;Trusted_Connection=True");
             }
         }
 
@@ -36,7 +36,7 @@ namespace ASI.Basecode.Data
             modelBuilder.Entity<MCategory>(entity =>
             {
                 entity.HasKey(e => e.CategoryId)
-                    .HasName("PK__M_Catego__19093A0B66626202");
+                    .HasName("PK__M_Catego__19093A0B8E1E94F1");
 
                 entity.ToTable("M_Category");
 
@@ -54,13 +54,15 @@ namespace ASI.Basecode.Data
             modelBuilder.Entity<MDebitLiab>(entity =>
             {
                 entity.HasKey(e => e.DeLiId)
-                    .HasName("PK__M_DebitL__B2BE78F21867EB6F");
+                    .HasName("PK__M_DebitL__B2BE78F23571057B");
 
                 entity.ToTable("M_DebitLiab");
 
                 entity.Property(e => e.DeLiBalance).HasColumnType("decimal(10, 2)");
 
-                entity.Property(e => e.DeLiColor).HasMaxLength(20);
+                entity.Property(e => e.DeLiColor)
+                    .IsRequired()
+                    .HasMaxLength(20);
 
                 entity.Property(e => e.DeLiDest).HasMaxLength(255);
 
@@ -68,7 +70,13 @@ namespace ASI.Basecode.Data
 
                 entity.Property(e => e.DeLiHapp).HasColumnType("datetime");
 
-                entity.Property(e => e.DeLiIcon).HasMaxLength(255);
+                entity.Property(e => e.DeLiIcon)
+                    .IsRequired()
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.DeLiName)
+                    .IsRequired()
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.DeLiType)
                     .IsRequired()
@@ -78,7 +86,7 @@ namespace ASI.Basecode.Data
             modelBuilder.Entity<MTransaction>(entity =>
             {
                 entity.HasKey(e => e.TransactionId)
-                    .HasName("PK__M_Transa__55433A6B73C58A00");
+                    .HasName("PK__M_Transa__55433A6BF2A6D7D5");
 
                 entity.ToTable("M_Transaction");
 
@@ -94,13 +102,13 @@ namespace ASI.Basecode.Data
                     .WithMany(p => p.MTransactions)
                     .HasForeignKey(d => d.CategoryId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__M_Transac__Categ__2E1BDC42");
+                    .HasConstraintName("FK__M_Transac__Categ__4E88ABD4");
 
                 entity.HasOne(d => d.DeLi)
                     .WithMany(p => p.MTransactions)
                     .HasForeignKey(d => d.DeLiId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__M_Transac__DeLiI__2F10007B");
+                    .HasConstraintName("FK__M_Transac__DeLiI__4F7CD00D");
             });
 
             modelBuilder.Entity<MUser>(entity =>

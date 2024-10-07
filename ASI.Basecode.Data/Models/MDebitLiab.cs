@@ -18,6 +18,7 @@ namespace ASI.Basecode.Data.Models
         public string DeLiDest { get; set; }
         public DateTime? DeLiHapp { get; set; }
         public DateTime? DeLiDue { get; set; }
+        public string DeLiName { get; set; }
 
         public virtual ICollection<MTransaction> MTransactions { get; set; }
     }

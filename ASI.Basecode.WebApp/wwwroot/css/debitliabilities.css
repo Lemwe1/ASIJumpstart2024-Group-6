@@ -1,3 +1,17 @@
+.accountCard {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    color: #fff;
+}
+
+/* Button styles */
+#addAccountButton {
+    padding: 0.5rem 1rem;
+    background-color: #3b82f6;
+    color: #fff;
+    border-radius: 0.5rem;
+}
+
 /* Style for modal body */
 #modalContent .modal-body {
     max-height: 400px; /* Set max height for modal body */
