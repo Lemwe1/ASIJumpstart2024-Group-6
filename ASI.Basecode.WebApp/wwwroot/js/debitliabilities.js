@@ -442,25 +442,37 @@ document.getElementById('deleteAccountButton').addEventListener('click', async (
     const id = document.getElementById('editAccountId').value;
 
     if (confirm('Are you sure you want to delete this account?')) {
+        // Retrieve CSRF token
+        const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
+        const token = tokenElement ? tokenElement.value : null;
+
         try {
             const response = await fetch(`/DebitLiabilities/Delete/${id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'RequestVerificationToken': token // Include CSRF token if required
+                    'RequestVerificationToken': token
                 }
             });
+
+            if (!response.ok) {
+                console.error('Server responded with an error:', await response.text());
+                return;
+            }
 
             const result = await response.json();
             if (result.success) {
                 closeModal(editAccountModal);
                 await loadAccounts(); // Refresh account list
+                // Automatically refresh the page
+                location.reload();
             } else {
-                console.error(result.message);
+                console.error('Deletion failed:', result.message);
             }
         } catch (error) {
             console.error('Error deleting account:', error);
         }
     }
 });
+
 

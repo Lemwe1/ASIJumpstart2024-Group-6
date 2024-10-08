@@ -1,9 +1,11 @@
 ﻿using ASI.Basecode.Data.Models;
 using ASI.Basecode.Services.Services;
+using ASI.Basecode.WebApp.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace ASI.Basecode.WebApp.Controllers
@@ -141,8 +143,15 @@ namespace ASI.Basecode.WebApp.Controllers
         {
             try
             {
+                // Get user ID
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized(new { success = false, message = "User is not authenticated." });
+                }
+
                 await _debitLiabilitiesService.DeleteDebitLiabilityAsync(id);
-                return Json(new { success = true, message = "Debit Liability deleted successfully." });
+                return Json(new { success = true, message = "Debit liability deleted successfully." });
             }
             catch (KeyNotFoundException knfEx)
             {
@@ -150,8 +159,9 @@ namespace ASI.Basecode.WebApp.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { success = false, message = ex.Message });
+                return StatusCode(500, new { success = false, message = $"Internal server error: {ex.Message}" });
             }
         }
+
     }
 }
