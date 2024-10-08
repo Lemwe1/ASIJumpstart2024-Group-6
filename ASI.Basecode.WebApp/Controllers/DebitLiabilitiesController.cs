@@ -24,10 +24,12 @@ namespace ASI.Basecode.WebApp.Controllers
             int userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "UserId").Value);
 
             // Fetch the debit liabilities belonging to the logged-in user
-            var debitLiabilities = await _debitLiabilitiesService.GetDebitLiabilitiesAsync();
+            var debitLiabilities = await _debitLiabilitiesService.GetDebitLiabilitiesAsync(userId); // Pass userId here
 
-            // Filter the list after awaiting the async method
-            var userDebitLiabilities = debitLiabilities.Where(x => x.UserId == userId).ToList();
+            // Filter the list after awaiting the async method and convert to a List
+            var userDebitLiabilities = debitLiabilities
+                .Where(x => x.UserId == userId)
+                .ToList(); // Convert to List<MDebitLiab>
 
             // Calculate totals
             var totalDebit = userDebitLiabilities.Where(x => x.DeLiType == "debit").Sum(x => x.DeLiBalance);
@@ -46,54 +48,49 @@ namespace ASI.Basecode.WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([FromBody] MDebitLiab model)
         {
-            Console.WriteLine("Request received");
-
             if (!ModelState.IsValid)
             {
-                var errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
-                Console.WriteLine($"ModelState errors: {string.Join(", ", errors)}");
-                return BadRequest(new { success = false, message = "Invalid data", errors });
-            }
-
-            if (string.IsNullOrEmpty(model.DeLiType))
-            {
-                Console.WriteLine("DeLiType is required.");
-                return BadRequest(new { success = false, message = "DeLiType is required." });
+                return BadRequest(new { success = false, message = "Invalid data", errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
             }
 
             try
             {
-                Console.WriteLine("Creating new Debit Liability");
-
-                // Get the currently logged-in user's ID (adjust as necessary for your authentication setup)
-                int userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "UserId").Value);
-
-                var newDebitLiab = new MDebitLiab
+                // Get the currently logged-in user's ID
+                var userClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId");
+                if (userClaim == null)
                 {
-                    DeLiType = model.DeLiType,
-                    DeLiIcon = model.DeLiIcon,
-                    DeLiColor = model.DeLiColor,
-                    DeLiBalance = model.DeLiBalance,
-                    DeLiName = model.DeLiName,
-                    DeLiHapp = model.DeLiHapp,
-                    DeLiDue = model.DeLiDue,
-                    UserId = userId // Set the UserId to the logged-in user's ID
-                };
+                    return BadRequest(new { success = false, message = "User not authenticated." });
+                }
 
-                await _debitLiabilitiesService.AddDebitLiabilityAsync(newDebitLiab);
+                int userId = int.Parse(userClaim.Value);
+                model.UserId = userId; // Set the UserId to the logged-in user's ID
+
+                // Handle specific properties for borrowed accounts if applicable
+                if (model.DeLiType == "borrowed")
+                {
+                    // You can add further validations if required for borrowed accounts
+                    if (model.DeLiHapp == null || model.DeLiDue == null)
+                    {
+                        return BadRequest(new { success = false, message = "Happening date and due date are required for borrowed accounts." });
+                    }
+                }
+
+                await _debitLiabilitiesService.AddDebitLiabilityAsync(model);
+
                 return Json(new { success = true, message = "Debit Liability created successfully." });
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
+                // Log the exception message (optional: use a logging framework)
                 return StatusCode(500, new { success = false, message = $"Server error: {ex.Message}" });
             }
         }
 
+
         // POST: /DebitLiabilities/Edit/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, MDebitLiab model)
+        public async Task<IActionResult> Edit(int id, [FromBody] MDebitLiab model)
         {
             if (id != model.DeLiId)
             {
@@ -108,19 +105,7 @@ namespace ASI.Basecode.WebApp.Controllers
 
             try
             {
-                // Map ViewModel to Model
-                var debitLiability = new MDebitLiab
-                {
-                    DeLiId = model.DeLiId,
-                    DeLiType = model.DeLiType,
-                    DeLiIcon = model.DeLiIcon,
-                    DeLiColor = model.DeLiColor,
-                    DeLiBalance = model.DeLiBalance,
-                    DeLiHapp = model.DeLiHapp,
-                    DeLiDue = model.DeLiDue
-                };
-
-                await _debitLiabilitiesService.UpdateDebitLiabilityAsync(debitLiability);
+                await _debitLiabilitiesService.UpdateDebitLiabilityAsync(model);
                 return Json(new { success = true, message = "Debit Liability updated successfully." });
             }
             catch (KeyNotFoundException knfEx)

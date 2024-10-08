@@ -1,50 +1,45 @@
-﻿using ASI.Basecode.Data;
+﻿using ASI.Basecode.Data.Interfaces;
 using ASI.Basecode.Data.Models;
-using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ASI.Basecode.Services.Services
 {
     public class DebitLiabilitiesService
     {
-        private readonly AsiBasecodeDbContext _context;
+        private readonly IDebitLiabilitiesRepository _debitLiabilitiesRepository;
 
-        public DebitLiabilitiesService(AsiBasecodeDbContext context)
+        public DebitLiabilitiesService(IDebitLiabilitiesRepository debitLiabilitiesRepository)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _debitLiabilitiesRepository = debitLiabilitiesRepository;
         }
 
-        // Get all debit liabilities
-        public async Task<List<MDebitLiab>> GetDebitLiabilitiesAsync()
+        public async Task<IEnumerable<MDebitLiab>> GetDebitLiabilitiesAsync(int userId)
         {
-            return await _context.MDebitLiabs.ToListAsync();
+            // Await the task to get the result
+            var allLiabilities = await _debitLiabilitiesRepository.RetrieveAllAsync();
+
+            // Filter the results based on the userId
+            return allLiabilities.Where(x => x.UserId == userId);
         }
 
-        // Add a new debit liability
+
+
+
         public async Task AddDebitLiabilityAsync(MDebitLiab model)
         {
-            _context.MDebitLiabs.Add(model);
-            await _context.SaveChangesAsync();
+            await _debitLiabilitiesRepository.AddAsync(model);
         }
 
-        // Update an existing debit liability
         public async Task UpdateDebitLiabilityAsync(MDebitLiab model)
         {
-            _context.MDebitLiabs.Update(model);
-            await _context.SaveChangesAsync();
+            await _debitLiabilitiesRepository.UpdateAsync(model);
         }
 
-        // Delete a debit liability
         public async Task DeleteDebitLiabilityAsync(int id)
         {
-            var entity = await _context.MDebitLiabs.FindAsync(id);
-            if (entity == null)
-                throw new KeyNotFoundException("Debit Liability not found.");
-
-            _context.MDebitLiabs.Remove(entity);
-            await _context.SaveChangesAsync();
+            await _debitLiabilitiesRepository.DeleteAsync(id);
         }
     }
 }
