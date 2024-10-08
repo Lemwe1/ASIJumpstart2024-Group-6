@@ -41,17 +41,6 @@ function renderAccounts() {
     document.getElementById('debitAccounts').innerHTML = '';
     document.getElementById('borrowedAccounts').innerHTML = '';
 
-    // Render debit accounts
-    debitAccounts.forEach(account => {
-        document.getElementById('debitAccounts').innerHTML += `
-            <div class="accountCard" style="background-color: ${account.DeLiColor}">
-                <i class="${account.DeLiIcon} text-lg"></i>
-                <h3 class="font-bold text-lg">${account.DeLiName}</h3>
-                <p>₱${account.DeLiBalance.toFixed(2)}</p>
-            </div>
-        `;
-    });
-
     // Render borrowed accounts
     borrowedAccounts.forEach(account => {
         document.getElementById('borrowedAccounts').innerHTML += `
@@ -64,6 +53,26 @@ function renderAccounts() {
             </div>
         `;
     });
+    // Render debit accounts
+    debitAccounts.forEach(account => {
+        document.getElementById('debitAccounts').innerHTML += `
+            <div class="accountCard" style="background-color: ${account.DeLiColor}">
+                <i class="${account.DeLiIcon} text-lg"></i>
+                <h3 class="font-bold text-lg">${account.DeLiName}</h3>
+                <p>₱${account.DeLiBalance.toFixed(2)}</p>
+                <button class="editButton" onclick="openEditModal(${JSON.stringify(account)})">Edit</button>
+            </div>
+        `;
+    });
+}
+if (editAccountModal) {
+    editAccountModal.addEventListener('click', (e) => {
+        if (e.target === editAccountModal) { // Only close if clicked outside modal content
+            closeModal(editAccountModal);
+        }
+    });
+} else {
+    console.error('Edit Account Modal not found.');
 
     // Update the net worth
     updateNetWorth();
@@ -293,7 +302,7 @@ document.getElementById('addAccountForm').addEventListener('submit', async (e) =
 
         const result = await response.json();
         if (result.success) {
-           // alert(result.message);
+            // alert(result.message);
 
             // Close the modal
             closeModal(addAccountModal);
@@ -329,3 +338,129 @@ async function loadAccounts() {
         console.error('Error fetching accounts:', error);
     }
 }
+
+function openEditModal(account) {
+    // Ensure account is defined
+    if (!account) {
+        console.error('No account data provided.');
+        return;
+    }
+
+    // Populate fields in the edit modal
+    document.getElementById('editAccountId').value = account.DeLiId || ''; // Default to empty string if undefined
+    document.getElementById('editAccountName').value = account.DeLiName || ''; // Default to empty string if undefined
+    document.getElementById('editAccountBalance').value = account.DeLiBalance || ''; // Default to empty string if undefined
+    document.getElementById('editAccountColor').value = account.DeLiColor || '#000000'; // Default color if undefined
+    document.getElementById('editCreateIcon').value = account.DeLiIcon || ''; // Default to empty string if undefined
+
+    // Show the appropriate fields based on the account type
+    if (account.DeLiType === 'borrowed') {
+        document.getElementById('editBorrowedFields').classList.remove('hidden');
+        document.getElementById('editHappeningDate').value = account.DeLiHapp ? new Date(account.DeLiHapp).toISOString().substring(0, 10) : '';
+        document.getElementById('editDueDate').value = account.DeLiDue ? new Date(account.DeLiDue).toISOString().substring(0, 10) : '';
+        setTypeSelection('borrowed');
+    } else {
+        document.getElementById('editBorrowedFields').classList.add('hidden');
+        setTypeSelection('debit');
+    }
+
+    openModal(editAccountModal);
+}
+
+
+    if (editAccountModal) {
+        editAccountModal.addEventListener('click', (e) => {
+            if (e.target === editAccountModal) { // Only close if clicked outside modal content
+                closeModal(editAccountModal);
+            }
+        });
+    } else {
+        console.error('Edit Account Modal not found.');
+}
+
+document.getElementById('editAccountForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
+    const token = tokenElement ? tokenElement.value : null;
+
+    const id = document.getElementById('editAccountId').value;
+    const name = document.getElementById('editAccountName').value;
+    const color = document.getElementById('editAccountColor').value;
+    const icon = document.getElementById('editCreateIcon').value;
+    const type = selectedAccountType.value; // This should reflect the account type
+
+    let data = {
+        DeLiId: id,
+        DeLiType: type,
+        DeLiIcon: icon,
+        DeLiColor: color,
+        DeLiName: name,
+        DeLiBalance: 0 // Set this dynamically for debit or borrowed
+    };
+
+    if (type === 'debit') {
+        const balance = parseFloat(document.getElementById('editAccountBalance').value);
+        data.DeLiBalance = balance;
+    } else if (type === 'borrowed') {
+        const amount = parseFloat(document.getElementById('accountAmount').value);
+        const happeningDate = document.getElementById('editHappeningDate').value;
+        const dueDate = document.getElementById('editDueDate').value;
+
+        data.DeLiBalance = amount;
+        data.DeLiHapp = happeningDate ? new Date(happeningDate).toISOString() : null;
+        data.DeLiDue = dueDate ? new Date(dueDate).toISOString() : null;
+    }
+
+    console.log('Sending data:', JSON.stringify(data));
+
+    try {
+        const response = await fetch(`/DebitLiabilities/Edit/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            closeModal(editAccountModal);
+            await loadAccounts(); // Fetch updated accounts from the server and render them
+            // Automatically refresh the page
+            location.reload();
+        } else {
+            console.error(result.errors);
+        }
+    } catch (error) {
+        console.error('Error updating account:', error);
+    }
+});
+
+document.getElementById('deleteAccountButton').addEventListener('click', async () => {
+    const id = document.getElementById('editAccountId').value;
+
+    if (confirm('Are you sure you want to delete this account?')) {
+        try {
+            const response = await fetch(`/DebitLiabilities/Delete/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token // Include CSRF token if required
+                }
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                closeModal(editAccountModal);
+                await loadAccounts(); // Refresh account list
+            } else {
+                console.error(result.message);
+            }
+        } catch (error) {
+            console.error('Error deleting account:', error);
+        }
+    }
+});
+
