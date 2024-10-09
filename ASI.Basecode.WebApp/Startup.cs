@@ -109,6 +109,7 @@ namespace ASI.Basecode.WebApp
 
             services.AddScoped<IDebitLiabilitiesRepository, DebitLiabilitiesRepository>();
             services.AddScoped<DebitLiabilitiesService>();
+            services.AddScoped<IDebitLiabilitiesService, DebitLiabilitiesService>();
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IEmailService, EmailService>();

@@ -1,6 +1,6 @@
 ﻿using ASI.Basecode.Data.Models;
-using ASI.Basecode.Services.Services;
-using ASI.Basecode.WebApp.Services;
+using ASI.Basecode.Services.Interfaces;
+using ASI.Basecode.Services.ServiceModels;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -12,9 +12,9 @@ namespace ASI.Basecode.WebApp.Controllers
 {
     public class DebitLiabilitiesController : Controller
     {
-        private readonly DebitLiabilitiesService _debitLiabilitiesService;
+        private readonly IDebitLiabilitiesService _debitLiabilitiesService;
 
-        public DebitLiabilitiesController(DebitLiabilitiesService debitLiabilitiesService)
+        public DebitLiabilitiesController(IDebitLiabilitiesService debitLiabilitiesService)
         {
             _debitLiabilitiesService = debitLiabilitiesService ?? throw new ArgumentNullException(nameof(debitLiabilitiesService));
         }
@@ -26,12 +26,12 @@ namespace ASI.Basecode.WebApp.Controllers
             int userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "UserId").Value);
 
             // Fetch the debit liabilities belonging to the logged-in user
-            var debitLiabilities = await _debitLiabilitiesService.GetDebitLiabilitiesAsync(userId); // Pass userId here
+            var debitLiabilities = await _debitLiabilitiesService.GetDebitLiabilitiesAsync(userId);
 
             // Filter the list after awaiting the async method and convert to a List
             var userDebitLiabilities = debitLiabilities
                 .Where(x => x.UserId == userId)
-                .ToList(); // Convert to List<MDebitLiab>
+                .ToList(); // Convert to List<DebitLiabilityViewModel>
 
             // Calculate totals
             var totalDebit = userDebitLiabilities.Where(x => x.DeLiType == "debit").Sum(x => x.DeLiBalance);
@@ -48,7 +48,7 @@ namespace ASI.Basecode.WebApp.Controllers
         // POST: /DebitLiabilities/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([FromBody] MDebitLiab model)
+        public async Task<IActionResult> Create([FromBody] DebitLiabilityViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -65,20 +65,15 @@ namespace ASI.Basecode.WebApp.Controllers
                 }
 
                 int userId = int.Parse(userClaim.Value);
-                model.UserId = userId; // Set the UserId to the logged-in user's ID
+                model.UserId = userId;
 
                 // Handle specific properties for borrowed accounts if applicable
-                if (model.DeLiType == "borrowed")
+                if (model.DeLiType == "borrowed" && (model.DeLiHapp == null || model.DeLiDue == null))
                 {
-                    // You can add further validations if required for borrowed accounts
-                    if (model.DeLiHapp == null || model.DeLiDue == null)
-                    {
-                        return BadRequest(new { success = false, message = "Happening date and due date are required for borrowed accounts." });
-                    }
+                    return BadRequest(new { success = false, message = "Happening date and due date are required for borrowed accounts." });
                 }
 
                 await _debitLiabilitiesService.AddDebitLiabilityAsync(model);
-
                 return Json(new { success = true, message = "Debit Liability created successfully." });
             }
             catch (Exception ex)
@@ -88,12 +83,10 @@ namespace ASI.Basecode.WebApp.Controllers
             }
         }
 
-
-        // POST: /DebitLiabilities/Edit/{id}
         // POST: /DebitLiabilities/Edit/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [FromBody] MDebitLiab model)
+        public async Task<IActionResult> Edit(int id, [FromBody] DebitLiabilityViewModel model)
         {
             if (model == null)
             {
@@ -162,6 +155,5 @@ namespace ASI.Basecode.WebApp.Controllers
                 return StatusCode(500, new { success = false, message = $"Internal server error: {ex.Message}" });
             }
         }
-
     }
 }
