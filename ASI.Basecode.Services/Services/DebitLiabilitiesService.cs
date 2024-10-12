@@ -1,50 +1,85 @@
-﻿using ASI.Basecode.Data;
+﻿using ASI.Basecode.Data.Interfaces;
 using ASI.Basecode.Data.Models;
-using Microsoft.EntityFrameworkCore;
-using System;
+using ASI.Basecode.Services.Interfaces;
+using ASI.Basecode.Services.ServiceModels;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ASI.Basecode.Services.Services
 {
-    public class DebitLiabilitiesService
+    public class DebitLiabilitiesService : IDebitLiabilitiesService
     {
-        private readonly AsiBasecodeDbContext _context;
+        private readonly IDebitLiabilitiesRepository _debitLiabilitiesRepository;
 
-        public DebitLiabilitiesService(AsiBasecodeDbContext context)
+        public DebitLiabilitiesService(IDebitLiabilitiesRepository debitLiabilitiesRepository)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _debitLiabilitiesRepository = debitLiabilitiesRepository;
         }
 
-        // Get all debit liabilities
-        public async Task<List<MDebitLiab>> GetDebitLiabilitiesAsync()
+        public async Task<IEnumerable<DebitLiabilityViewModel>> GetDebitLiabilitiesAsync(int userId)
         {
-            return await _context.MDebitLiabs.ToListAsync();
+            var allLiabilities = await _debitLiabilitiesRepository.RetrieveAllAsync();
+            return allLiabilities
+                .Where(x => x.UserId == userId)
+                .Select(MapToViewModel);
         }
 
-        // Add a new debit liability
-        public async Task AddDebitLiabilityAsync(MDebitLiab model)
+        public async Task<DebitLiabilityViewModel> GetByIdAsync(int id)
         {
-            _context.MDebitLiabs.Add(model);
-            await _context.SaveChangesAsync();
+            var model = await _debitLiabilitiesRepository.GetByIdAsync(id);
+            return model != null ? MapToViewModel(model) : null;
         }
 
-        // Update an existing debit liability
-        public async Task UpdateDebitLiabilityAsync(MDebitLiab model)
+        public async Task AddDebitLiabilityAsync(DebitLiabilityViewModel viewModel)
         {
-            _context.MDebitLiabs.Update(model);
-            await _context.SaveChangesAsync();
+            var model = MapToModel(viewModel);
+            await _debitLiabilitiesRepository.AddAsync(model);
         }
 
-        // Delete a debit liability
+        public async Task UpdateDebitLiabilityAsync(DebitLiabilityViewModel viewModel)
+        {
+            var model = MapToModel(viewModel);
+            await _debitLiabilitiesRepository.UpdateAsync(model);
+        }
+
         public async Task DeleteDebitLiabilityAsync(int id)
         {
-            var entity = await _context.MDebitLiabs.FindAsync(id);
-            if (entity == null)
-                throw new KeyNotFoundException("Debit Liability not found.");
+            await _debitLiabilitiesRepository.DeleteAsync(id);
+        }
 
-            _context.MDebitLiabs.Remove(entity);
-            await _context.SaveChangesAsync();
+        // Mapping from MDebitLiab to DebitLiabilityViewModel
+        private DebitLiabilityViewModel MapToViewModel(MDebitLiab model)
+        {
+            return new DebitLiabilityViewModel
+            {
+                DeLiId = model.DeLiId,
+                DeLiType = model.DeLiType,
+                DeLiBalance = model.DeLiBalance,
+                DeLiIcon = model.DeLiIcon,
+                DeLiColor = model.DeLiColor,
+                DeLiHapp = model.DeLiHapp,
+                DeLiDue = model.DeLiDue,
+                DeLiName = model.DeLiName,
+                UserId = model.UserId
+            };
+        }
+
+        // Mapping from DebitLiabilityViewModel to MDebitLiab
+        private MDebitLiab MapToModel(DebitLiabilityViewModel viewModel)
+        {
+            return new MDebitLiab
+            {
+                DeLiId = viewModel.DeLiId,
+                DeLiType = viewModel.DeLiType,
+                DeLiBalance = viewModel.DeLiBalance,
+                DeLiIcon = viewModel.DeLiIcon,
+                DeLiColor = viewModel.DeLiColor,
+                DeLiHapp = viewModel.DeLiHapp,
+                DeLiDue = viewModel.DeLiDue,
+                DeLiName = viewModel.DeLiName,
+                UserId = viewModel.UserId
+            };
         }
     }
 }

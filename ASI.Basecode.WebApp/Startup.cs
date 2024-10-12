@@ -1,4 +1,6 @@
 ﻿using ASI.Basecode.Data;
+using ASI.Basecode.Data.Interfaces;
+using ASI.Basecode.Data.Repositories;
 using ASI.Basecode.Resources.Constants;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.Manager;
@@ -106,6 +108,7 @@ namespace ASI.Basecode.WebApp
             // Registering the CategoryService
             services.AddScoped<CategoryService>();
 
+            services.AddScoped<IDebitLiabilitiesRepository, DebitLiabilitiesRepository>();
             services.AddScoped<DebitLiabilitiesService>();
             services.AddScoped<IDebitLiabilitiesService, DebitLiabilitiesService>();
             services.AddScoped<ICategoryService, CategoryService>();
