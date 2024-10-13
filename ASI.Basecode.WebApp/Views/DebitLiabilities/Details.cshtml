@@ -1,0 +1,64 @@
+﻿@model List<ASI.Basecode.Services.ServiceModels.DebitLiabilityViewModel>
+
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<!-- Debit Sections -->
+<div id="debitSection" class="mb-6">
+    <h3 id="debitSectionTitle" class="text-xl font-semibold mb-8 @(Model.Any(x => x.DeLiType == "debit") ? "" : "hidden")">Debit</h3>
+    <div id="debitAccounts" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        @foreach (var debit in Model.Where(x => x.DeLiType == "debit"))
+        {
+            <div class="accountCard relative" style="background-color: @debit.DeLiColor">
+                <button class="absolute top-2 right-2 bg-gray-200 text-black rounded-full p-1"
+                        onclick="openEditModal({
+            DeLiId: '@debit.DeLiId',
+            DeLiName: '@debit.DeLiName',
+            DeLiBalance: '@debit.DeLiBalance',
+            DeLiColor: '@debit.DeLiColor',
+            DeLiIcon: '@debit.DeLiIcon',
+            DeLiType: 'debit'
+        })">
+                    <i class="fas fa-edit"></i>
+                </button>
+
+                <i class="@debit.DeLiIcon text-lg"></i>
+                <h3 class="font-bold text-lg">@debit.DeLiName</h3>
+                <p>₱@debit.DeLiBalance</p>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Borrowed Sections -->
+<div id="borrowedSection" class="mb-6">
+    <h3 id="borrowedSectionTitle" class="text-xl font-semibold mb-8 @(Model.Any(x => x.DeLiType == "borrowed") ? "" : "hidden")">Borrowed</h3>
+    <div id="borrowedAccounts" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        @foreach (var borrowed in Model.Where(x => x.DeLiType == "borrowed"))
+        {
+            <div class="accountCard relative" style="background-color: @borrowed.DeLiColor">
+                <button class="absolute top-2 right-2 bg-gray-200 text-black rounded-full p-1"
+                        onclick="openEditModal({
+            DeLiId: '@borrowed.DeLiId',
+            DeLiName: '@borrowed.DeLiName',
+            DeLiBalance: '@borrowed.DeLiBalance',
+            DeLiColor: '@borrowed.DeLiColor',
+            DeLiIcon: '@borrowed.DeLiIcon',
+            DeLiHapp: '@borrowed.DeLiHapp',
+            DeLiDue: '@borrowed.DeLiDue',
+            DeLiType: 'borrowed'
+        })">
+                    <i class="fas fa-edit"></i>
+                </button>
+
+                <i class="@borrowed.DeLiIcon text-lg"></i>
+                <h3 class="font-bold text-lg">@borrowed.DeLiName</h3>
+                <p>₱@borrowed.DeLiBalance</p>
+                <p>Happening Date: @borrowed.DeLiHapp?.ToString("yyyy-MM-dd")</p>
+                <p>Due Date: @borrowed.DeLiDue?.ToString("yyyy-MM-dd")</p>
+            </div>
+        }
+    </div>
+</div>

@@ -19,6 +19,7 @@
 
         <form id="transactionForm" method="post" action="/Transaction/Create">
             <!-- Amount Field -->
+            @Html.AntiForgeryToken()
             <div class="mb-6">
                 <label for="transactionAmount" class="block text-sm font-medium text-gray-700">Amount</label>
                 <input type="number" id="transactionAmount" name="Amount" placeholder="Enter amount" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900" />

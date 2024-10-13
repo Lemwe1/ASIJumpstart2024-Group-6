@@ -1,0 +1,61 @@
+﻿@model List<ASI.Basecode.Services.ServiceModels.DebitLiabilityViewModel>
+
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<!-- Edit Account Modal -->
+<div id="editAccountModal" class="fixed z-50 inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white p-6 rounded-lg max-w-md w-full" id="modalContent">
+        <h2 class="text-xl font-bold mb-4">Edit Account</h2>
+        <form id="editAccountForm">
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="editAccountId" />
+            <div class="mb-4">
+                <label class="block">Type</label>
+                <div class="flex space-x-4">
+                    <button type="button" class="w-full p-2 bg-blue-500 text-white" id="editDebitType">Debit</button>
+                    <button type="button" class="w-full p-2 bg-gray-100 text-black" id="editBorrowedType">Borrowed</button>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block">Name</label>
+                <input type="text" id="editAccountName" class="border p-2 w-full" required />
+            </div>
+            <div class="mb-4">
+                <label class="block">Balance</label>
+                <input type="number" id="editAccountBalance" class="border p-2 w-full" required />
+            </div>
+            <div class="mb-4">
+                <label class="block">Icon</label>
+                <select name="Icon" id="editCreateIcon" class="block w-full">
+                    <option value="">Select Icon</option>
+                    <option value="fas fa-apple-alt">Apple (Food)</option>
+                    <option value="fas fa-shopping-bag">Shopping Bag</option>
+                    <option value="fas fa-bolt">Bolt (Electricity)</option>
+                    <option value="fas fa-wallet">Wallet (Income)</option>
+                    <option value="fas fa-money-bill-wave">Money (Expense)</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block">Color</label>
+                <input type="color" id="editAccountColor" class="border p-2 w-full" style="height: 50px;" required />
+            </div>
+            <div id="editBorrowedFields" class="mb-4 hidden">
+                <div class="mb-4">
+                    <label class="block">Happening Date</label>
+                    <input type="date" id="editHappeningDate" class="border p-2 w-full" />
+                </div>
+                <div class="mb-4">
+                    <label class="block">Due Date</label>
+                    <input type="date" id="editDueDate" class="border p-2 w-full" />
+                </div>
+            </div>
+            <div class="text-right mt-4">
+                <button type="button" class="px-4 py-2 bg-red-500 text-white" id="deleteAccountButton">Delete</button>
+                <button type="submit" class="px-4 py-2 bg-blue-500 text-white">Save</button>
+            </div>
+        </form>
+    </div>
+</div>

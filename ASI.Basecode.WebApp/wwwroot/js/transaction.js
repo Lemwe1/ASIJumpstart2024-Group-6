@@ -132,13 +132,16 @@
         const formData = new FormData(this); // Create FormData object
 
         // Send data to the server
-        fetch('/Transaction/Create', {
+        fetch('/Transaction/Index', { 
             method: 'POST',
             body: formData
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    return response.text().then(text => {
+                        console.error('Error response:', text); // Log the error response for debugging
+                        throw new Error('Network response was not ok');
+                    });
                 }
                 return response.json();
             })
@@ -147,16 +150,16 @@
                     // Add the new transaction row to the table
                     const newRow = document.createElement('tr');
                     newRow.innerHTML = `
-                    <td class="border px-4 py-2">${response.data.Category}</td>
-                    <td class="border px-4 py-2">${response.data.Description}</td>
-                    <td class="border px-4 py-2">₱ ${response.data.Amount}</td>
-                    <td class="border px-4 py-2">${response.data.Account}</td>
-                    <td class="border px-4 py-2">${response.data.Date}</td>
-                    <td class="border px-4 py-2">
-                        <button class="bg-blue-500 text-white px-3 py-1 rounded-lg">Edit</button>
-                        <button class="bg-red-500 text-white px-2 py-1 rounded-lg">Delete</button>
-                    </td>
-                `;
+                <td class="border px-4 py-2">${response.data.Category}</td>
+                <td class="border px-4 py-2">${response.data.Description}</td>
+                <td class="border px-4 py-2">₱ ${response.data.Amount}</td>
+                <td class="border px-4 py-2">${response.data.Account}</td>
+                <td class="border px-4 py-2">${response.data.Date}</td>
+                <td class="border px-4 py-2">
+                    <button class="bg-blue-500 text-white px-3 py-1 rounded-lg">Edit</button>
+                    <button class="bg-red-500 text-white px-2 py-1 rounded-lg">Delete</button>
+                </td>
+            `;
                     document.getElementById('transactionTable').querySelector('tbody').appendChild(newRow);
 
                     // Close the modal
@@ -165,14 +168,15 @@
                     // Optionally display a success message
                     alert(response.message);
                 } else {
-                    // Handle errors
+                    // Handle errors returned from the server
                     alert(response.message);
                 }
             })
             .catch(error => {
-                // Handle errors
+                // Handle network errors
                 console.error('There was a problem with the fetch operation:', error);
                 alert('An error occurred. Please try again later.');
             });
     });
+
 });
