@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace ASI.Basecode.Data.Models
+namespace ASI.Basecode.Services.ServiceModels
 {
-    public partial class MTransaction
+    public class TransactionViewModel
     {
         public int TransactionId { get; set; }
         public int CategoryId { get; set; }
@@ -14,9 +13,5 @@ namespace ASI.Basecode.Data.Models
         public decimal Amount { get; set; }
         public DateTime TransactionDate { get; set; }
         public string Note { get; set; }
-
-        public virtual MCategory Category { get; set; }
-        public virtual MDebitLiab DeLi { get; set; }
-        public virtual MUser User { get; set; }
     }
 }

@@ -17,7 +17,9 @@ const borrowedSectionTitle = document.getElementById('borrowedSectionTitle');
 let debitAccounts = [];
 let borrowedAccounts = [];
 
-// Function to update the net worth section
+// Flag to track if changes were made in the modal
+let isModalDirty = false;
+
 // Function to update the net worth section
 function updateNetWorth() {
     // Calculate the total debit and total liabilities
@@ -99,12 +101,15 @@ function openModal(modal) {
     }
 }
 
-// Function to close modal
+// Function to close modal with confirmation
 function closeModal(modal) {
-    if (modal) {
-        modal.classList.add('hidden');
+    if (isModalDirty) {
+        if (confirm("You have unsaved changes. Do you want to discard them?")) {
+            modal.classList.add('hidden');
+            isModalDirty = false; // Reset dirty flag
+        }
     } else {
-        console.error('Modal element not found.');
+        modal.classList.add('hidden');
     }
 }
 
@@ -163,6 +168,11 @@ function setTypeSelection(type) {
         loadBorrowedForm();
     }
 }
+
+// Handle form field input to set dirty flag
+document.getElementById('addAccountForm').addEventListener('input', () => {
+    isModalDirty = true; // Set dirty flag when form input is changed
+});
 
 // Function to load Debit form fields
 function loadDebitForm() {
