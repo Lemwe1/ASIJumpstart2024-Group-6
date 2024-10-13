@@ -100,11 +100,57 @@
         isModalDirty = true; // Set dirty flag when form input is changed
     });
 
+
     // Handle form submission
     transactionForm.addEventListener('submit', function (event) {
         event.preventDefault(); // Prevent the default form submission
         const formData = new FormData(this); // Create FormData object
-        // Process the form data as needed here
-        closeAddTransactionModal(); // Close modal after processing
+
+        // Send data to the server
+        fetch('/Transaction/Create', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(response => {
+                if (response.success) {
+                    // Add the new transaction row to the table
+                    const newRow = document.createElement('tr');
+                    newRow.innerHTML = `
+                    <td class="border px-4 py-2">${response.data.Category}</td>
+                    <td class="border px-4 py-2">${response.data.Description}</td>
+                    <td class="border px-4 py-2">₱ ${response.data.Amount}</td>
+                    <td class="border px-4 py-2">${response.data.Account}</td>
+                    <td class="border px-4 py-2">${response.data.Date}</td>
+                    <td class="border px-4 py-2">
+                        <button class="bg-blue-500 text-white px-3 py-1 rounded-lg">Edit</button>
+                        <button class="bg-red-500 text-white px-2 py-1 rounded-lg">Delete</button>
+                    </td>
+                `;
+                    document.getElementById('transactionTable').querySelector('tbody').appendChild(newRow);
+
+                    // Close the modal
+                    closeAddTransactionModal();
+
+                    // Clear the form
+                    transactionForm.reset();
+
+                    // Optionally display a success message
+                    alert(response.message);
+                } else {
+                    // Handle errors
+                    alert(response.message);
+                }
+            })
+            .catch(error => {
+                // Handle errors
+                console.error('There was a problem with the fetch operation:', error);
+                alert('An error occurred. Please try again later.');
+            });
     });
 });
