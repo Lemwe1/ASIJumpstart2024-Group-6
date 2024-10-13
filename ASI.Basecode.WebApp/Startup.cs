@@ -9,6 +9,7 @@ using ASI.Basecode.WebApp.Authentication;
 using ASI.Basecode.WebApp.Extensions.Configuration;
 using ASI.Basecode.WebApp.Models;
 using ASI.Basecode.WebApp.Services;
+using ASI.Basecode.WebApp.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Features;
@@ -110,7 +111,7 @@ namespace ASI.Basecode.WebApp
             services.AddScoped<IDebitLiabilitiesRepository, DebitLiabilitiesRepository>();
             services.AddScoped<DebitLiabilitiesService>();
             services.AddScoped<IDebitLiabilitiesService, DebitLiabilitiesService>();
-
+            services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IEmailService, EmailService>();
 

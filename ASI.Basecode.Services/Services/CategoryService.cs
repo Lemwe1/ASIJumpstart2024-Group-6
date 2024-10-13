@@ -1,5 +1,6 @@
 ﻿using ASI.Basecode.Data;
 using ASI.Basecode.Data.Models;
+using ASI.Basecode.WebApp.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ASI.Basecode.WebApp.Services
 {
-    public class CategoryService
+    public class CategoryService : ICategoryService
     {
         private readonly AsiBasecodeDbContext _context;
 
