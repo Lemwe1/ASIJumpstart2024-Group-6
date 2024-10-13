@@ -27,8 +27,16 @@ namespace ASI.Basecode.Data.Models
         public string Mail { get; set; }
         public int? UserRole { get; set; }
         public string Remarks { get; set; }
+
+        // Fields for password reset functionality
         public string PasswordResetToken { get; set; }
         public DateTime? PasswordResetExpiration { get; set; }
+
+        // Fields for email verification functionality
+        public string VerificationToken { get; set; }
+        public DateTime? VerificationTokenExpiration { get; set; }
+
+        public bool isVerified { get; set; }
 
         public virtual ICollection<MCategory> MCategories { get; set; }
         public virtual ICollection<MDebitLiab> MDebitLiabs { get; set; }
