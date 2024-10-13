@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
 namespace ASI.Basecode.Services.ServiceModels
 {
     public class UserViewModel
     {
         public int Id { get; set; }
-
-        public string Name { get; set; }
-
-        public string Description { get; set; }
 
         [Required(ErrorMessage = "UserCode is required")]
         public string UserCode { get; set; }
@@ -23,18 +19,27 @@ namespace ASI.Basecode.Services.ServiceModels
         public string LastName { get; set; }
 
         [Required(ErrorMessage = "Password is required")]
+        [DataType(DataType.Password)]  // Ensure password is treated securely
         public string Password { get; set; }
 
-        // Email
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid Email Address")]
-        public string Mail { get; set; }  // You can rename this to Email if preferred
+        public string Mail { get; set; }
 
-        // Add Password Reset Token
+        // Fields for email verification functionality
+        public string VerificationToken { get; set; }
+        public DateTime? VerificationTokenExpiration { get; set; }
+
+        // Verification status
+        public bool isVerified { get; set; }  // Track email verification status
+
+        // Fields for password reset functionality
         public string PasswordResetToken { get; set; }
-
-        // Add Password Reset Expiration
         public DateTime? PasswordResetExpiration { get; set; }
+
+        // Other optional fields
+        public string Name { get; set; }  // This could be derived from FirstName + LastName if needed
+        public string Description { get; set; }
     }
 
     public class UserListViewModel
