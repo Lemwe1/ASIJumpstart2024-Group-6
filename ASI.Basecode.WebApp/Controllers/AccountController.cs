@@ -353,7 +353,7 @@ namespace ASI.Basecode.WebApp.Controllers
             user.PasswordResetExpiration = null;  // Clear the expiration
 
             // Update the user in the database
-            _userService.Update(user);
+            _userService.Update(user, true); // For password reset
 
             // Set the success message and render the view with the overlay
             ViewBag.SuccessMessage = "Password has been reset successfully. Redirecting to login...";

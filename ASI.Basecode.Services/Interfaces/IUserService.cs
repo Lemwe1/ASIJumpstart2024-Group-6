@@ -10,7 +10,7 @@ namespace ASI.Basecode.Services.Interfaces
         IEnumerable<UserViewModel> RetrieveAll(int? id = null, string firstName = null);
         UserViewModel RetrieveUser(int id);
         void Add(MUser model);
-        void Update(MUser model);
+        void Update(MUser model, bool isPasswordUpdate = false);
         void Delete(int id);
         LoginResult AuthenticateUser(string userCode, string password, ref MUser user);
 

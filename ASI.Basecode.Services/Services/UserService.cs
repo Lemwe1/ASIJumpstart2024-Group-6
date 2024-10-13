@@ -104,7 +104,7 @@ namespace ASI.Basecode.Services.Services
         /// <summary>
         /// Updates the user details, including resetting or clearing tokens.
         /// </summary>
-        public void Update(MUser model)
+        public void Update(MUser model, bool isPasswordUpdate = false)
         {
             var existingData = _userRepository.GetUsers().FirstOrDefault(s => !s.Deleted && s.UserId == model.UserId);
             if (existingData != null)
@@ -113,13 +113,13 @@ namespace ASI.Basecode.Services.Services
                 existingData.FirstName = model.FirstName;
                 existingData.LastName = model.LastName;
 
-                // Only encrypt the password if the new password is provided (i.e., when resetting the password)
-                if (!string.IsNullOrEmpty(model.Password) && model.Password != existingData.Password)
+                // Only encrypt and update the password if it's a password reset operation
+                if (isPasswordUpdate && !string.IsNullOrEmpty(model.Password))
                 {
                     existingData.Password = PasswordManager.EncryptPassword(model.Password);
                 }
 
-                // Update only if tokens are provided
+                // Update reset and verification tokens only if they are provided
                 if (!string.IsNullOrEmpty(model.PasswordResetToken))
                 {
                     existingData.PasswordResetToken = model.PasswordResetToken;
@@ -137,7 +137,6 @@ namespace ASI.Basecode.Services.Services
                 _userRepository.UpdateUser(existingData);  // Update user in the database
             }
         }
-
 
         /// <summary>
         /// Deletes the specified identifier.
