@@ -111,3 +111,4 @@ document.getElementById('editExpenseButton').addEventListener('click', function 
 document.getElementById('editIncomeButton').addEventListener('click', function () {
     setTypeSelection('edit', 'Income');
 });
+git
