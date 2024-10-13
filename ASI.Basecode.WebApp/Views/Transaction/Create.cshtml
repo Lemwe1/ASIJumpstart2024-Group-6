@@ -5,10 +5,9 @@
 @using ASI.Basecode.Data.Models
 @using ASI.Basecode.Services.ServiceModels
 
-
 <!-- Modal Structure -->
 <div id="addTransactionModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 items-center justify-center hidden z-50">
-    <div id="addModalContent" class="modal-content bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-auto p-6">
+    <div id="addModalContent" class="modal-content bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-auto">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-2xl font-bold">Add Transaction</h2>
             <button id="closeTransactionModal" class="text-gray-400 hover:text-gray-600">
@@ -18,7 +17,7 @@
 
         <p class="text-gray-600 mb-4">Fill out all the fields below to add a transaction</p>
 
-        <form id="transactionForm">
+        <form id="transactionForm" method="post" action="/Transaction/Create">
             <!-- Amount Field -->
             <div class="mb-6">
                 <label for="transactionAmount" class="block text-sm font-medium text-gray-700">Amount</label>
@@ -33,6 +32,7 @@
                     <button type="button" id="createIncomeButton" class="type-button px-4 py-2 border rounded-md bg-white text-gray-700">Income</button>
                 </div>
             </div>
+
             <!-- Category Field -->
             <div class="mb-6">
                 <label for="transactionCategory" class="block text-sm font-medium text-gray-700">Category</label>
@@ -71,8 +71,6 @@
                 </select>
             </div>
 
-
-
             <!-- Date Field -->
             <div class="mb-6">
                 <label for="transactionDate" class="block text-sm font-medium text-gray-700">Date</label>
@@ -94,4 +92,3 @@
         </form>
     </div>
 </div>
-

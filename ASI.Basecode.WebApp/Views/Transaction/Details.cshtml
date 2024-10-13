@@ -15,24 +15,32 @@
         </tr>
     </thead>
     <tbody>
-        @if (ViewData["Transaction"] is List<TransactionViewModel> transactions)
+        @if (ViewData["Transactions"] is List<TransactionViewModel> transactions)
         {
-            foreach (var transaction in transactions)
+            if (transactions.Count > 0)
+            {
+                foreach (var transaction in transactions)
+                {
+                    <tr>
+                        <td class="border px-4 py-2">@transaction.CategoryId</td>
+                        <td class="border px-4 py-2">@transaction.Description</td>
+                        <td class="border px-4 py-2">₱ @transaction.Amount</td>
+                        <td class="border px-4 py-2">@transaction.DeLiId</td>
+                        <td class="border px-4 py-2">@transaction.TransactionDate</td>
+                        <td class="border px-4 py-2">
+                            <button class="bg-blue-500 text-white px-3 py-1 rounded-lg">Edit</button>
+                            <button class="bg-red-500 text-white px-2 py-1 rounded-lg">Delete</button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
             {
                 <tr>
-                    <td class="border px-4 py-2">@transaction.CategoryId</td>
-                    <td class="border px-4 py-2">@transaction.Description</td>
-                    <td class="border px-4 py-2">₱ @transaction.Amount</td>
-                    <td class="border px-4 py-2">@transaction.DeLiId</td>
-                    <td class="border px-4 py-2">@transaction.TransactionDate</td>
-                    <td class="border px-4 py-2">
-                        <button class="bg-blue-500 text-white px-3 py-1 rounded-lg">Edit</button>
-                        <button class="bg-red-500 text-white px-2 py-1 rounded-lg">Delete</button>
-                    </td>
+                    <td colspan="6" class="border px-4 py-2 text-center">No entries yet.</td>
                 </tr>
             }
         }
-      
     </tbody>
 </table>
 

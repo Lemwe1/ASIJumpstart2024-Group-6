@@ -18,7 +18,7 @@ namespace ASI.Basecode.Services.Services
         }
 
         // Get all transactions
-        public async Task<IEnumerable<TransactionViewModel>> GetAllTransactionsAsync()
+        public async Task<IEnumerable<TransactionViewModel>> GetAllTransactionsAsync(int userId)
         {
             var transactions = await _transactionRepository.GetAllAsync();
 

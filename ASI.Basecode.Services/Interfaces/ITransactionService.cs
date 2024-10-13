@@ -6,7 +6,7 @@ namespace ASI.Basecode.Services.Interfaces
 {
     public interface ITransactionService
     {
-        Task<IEnumerable<TransactionViewModel>> GetAllTransactionsAsync();
+        Task<IEnumerable<TransactionViewModel>> GetAllTransactionsAsync(int userId);
         Task<TransactionViewModel> GetTransactionByIdAsync(int transactionId);
         Task AddTransactionAsync(TransactionViewModel transactionViewModel);
         Task UpdateTransactionAsync(TransactionViewModel transactionViewModel);

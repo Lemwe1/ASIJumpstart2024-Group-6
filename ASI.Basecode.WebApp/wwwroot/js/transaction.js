@@ -6,7 +6,7 @@
     const createExpenseButton = document.getElementById('createExpenseButton');
     const createIncomeButton = document.getElementById('createIncomeButton');
     const transactionCategorySelect = document.getElementById('transactionCategory');
-    const transactionAccountSelect = document.getElementById('transactionAccount'); // New account select
+    const transactionAccountSelect = document.getElementById('transactionAccount');
 
     let transactionType = 'Expense'; // Default type
     let isModalDirty = false; // Flag to track if changes were made
@@ -26,21 +26,22 @@
     function closeAddTransactionModal() {
         if (isModalDirty) {
             if (confirm("You have unsaved changes. Do you want to discard them?")) {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
+                resetModal();
             }
         } else {
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
+            resetModal();
         }
     }
 
-    // Handle outside click to close modal
-    window.addEventListener('click', (event) => {
-        if (event.target === modal) {
-            closeAddTransactionModal();
-        }
-    });
+    // Function to reset modal state
+    function resetModal() {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        transactionForm.reset();
+        transactionCategorySelect.value = "";
+        transactionAccountSelect.value = "";
+        isModalDirty = false; // Reset the dirty flag
+    }
 
     // Update the type button selection
     function updateTypeSelection(type) {
@@ -60,20 +61,45 @@
     // Filter categories based on transaction type
     function filterCategories(type) {
         const options = transactionCategorySelect.querySelectorAll('option');
+        let hasCategories = false; // Track if any category is available
+
         options.forEach(option => {
-            // Show options matching the transaction type or the default "Select category"
-            option.style.display = (option.dataset.type === type || option.value === "") ? 'block' : 'none';
+            if (option.dataset.type === type || option.value === "") {
+                option.style.display = 'block';
+                if (option.value !== "") {
+                    hasCategories = true;
+                }
+            } else {
+                option.style.display = 'none';
+            }
         });
+
         transactionCategorySelect.value = ""; // Reset selection
+
+        // Check if no categories are available for the selected type
+        if (!hasCategories) {
+            alert(`No ${type.toLowerCase()} categories available.`);
+        }
     }
 
     // Filter accounts based on transaction type
     function filterAccounts(type) {
         const options = transactionAccountSelect.querySelectorAll('option');
+        let hasAccounts = false; // Track if any account is available
+
         options.forEach(option => {
-            option.style.display = 'block'; // Show all options
+            option.style.display = 'block'; // Show all options for now
+            if (option.value !== "") {
+                hasAccounts = true;
+            }
         });
+
         transactionAccountSelect.value = ""; // Reset selection
+
+        // Check if no accounts are available
+        if (!hasAccounts) {
+            alert(`No ${type.toLowerCase()} accounts available.`);
+        }
     }
 
     // Event listeners
@@ -99,7 +125,6 @@
     transactionForm.addEventListener('input', () => {
         isModalDirty = true; // Set dirty flag when form input is changed
     });
-
 
     // Handle form submission
     transactionForm.addEventListener('submit', function (event) {
@@ -135,10 +160,7 @@
                     document.getElementById('transactionTable').querySelector('tbody').appendChild(newRow);
 
                     // Close the modal
-                    closeAddTransactionModal();
-
-                    // Clear the form
-                    transactionForm.reset();
+                    resetModal();
 
                     // Optionally display a success message
                     alert(response.message);
