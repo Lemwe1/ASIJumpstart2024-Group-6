@@ -1,6 +1,27 @@
 "# ASIBasecodeCSharp2024" 
 
 FOR QUERY:
+create table M_ROLE (
+    RoleId int NOT NULL,
+    RoleName varchar(100) NOT NULL,
+    CONSTRAINT PK_M_ROLE PRIMARY KEY (RoleId)
+);
+
+ALTER TABLE M_USER
+ADD PasswordResetToken NVARCHAR(255),
+    PasswordResetExpiration DATETIME;
+
+ALTER TABLE M_USER
+ALTER COLUMN Password VARCHAR(512) NOT NULL;
+ALTER TABLE M_USER
+ALTER COLUMN PasswordResetToken NVARCHAR(1000);
+
+ALTER TABLE M_User
+ADD IsVerified BIT NOT NULL DEFAULT 0;
+
+ALTER TABLE [AsiBasecodeDb].[dbo].[M_User]
+ADD VerificationToken NVARCHAR(255),
+    VerificationTokenExpiration DATETIME;
 
 CREATE TABLE M_Category (
     CategoryId INT PRIMARY KEY IDENTITY(1,1),
