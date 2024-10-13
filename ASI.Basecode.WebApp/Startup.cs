@@ -111,7 +111,13 @@ namespace ASI.Basecode.WebApp
             services.AddScoped<IDebitLiabilitiesRepository, DebitLiabilitiesRepository>();
             services.AddScoped<DebitLiabilitiesService>();
             services.AddScoped<IDebitLiabilitiesService, DebitLiabilitiesService>();
+
+            services.AddScoped<ITransactionRepository, TransactionRepository>();
+            services.AddScoped<TransactionService>();
+            services.AddScoped<ITransactionService, TransactionService>();
+
             services.AddScoped<ICategoryService, CategoryService>();
+
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IEmailService, EmailService>();
 
