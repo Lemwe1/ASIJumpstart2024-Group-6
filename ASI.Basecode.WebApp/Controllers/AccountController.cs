@@ -35,14 +35,13 @@ namespace ASI.Basecode.WebApp.Controllers
             ViewData["Title"] = "Transaction Page"; // Set title for the transactions page
 
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
             if (!int.TryParse(userIdString, out int userId))
             {
                 return BadRequest("Invalid user ID.");
             }
 
             // Fetch categories and debit liabilities
-            var categories = await _categoryService.GetCategoriesAsync(userIdString);
+            var categories = await _categoryService.GetCategoriesAsync(userId);
             var debitLiabilities = await _debitLiabilitiesService.GetDebitLiabilitiesAsync(userId);
 
             // Pass data to the view
@@ -51,5 +50,6 @@ namespace ASI.Basecode.WebApp.Controllers
 
             return View();
         }
+
     }
 }
