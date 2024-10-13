@@ -52,6 +52,10 @@ namespace ASI.Basecode.Services.Services
             };
             return model;
         }
+        public MUser GetByUserCode(string userCode)
+        {
+            return _userRepository.GetUsers().SingleOrDefault(u => u.UserCode == userCode && !u.Deleted);
+        }
 
         public MUser GetByEmail(string email)
         {
@@ -65,32 +69,41 @@ namespace ASI.Basecode.Services.Services
             return _userRepository.GetUsers().SingleOrDefault(u => u.PasswordResetToken == token && u.PasswordResetExpiration > DateTime.Now && !u.Deleted);
         }
 
+        public MUser GetByVerificationToken(string token)
+        {
+            // Ensure we are correctly filtering for tokens that haven't expired and are not deleted
+            return _userRepository.GetUsers().SingleOrDefault(u => u.VerificationToken == token && u.VerificationTokenExpiration > DateTime.Now && !u.Deleted);
+        }
+
+
         /// <summary>
-        /// Adds the specified model.
+        /// Adds a new user, including the verification token for email verification.
         /// </summary>
-        /// <param name="model">The model.</param>
-        public void Add(UserViewModel model)
+        public void Add(MUser newUser)
         {
             var newModel = new MUser
             {
-                UserCode = model.UserCode,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Mail = model.Mail,
-                Password = PasswordManager.EncryptPassword(model.Password),  // Encrypt the password
+                UserCode = newUser.UserCode,
+                FirstName = newUser.FirstName,
+                LastName = newUser.LastName,
+                Mail = newUser.Mail,
+                Password = PasswordManager.EncryptPassword(newUser.Password),  // Password is already encrypted
                 UserRole = 1,  // Assuming 1 is for regular users
                 InsDt = DateTime.Now,
                 UpdDt = DateTime.Now,
-                Deleted = false
+                Deleted = false,
+                VerificationToken = newUser.VerificationToken,  // Use the token generated in the controller
+                VerificationTokenExpiration = newUser.VerificationTokenExpiration,  // Use the expiration generated in the controller
+                isVerified = false  // Account is initially unverified
             };
 
             _userRepository.AddUser(newModel);
         }
 
+
         /// <summary>
-        /// Updates the specified model.
+        /// Updates the user details, including resetting or clearing tokens.
         /// </summary>
-        /// <param name="model">The model.</param>
         public void Update(MUser model)
         {
             var existingData = _userRepository.GetUsers().FirstOrDefault(s => !s.Deleted && s.UserId == model.UserId);
@@ -99,20 +112,36 @@ namespace ASI.Basecode.Services.Services
                 existingData.UserCode = model.UserCode;
                 existingData.FirstName = model.FirstName;
                 existingData.LastName = model.LastName;
-                existingData.Password = PasswordManager.EncryptPassword(model.Password);  // Ensure the password is encrypted
-                existingData.PasswordResetToken = model.PasswordResetToken;
-                existingData.PasswordResetExpiration = model.PasswordResetExpiration;
 
-                _userRepository.UpdateUser(existingData);  // Call the repository to update the user in the database
+                // Only encrypt the password if the new password is provided (i.e., when resetting the password)
+                if (!string.IsNullOrEmpty(model.Password) && model.Password != existingData.Password)
+                {
+                    existingData.Password = PasswordManager.EncryptPassword(model.Password);
+                }
+
+                // Update only if tokens are provided
+                if (!string.IsNullOrEmpty(model.PasswordResetToken))
+                {
+                    existingData.PasswordResetToken = model.PasswordResetToken;
+                    existingData.PasswordResetExpiration = model.PasswordResetExpiration;
+                }
+
+                if (!string.IsNullOrEmpty(model.VerificationToken))
+                {
+                    existingData.VerificationToken = model.VerificationToken;
+                    existingData.VerificationTokenExpiration = model.VerificationTokenExpiration;
+                }
+
+                existingData.isVerified = model.isVerified;  // Update verification status
+
+                _userRepository.UpdateUser(existingData);  // Update user in the database
             }
         }
-
 
 
         /// <summary>
         /// Deletes the specified identifier.
         /// </summary>
-        /// <param name="id">The identifier.</param>
         public void Delete(int id)
         {
             _userRepository.DeleteUser(id);
@@ -128,4 +157,5 @@ namespace ASI.Basecode.Services.Services
             return user != null ? LoginResult.Success : LoginResult.Failed;
         }
     }
+
 }
