@@ -18,17 +18,16 @@ namespace ASI.Basecode.WebApp.Services
             _context = context;
         }
 
-        // Get categories by UserId
-        public async Task<List<MCategory>> GetCategoriesAsync(string userId)
+        public async Task<List<MCategory>> GetCategoriesAsync(int userId)
         {
-            if (!int.TryParse(userId, out int userIdInt))
+            if (userId <= 0)
             {
-                throw new ArgumentException("Invalid user ID");
+                throw new ArgumentException("Invalid userId");
             }
 
             return await _context.MCategories
-                                 .Where(c => c.UserId == userIdInt)
-                                 .ToListAsync();
+                .Where(c => c.UserId == userId)
+                .ToListAsync();
         }
 
         // Add a new category for a specific user

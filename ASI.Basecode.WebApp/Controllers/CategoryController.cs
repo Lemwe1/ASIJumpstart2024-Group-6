@@ -19,16 +19,21 @@ namespace ASI.Basecode.WebApp.Controllers
             _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
         }
 
-        // GET: /Category/
         public async Task<IActionResult> Index()
         {
             ViewData["Title"] = "Category List";
 
             // Get user ID
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId))
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdString))
             {
                 return Unauthorized();
+            }
+
+            // Convert the string userId to an integer
+            if (!int.TryParse(userIdString, out int userId))
+            {
+                return BadRequest("Invalid user ID");
             }
 
             // Retrieve list of MCategory from the service for the specific user
@@ -44,9 +49,9 @@ namespace ASI.Basecode.WebApp.Controllers
                 Color = category.Color
             }).ToList();
 
-            // Pass the ViewModel to the view
             return View(categoryViewModels);
         }
+
 
         // GET: /Category/GetCategory/{id}
         [HttpGet]

@@ -1,30 +1,24 @@
 ﻿using ASI.Basecode.Data.Models;
 using ASI.Basecode.Services.Interfaces;
-using ASI.Basecode.WebApp.Mvc;
+using ASI.Basecode.WebApp.Models;
+using ASI.Basecode.WebApp.Services;
 using ASI.Basecode.WebApp.Services.Interfaces;
-using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using System.Security.Claims;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace ASI.Basecode.WebApp.Controllers
 {
-    public class TransactionController : ControllerBase<TransactionController>
+    public class TransactionController : Controller
     {
         private readonly IDebitLiabilitiesService _debitLiabilitiesService;
         private readonly ICategoryService _categoryService;
 
-        public TransactionController(IHttpContextAccessor httpContextAccessor,
-                                     ILoggerFactory loggerFactory,
-                                     IConfiguration configuration,
-                                     IMapper mapper,
-                                     IDebitLiabilitiesService debitLiabilitiesService,
+        public TransactionController(IDebitLiabilitiesService debitLiabilitiesService,
                                      ICategoryService categoryService)
-            : base(httpContextAccessor, loggerFactory, configuration, mapper)
         {
             _debitLiabilitiesService = debitLiabilitiesService;
             _categoryService = categoryService;
@@ -42,7 +36,7 @@ namespace ASI.Basecode.WebApp.Controllers
             }
 
             // Fetch categories and debit liabilities
-            var categories = await _categoryService.GetCategoriesAsync(userIdString);
+            var categories = await _categoryService.GetCategoriesAsync(userId);
             var debitLiabilities = await _debitLiabilitiesService.GetDebitLiabilitiesAsync(userId);
 
             // Pass data to the view

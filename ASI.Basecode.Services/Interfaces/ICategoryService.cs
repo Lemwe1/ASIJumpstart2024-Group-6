@@ -6,7 +6,7 @@ namespace ASI.Basecode.WebApp.Services.Interfaces
 {
     public interface ICategoryService
     {
-        Task<List<MCategory>> GetCategoriesAsync(string userId);
+        Task<List<MCategory>> GetCategoriesAsync(int userId);
         Task AddCategoryAsync(MCategory category, string userId);
         Task<MCategory> GetCategoryByIdAsync(int id, string userId);
         Task UpdateCategoryAsync(MCategory category, string userId);
