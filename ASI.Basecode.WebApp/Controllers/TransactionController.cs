@@ -109,7 +109,6 @@ namespace ASI.Basecode.WebApp.Controllers
             }
         }
 
-
         // GET: Edit a transaction by ID
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
@@ -126,10 +125,16 @@ namespace ASI.Basecode.WebApp.Controllers
                 return BadRequest("Invalid user ID.");
             }
 
+            // Ensure that the transaction belongs to the logged-in user
+            if (transaction.UserId != userId.Value)
+            {
+                return Forbid(); // or return NotFound()
+            }
+
             await LoadDropdownsForUser(userId.Value);
 
-            // Return the existing transaction as a model for editing
-            return View(transaction);
+            // Return the existing transaction directly as a model for editing
+            return View(transaction); // Assuming the view is expecting the transaction type or it's a suitable model
         }
 
         // POST: Update an existing transaction
@@ -143,21 +148,34 @@ namespace ASI.Basecode.WebApp.Controllers
                 return BadRequest("Invalid user ID.");
             }
 
+            // Ensure the transaction belongs to the current user
+            var existingTransaction = await _transactionService.GetTransactionByIdAsync(model.TransactionId);
+            if (existingTransaction == null || existingTransaction.UserId != userId)
+            {
+                return Forbid(); // Prevent unauthorized access
+            }
+
             if (!ModelState.IsValid)
             {
                 await LoadDropdownsForUser(userId.Value); // Load dropdowns if the model is invalid
-                return View(model);
+                return View(existingTransaction); // Return existing transaction if model state is invalid
             }
 
-            // Set the UserId for the transaction
-            model.UserId = userId.Value;
+            // Update the properties of the existing transaction based on the model
+            existingTransaction.Description = model.Description;
+            existingTransaction.Amount = model.Amount;
+            existingTransaction.TransactionDate = model.TransactionDate;
+            existingTransaction.Note = model.Note;
+            existingTransaction.CategoryId = model.CategoryId;
+            // ... add other properties as necessary
 
             // Call the service to update the transaction
-            await _transactionService.UpdateTransactionAsync(model);
+            await _transactionService.UpdateTransactionAsync(existingTransaction);
 
             // Redirect to the Index page upon success
             return RedirectToAction("Index");
         }
+
 
         // POST: Delete a transaction by ID
         [HttpPost]

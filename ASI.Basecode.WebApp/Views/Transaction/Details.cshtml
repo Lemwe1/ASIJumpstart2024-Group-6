@@ -31,8 +31,11 @@
                             <td class=" px-4 py-3">@transaction.TransactionDate.ToShortDateString()</td>
                             <td class=" px-4 py-3">@transaction.Note</td>
                             <td class=" px-4 py-3 flex justify-center space-x-2">
-                                <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg transition duration-150">Edit</button>
-                                <button class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-lg transition duration-150">Delete</button>
+                                <button data-id="@transaction.TransactionId"
+                                        class="editTransaction bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg transition duration-150">
+                                    Edit
+                                </button>
+                                <button id="deleteTransaction" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-lg transition duration-150">Delete</button>
                             </td>
                         </tr>
                     }
