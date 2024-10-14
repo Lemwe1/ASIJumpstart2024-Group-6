@@ -33,8 +33,8 @@ public class TransactionService : ITransactionService
                 Amount = transaction.Amount,
                 TransactionDate = transaction.TransactionDate,
                 Note = transaction.Note,
-                CategoryName = transaction.Category?.Name ?? string.Empty, // Assuming Category is included
-                DebitLiabilityName = transaction.DeLi?.DeLiName ?? string.Empty // Assuming DeLi is included
+                CategoryName = transaction.Category?.Name ?? string.Empty, 
+                DebitLiabilityName = transaction.DeLi?.DeLiName ?? string.Empty 
             });
 
         return transactionViewModels;

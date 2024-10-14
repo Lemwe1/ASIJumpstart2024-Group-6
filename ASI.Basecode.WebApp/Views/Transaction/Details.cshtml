@@ -3,46 +3,47 @@
 }
 @using ASI.Basecode.Services.ServiceModels
 
-<table class="min-w-full table-auto">
-    <thead class="bg-gray-200">
-        <tr>
-            <th class="px-4 py-2">Category</th>
-            <th class="px-4 py-2">Description</th>
-            <th class="px-4 py-2">Amount</th>
-            <th class="px-4 py-2">Account</th>
-            <th class="px-4 py-2">Date</th>
-            <th class="px-4 py-2">Note</th>
-            <th class="px-4 py-2 ">Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (ViewData["Transactions"] is List<TransactionViewModel> transactions)
-        {
-            if (transactions.Count > 0)
+<div class="overflow-x-auto shadow-md ">
+    <table class="min-w-full table-auto bg-white rounded-lg">
+        <thead class="bg-gray-200">
+            <tr>
+                <th class="p-4">Category</th>
+                <th class="p-4">Description</th>
+                <th class="p-4">Amount</th>
+                <th class="p-4">Account</th>
+                <th class="p-4">Date</th>
+                <th class="p-4">Note</th>
+                <th class="p-4 text-center justify-center">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (ViewData["Transactions"] is List<TransactionViewModel> transactions)
             {
-                foreach (var transaction in transactions)
+                if (transactions.Count > 0)
+                {
+                    foreach (var transaction in transactions)
+                    {
+                        <tr class="">
+                            <td class=" px-4 py-3">@transaction.CategoryName</td>
+                            <td class=" px-4 py-3">@transaction.Description</td>
+                            <td class=" px-4 py-3">₱ @transaction.Amount</td>
+                            <td class=" px-4 py-3">@transaction.DebitLiabilityName</td>
+                            <td class=" px-4 py-3">@transaction.TransactionDate.ToShortDateString()</td>
+                            <td class=" px-4 py-3">@transaction.Note</td>
+                            <td class=" px-4 py-3 flex justify-center space-x-2">
+                                <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg transition duration-150">Edit</button>
+                                <button class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-lg transition duration-150">Delete</button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
                 {
                     <tr>
-                        <td class="border px-4 py-2">@transaction.CategoryName</td>
-                        <td class="border px-4 py-2">@transaction.Description</td>
-                        <td class="border px-4 py-2">₱ @transaction.Amount</td>
-                        <td class="border px-4 py-2">@transaction.DebitLiabilityName</td>
-                        <td class="border px-4 py-2">@transaction.TransactionDate</td>
-                        <td class="border px-4 py-2">@transaction.Note</td>
-                        <td class="border px-4 py-2">
-                            <button class="bg-blue-500 text-white px-3 py-1 rounded-lg">Edit</button>
-                            <button class="bg-red-500 text-white px-2 py-1 rounded-lg">Delete</button>
-                        </td>
+                        <td colspan="7" class=" px-4 py-3 text-center">No entries yet.</td>
                     </tr>
                 }
             }
-            else
-            {
-                <tr>
-                    <td colspan="6" class="border px-4 py-2 text-center">No entries yet.</td>
-                </tr>
-            }
-        }
-    </tbody>
-</table>
-
+        </tbody>
+    </table>
+</div>
