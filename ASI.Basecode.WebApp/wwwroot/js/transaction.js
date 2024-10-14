@@ -38,21 +38,22 @@
         modal.classList.add('hidden');
         modal.classList.remove('flex');
         transactionForm.reset();
-        transactionCategorySelect.value = "";
-        transactionAccountSelect.value = "";
+        transactionCategorySelect.value = ""; // Reset category selection
+        transactionAccountSelect.value = ""; // Reset account selection
         isModalDirty = false; // Reset the dirty flag
     }
 
     // Update the type button selection
     function updateTypeSelection(type) {
+        // Set button styles based on selected type
         if (type === 'Expense') {
             createExpenseButton.classList.add('bg-blue-500', 'text-white');
-            createExpenseButton.classList.remove('bg-white', 'text-gray-700');
+            createExpenseButton.classList.remove('bg-gray-200', 'text-gray-800');
             createIncomeButton.classList.remove('bg-blue-500', 'text-white');
             createIncomeButton.classList.add('bg-gray-200', 'text-gray-800');
         } else {
             createIncomeButton.classList.add('bg-blue-500', 'text-white');
-            createIncomeButton.classList.remove('bg-white', 'text-gray-700');
+            createIncomeButton.classList.remove('bg-gray-200', 'text-gray-800');
             createExpenseButton.classList.remove('bg-blue-500', 'text-white');
             createExpenseButton.classList.add('bg-gray-200', 'text-gray-800');
         }
@@ -65,12 +66,12 @@
 
         options.forEach(option => {
             if (option.dataset.type === type || option.value === "") {
-                option.style.display = 'block';
+                option.style.display = 'block'; // Show relevant options
                 if (option.value !== "") {
-                    hasCategories = true;
+                    hasCategories = true; // At least one category is available
                 }
             } else {
-                option.style.display = 'none';
+                option.style.display = 'none'; // Hide irrelevant options
             }
         });
 
@@ -90,7 +91,7 @@
         options.forEach(option => {
             option.style.display = 'block'; // Show all options for now
             if (option.value !== "") {
-                hasAccounts = true;
+                hasAccounts = true; // At least one account is available
             }
         });
 
@@ -108,15 +109,15 @@
 
     // Handle type selection
     createExpenseButton.addEventListener('click', () => {
-        transactionType = 'Expense';
-        updateTypeSelection(transactionType);
+        transactionType = 'Expense'; // Update transaction type
+        updateTypeSelection(transactionType); // Update button styles
         filterCategories(transactionType); // Filter categories based on selection
         filterAccounts(transactionType); // Filter accounts based on selection
     });
 
     createIncomeButton.addEventListener('click', () => {
-        transactionType = 'Income';
-        updateTypeSelection(transactionType);
+        transactionType = 'Income'; // Update transaction type
+        updateTypeSelection(transactionType); // Update button styles
         filterCategories(transactionType); // Filter categories based on selection
         filterAccounts(transactionType); // Filter accounts based on selection
     });
@@ -127,19 +128,24 @@
     });
 
     // Handle form submission
+    // Handle form submission
     transactionForm.addEventListener('submit', function (event) {
-        event.preventDefault(); // Prevent the default form submission
-        const formData = new FormData(this); // Create FormData object
+        event.preventDefault(); // Prevent default form submission
+        const formData = new FormData(this);
 
-        // Send data to the server
-        fetch('/Transaction/Index', { 
+        // Log form data for debugging
+        for (var pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1]); // Check if the data is correct
+        }
+
+        fetch('/Transaction/Create', {
             method: 'POST',
             body: formData
         })
             .then(response => {
                 if (!response.ok) {
-                    return response.text().then(text => {
-                        console.error('Error response:', text); // Log the error response for debugging
+                    return response.json().then(text => {
+                        console.error('Error response:', text);
                         throw new Error('Network response was not ok');
                     });
                 }
@@ -147,33 +153,25 @@
             })
             .then(response => {
                 if (response.success) {
-                    // Add the new transaction row to the table
-                    const newRow = document.createElement('tr');
-                    newRow.innerHTML = `
-                <td class="border px-4 py-2">${response.data.Category}</td>
-                <td class="border px-4 py-2">${response.data.Description}</td>
-                <td class="border px-4 py-2">₱ ${response.data.Amount}</td>
-                <td class="border px-4 py-2">${response.data.Account}</td>
-                <td class="border px-4 py-2">${response.data.Date}</td>
-                <td class="border px-4 py-2">
-                    <button class="bg-blue-500 text-white px-3 py-1 rounded-lg">Edit</button>
-                    <button class="bg-red-500 text-white px-2 py-1 rounded-lg">Delete</button>
-                </td>
-            `;
-                    document.getElementById('transactionTable').querySelector('tbody').appendChild(newRow);
-
-                    // Close the modal
-                    resetModal();
-
-                    // Optionally display a success message
-                    alert(response.message);
+                    // Success handling
+                    alert(response.message); // Optionally show a success message
+                    location.reload(); // Refresh the page after a successful POST
                 } else {
-                    // Handle errors returned from the server
-                    alert(response.message);
+                    // Handle validation errors from the server
+                    if (response.errors) {
+                        console.error('Validation errors:', response.errors); // Log validation errors for debugging
+                        let errorMessages = '';
+                        for (let field in response.errors) {
+                            errorMessages += `${field}: ${response.errors[field].join(', ')}\n`;
+                        }
+                        alert(`Validation errors:\n${errorMessages}`); // Display error messages
+                    } else {
+                        console.error('Unexpected error format:', response);
+                        alert(response.message || 'Validation error occurred.');
+                    }
                 }
             })
             .catch(error => {
-                // Handle network errors
                 console.error('There was a problem with the fetch operation:', error);
                 alert('An error occurred. Please try again later.');
             });

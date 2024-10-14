@@ -2,6 +2,7 @@
 using ASI.Basecode.Services.ServiceModels;
 using ASI.Basecode.WebApp.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -58,32 +59,56 @@ namespace ASI.Basecode.WebApp.Controllers
             }
 
             await LoadDropdownsForUser(userId.Value);
-
-            return View();
+            return View(new TransactionViewModel()); // Ensure we return an empty model for the create view
         }
 
-        // POST: Handle the form submission to create a transaction
         [HttpPost]
         public async Task<IActionResult> Create(TransactionViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                var userId = GetUserId();
-                if (userId == null)
+                // Capture detailed validation errors
+                var errors = ModelState.ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                );
+
+                // Log the validation errors
+                foreach (var key in errors.Keys)
                 {
-                    return BadRequest("Invalid user ID.");
+                    foreach (var error in errors[key])
+                    {
+                        Console.WriteLine($"Validation Error - {key}: {error}");
+                    }
                 }
 
-                await LoadDropdownsForUser(userId.Value);
-                return View(model);
+                // Return the validation errors in the response
+                return Json(new { success = false, message = "Validation failed.", errors = errors });
             }
 
-            // Call the service to add the transaction
-            await _transactionService.AddTransactionAsync(model);
+            // Get the currently logged-in user's ID
+            var userClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId");
+            if (userClaim == null)
+            {
+                return Json(new { success = false, message = "User not authenticated." });
+            }
 
-            // Redirect to the Index page upon success
-            return RedirectToAction("Index");
+            // Parse the user ID and assign it to the model
+            model.UserId = int.Parse(userClaim.Value);
+
+            try
+            {
+                // Proceed with adding the transaction
+                await _transactionService.AddTransactionAsync(model);
+                return Json(new { success = true, message = "Transaction added successfully!", data = model });
+            }
+            catch (Exception ex)
+            {
+                // Log the exception message (optional: use a logging framework)
+                return StatusCode(500, new { success = false, message = $"Server error: {ex.Message}" });
+            }
         }
+
 
         // GET: Edit a transaction by ID
         [HttpGet]
@@ -103,24 +128,29 @@ namespace ASI.Basecode.WebApp.Controllers
 
             await LoadDropdownsForUser(userId.Value);
 
+            // Return the existing transaction as a model for editing
             return View(transaction);
         }
 
         // POST: Update an existing transaction
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(TransactionViewModel model)
         {
+            var userId = GetUserId();
+            if (userId == null)
+            {
+                return BadRequest("Invalid user ID.");
+            }
+
             if (!ModelState.IsValid)
             {
-                var userId = GetUserId();
-                if (userId == null)
-                {
-                    return BadRequest("Invalid user ID.");
-                }
-
-                await LoadDropdownsForUser(userId.Value);
+                await LoadDropdownsForUser(userId.Value); // Load dropdowns if the model is invalid
                 return View(model);
             }
+
+            // Set the UserId for the transaction
+            model.UserId = userId.Value;
 
             // Call the service to update the transaction
             await _transactionService.UpdateTransactionAsync(model);
@@ -131,6 +161,7 @@ namespace ASI.Basecode.WebApp.Controllers
 
         // POST: Delete a transaction by ID
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
             await _transactionService.DeleteTransactionAsync(id);

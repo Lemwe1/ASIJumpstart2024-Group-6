@@ -11,6 +11,7 @@
             <th class="px-4 py-2">Amount</th>
             <th class="px-4 py-2">Account</th>
             <th class="px-4 py-2">Date</th>
+            <th class="px-4 py-2">Note</th>
             <th class="px-4 py-2 ">Action</th>
         </tr>
     </thead>
@@ -22,11 +23,12 @@
                 foreach (var transaction in transactions)
                 {
                     <tr>
-                        <td class="border px-4 py-2">@transaction.CategoryId</td>
+                        <td class="border px-4 py-2">@transaction.CategoryName</td>
                         <td class="border px-4 py-2">@transaction.Description</td>
                         <td class="border px-4 py-2">₱ @transaction.Amount</td>
-                        <td class="border px-4 py-2">@transaction.DeLiId</td>
+                        <td class="border px-4 py-2">@transaction.DebitLiabilityName</td>
                         <td class="border px-4 py-2">@transaction.TransactionDate</td>
+                        <td class="border px-4 py-2">@transaction.Note</td>
                         <td class="border px-4 py-2">
                             <button class="bg-blue-500 text-white px-3 py-1 rounded-lg">Edit</button>
                             <button class="bg-red-500 text-white px-2 py-1 rounded-lg">Delete</button>
