@@ -7,9 +7,11 @@
     const createIncomeButton = document.getElementById('createIncomeButton');
     const transactionCategorySelect = document.getElementById('transactionCategory');
     const transactionAccountSelect = document.getElementById('transactionAccount');
+    const addDebitType = document.getElementById('addDebitType'); // Assuming element exists
+    const addBorrowedType = document.getElementById('addBorrowedType'); // Assuming element exists
+    const transactionType = document.getElementById('transactionType');
 
-    let transactionType = 'Expense'; // Default type
-    let isModalDirty = false; // Flag to track if changes were made
+    let isModalDirty = false;
     let currentTransactionId = null; // Store the current transaction ID for edits
 
     // Open modal for adding a new transaction
@@ -18,9 +20,9 @@
         modal.classList.add('flex');
         transactionForm.reset(); // Reset form when opening modal
         currentTransactionId = null; // Ensure ID is null for add
-        updateTypeSelection(transactionType); // Reflect default type
-        filterCategories(transactionType); // Filter categories based on type
-        filterAccounts(transactionType); // Filter accounts based on type
+        updateTypeSelection('Expense'); // Set default type to 'Expense'
+        filterCategories('Expense'); // Filter categories based on type
+        filterAccounts('Expense'); // Filter accounts based on type
         isModalDirty = false; // Reset dirty flag
     }
 
@@ -60,18 +62,36 @@
 
     // Update the type button selection
     function updateTypeSelection(type) {
+        if (transactionType) {
+            transactionType.value = type;
+        } else {
+            console.error('Transaction Type element not found.');
+            return;
+        }
+
         if (type === 'Expense') {
             createExpenseButton.classList.add('bg-blue-500', 'text-white');
-            createExpenseButton.classList.remove('bg-gray-200', 'text-gray-800');
             createIncomeButton.classList.remove('bg-blue-500', 'text-white');
             createIncomeButton.classList.add('bg-gray-200', 'text-gray-800');
         } else {
             createIncomeButton.classList.add('bg-blue-500', 'text-white');
-            createIncomeButton.classList.remove('bg-gray-200', 'text-gray-800');
             createExpenseButton.classList.remove('bg-blue-500', 'text-white');
             createExpenseButton.classList.add('bg-gray-200', 'text-gray-800');
         }
     }
+
+    // Type selection buttons
+    createExpenseButton.addEventListener('click', () => {
+        updateTypeSelection('Expense');
+        filterCategories('Expense');
+        filterAccounts('Expense');
+    });
+
+    createIncomeButton.addEventListener('click', () => {
+        updateTypeSelection('Income');
+        filterCategories('Income');
+        filterAccounts('Income');
+    });
 
     // Filter categories based on transaction type
     function filterCategories(type) {
@@ -133,7 +153,17 @@
             method: 'POST',
             body: formData
         })
-            .then(response => response.json())
+            .then(response => {
+                // Check if the response is OK (status in the range 200-299)
+                if (!response.ok) {
+                    return response.clone().text().then(errorDetails => {
+                        console.error('Error adding transaction:', response.status, response.statusText);
+                        console.error('Raw response:', errorDetails);
+                        throw new Error('An error occurred while adding the transaction. Please try again later.');
+                    });
+                }
+                return response.json();
+            })
             .then(result => {
                 if (result.success) {
                     alert("Transaction added successfully!");
@@ -145,20 +175,30 @@
             })
             .catch(error => {
                 console.error('Error adding transaction:', error);
-                alert('An error occurred. Please try again later.');
+                alert(error.message);
             });
     }
 
     // Handle editing an existing transaction
     function handleEditTransaction(event) {
         event.preventDefault();
-        const formData = new FormData(transactionForm); // Collect form data
+        const formData = new FormData(transactionForm); 
 
-        fetch(`/Transaction/Edit/${currentTransactionId}`, { // Adjust URL for editing transaction
+        fetch(`/Transaction/Edit/${currentTransactionId}`, { 
             method: 'POST',
             body: formData
         })
-            .then(response => response.json())
+            .then(response => {
+                // Check if the response is OK (status in the range 200-299)
+                if (!response.ok) {
+                    return response.clone().text().then(errorDetails => {
+                        console.error('Error updating transaction:', response.status, response.statusText);
+                        console.error('Raw response:', errorDetails);
+                        throw new Error('An error occurred while updating the transaction. Please try again later.');
+                    });
+                }
+                return response.json();
+            })
             .then(result => {
                 if (result.success) {
                     alert("Transaction updated successfully!");
@@ -170,28 +210,13 @@
             })
             .catch(error => {
                 console.error('Error updating transaction:', error);
-                alert('An error occurred. Please try again later.');
+                alert(error.message);
             });
     }
 
     // Event listeners for modal open and close
     addTransactionButton.addEventListener('click', openAddTransactionModal);
     closeModalButton.addEventListener('click', closeAddTransactionModal);
-
-    // Type selection buttons
-    createExpenseButton.addEventListener('click', () => {
-        transactionType = 'Expense';
-        updateTypeSelection(transactionType);
-        filterCategories(transactionType);
-        filterAccounts(transactionType);
-    });
-
-    createIncomeButton.addEventListener('click', () => {
-        transactionType = 'Income';
-        updateTypeSelection(transactionType);
-        filterCategories(transactionType);
-        filterAccounts(transactionType);
-    });
 
     // Submit form for adding/editing transactions
     transactionForm.addEventListener('submit', (event) => {
@@ -207,36 +232,19 @@
         isModalDirty = true;
     });
 
-    document.querySelectorAll('.editTransaction').forEach(button => {
-        button.addEventListener('click', (event) => {
-            const transactionId = event.target.getAttribute('data-id');
-            currentTransactionId = transactionId;
-
-            fetch(`/Transaction/Edit/${transactionId}`)
-                .then(response => {
-                    // Check if the response is OK (status in the range 200-299)
-                    if (!response.ok) {
-                        return response.clone().text().then(errorDetails => {
-                            // Log the raw HTML response in case it's not JSON
-                            console.error('Error fetching transaction:', response.status, response.statusText);
-                            console.error('Raw response:', errorDetails);
-
-                            // Show a user-friendly error message
-                            throw new Error(`Failed to fetch transaction details: ${response.status} - ${response.statusText}`);
-                        });
-                    }
-
-                    // If response is OK, attempt to parse JSON
-                    return response.json();
-                })
-                .then(transaction => {
-                    openEditTransactionModal(transaction); // Open modal with transaction data
-                })
-                .catch(error => {
-                    console.error('Error fetching transaction details:', error);
-                    alert(`An error occurred: ${error.message}`);
-                });
-        });
+    // Close modal when clicking outside
+    window.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            closeAddTransactionModal();
+        }
     });
 
+    document.querySelectorAll('.editTransaction').forEach(button => {
+        button.addEventListener('click', (event) => {
+            const transactionId = event.target.dataset.transactionId; // Get transaction ID from data attribute
+            const transaction = getTransactionById(transactionId); // Function to retrieve transaction data (implement accordingly)
+            openEditTransactionModal(transaction); // Open modal with transaction data
+            currentTransactionId = transactionId; // Set the current transaction ID for editing
+        });
+    });
 });
