@@ -14,13 +14,30 @@ public class TransactionService : ITransactionService
         _transactionRepository = transactionRepository;
     }
 
-    // Get all transactions
     public async Task<IEnumerable<TransactionViewModel>> GetAllTransactionsAsync(int userId)
     {
+        // Get all transactions for the user from the repository including related data
         var transactions = await _transactionRepository.GetAllAsync();
-        return transactions
-            .Where(t => t.UserId == userId)
-            .Select(MapToViewModel); 
+
+        // Filter transactions by userId and map MTransaction to TransactionViewModel
+        var transactionViewModels = transactions
+            .Where(transaction => transaction.UserId == userId)
+            .Select(transaction => new TransactionViewModel
+            {
+                TransactionId = transaction.TransactionId,
+                CategoryId = transaction.CategoryId,
+                DeLiId = transaction.DeLiId,
+                UserId = transaction.UserId,
+                TransactionType = transaction.TransactionType,
+                Description = transaction.Description,
+                Amount = transaction.Amount,
+                TransactionDate = transaction.TransactionDate,
+                Note = transaction.Note,
+                CategoryName = transaction.Category?.Name ?? string.Empty, 
+                DebitLiabilityName = transaction.DeLi?.DeLiName ?? string.Empty 
+            });
+
+        return transactionViewModels;
     }
 
     // Get a specific transaction by ID
@@ -42,6 +59,7 @@ public class TransactionService : ITransactionService
     {
         var transaction = MapToModel(transactionViewModel); 
         await _transactionRepository.UpdateAsync(transaction);
+
     }
 
     // Delete a transaction by ID

@@ -21,13 +21,12 @@
         </div>
 
         <!-- Transactions Table -->
-        <div class="bg-white p-6 shadow-md rounded-lg">
+        <div class="overflow-x-auto  rounded-lg">
             <div class="flex justify-between items-center mb-4">
-
                 <div class="flex items-center space-x-4">
                     <div>
                         <label for="category-filter" class="text-gray-700 font-semibold mr-2">Filter by category:</label>
-                        <select id="category-filter" class="border border-gray-300 rounded-lg px-4 py-2">
+                        <select id="category-filter" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring focus:ring-blue-500">
                             <option value="all">All</option>
                             <option value="food">Food</option>
                             <option value="transport">Transport</option>
@@ -35,10 +34,8 @@
                             <!-- Add more categories as needed -->
                         </select>
                     </div>
-
-
                 </div>
-                <button id="openAddTransactionModal" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none">
+                <button id="openAddTransactionModal" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none transition duration-150">
                     + Add
                 </button>
             </div>
@@ -50,4 +47,5 @@
 
 
 @Html.Partial("Create")
+@Html.Partial("Edit")
 <script src="~/js/transaction.js" asp-append-version="true"></script>

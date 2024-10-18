@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Edit";
 }
 
 @using ASI.Basecode.Data.Models
@@ -32,7 +32,7 @@
                     <button type="button" id="createExpenseButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300">Expense</button>
                     <button type="button" id="createIncomeButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300">Income</button>
                 </div>
-                <input type="hidden" name="TransactionType" id="transactionType" value="Expense" />
+                <input type="hidden" name="Type" id="transactionType" value="Expense" />
             </div>
 
             <!-- Category Field -->
@@ -40,19 +40,19 @@
                 <label for="transactionCategory" class="block text-sm font-medium text-gray-700">Category</label>
                 <select id="transactionCategory" name="CategoryId" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900">
                     <option value="" disabled>Select category</option>
-                                     
+
                     @if (ViewData["Categories"] is List<MCategory> categories && categories.Any())
                     {
-                    foreach (var category in categories)
-                    {
-                    <option value="@category.CategoryId" data-type="@category.Type">@category.Name</option>
-                    }
+                        foreach (var category in categories)
+                        {
+                            <option value="@category.CategoryId" data-type="@category.Type">@category.Name</option>
+                        }
                     }
                     else
                     {
-                    <option value="" disabled>No Entries yet</option>
+                        <option value="" disabled>No Entries yet</option>
                     }
-                   
+
                 </select>
             </div>
 
@@ -61,19 +61,19 @@
                 <label for="transactionAccount" class="block text-sm font-medium text-gray-700">Account</label>
                 <select id="transactionAccount" name="DeLiId" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900">
                     <option value="" disabled>Select account</option>
-                    
+
                     @if (ViewData["DebitLiabilities"] is List<DebitLiabilityViewModel> debitLiabilities && debitLiabilities.Any())
                     {
-                    foreach (var account in debitLiabilities)
-                    {
-                    <option value="@account.DeLiId" data-type="@account.DeLiType">@account.DeLiName</option>
-                    }
+                        foreach (var account in debitLiabilities)
+                        {
+                            <option value="@account.DeLiId" data-type="@account.DeLiType">@account.DeLiName</option>
+                        }
                     }
                     else
                     {
-                    <option value="" disabled>No Entries yet</option>
+                        <option value="" disabled>No Entries yet</option>
                     }
-                   
+
                 </select>
             </div>
 
@@ -81,7 +81,7 @@
             <!-- Description Field -->
             <div class="mb-6">
                 <label for="transactionDescription" class="block text-sm font-medium text-gray-700">Description</label>
-                <input type="text" id="transactionDescription" name="Description" placeholder="Enter Description" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900" />
+                <input type="text" id="transactionDescription" name="Description" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900" />
             </div>
 
             <!-- Date Field -->
