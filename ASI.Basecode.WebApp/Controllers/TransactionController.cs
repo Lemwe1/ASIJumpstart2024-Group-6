@@ -88,7 +88,7 @@ namespace ASI.Basecode.WebApp.Controllers
                 TransactionDate = transaction.TransactionDate,
                 Note = transaction.Note,
                 CategoryId = transaction.CategoryId,
-                // Add any other necessary properties here
+                DeLiId = transaction.DeLiId
             };
 
             return Json(new { success = true, data = transactionViewModel });
@@ -183,6 +183,7 @@ namespace ASI.Basecode.WebApp.Controllers
             existingTransaction.TransactionDate = model.TransactionDate;
             existingTransaction.Note = model.Note;
             existingTransaction.CategoryId = model.CategoryId;
+            existingTransaction.DeLiId = model.DeLiId;
 
             await _transactionService.UpdateTransactionAsync(existingTransaction);
 

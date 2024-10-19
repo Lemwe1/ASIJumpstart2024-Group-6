@@ -1,12 +1,18 @@
 ﻿document.addEventListener("DOMContentLoaded", () => {
     const modal = document.getElementById('addTransactionModal');
-    const editModal = document.getElementById('editTransactionModal'); // New reference for the edit modal
+    const editModal = document.getElementById('editTransactionModal');
     const addTransactionButton = document.getElementById('openAddTransactionModal');
-    const closeModalButton = document.getElementById('closeTransactionModal');
-    const transactionForm = document.getElementById('transactionForm');
+    const closeAddModalButton = document.getElementById('closeTransactionModal');
+    const closeEditModalButton = document.getElementById('closeEditTransactionModal');
 
-    const expenseButton = document.getElementById('expenseButton');
-    const incomeButton = document.getElementById('incomeButton');
+    const transactionForm = document.getElementById('transactionForm');
+    const editTransactionForm = document.getElementById('editTransactionForm');
+
+    const createExpenseButton = document.getElementById('createExpenseButton');
+    const createIncomeButton = document.getElementById('createIncomeButton');
+    const editExpenseButton = document.getElementById('editExpenseButton');
+    const editIncomeButton = document.getElementById('editIncomeButton');
+
     const transactionCategorySelect = document.getElementById('transactionCategory');
     const transactionAccountSelect = document.getElementById('transactionAccount');
     const transactionType = document.getElementById('transactionType');
@@ -30,8 +36,22 @@
         populateEditModalFields(transaction); // Populate fields with transaction data
     }
 
+    // Reset form fields when the reset button is clicked
+    document.getElementById('resetTransactionForm').addEventListener('click', function () {
+        // Reset the form fields
+        document.getElementById('transactionForm').reset();
+
+        // Reset category and account selections
+        const transactionCategorySelect = document.getElementById('transactionCategory');
+        const transactionAccountSelect = document.getElementById('transactionAccount');
+
+        // Resetting to default (assuming the first option is disabled)
+        transactionCategorySelect.value = ""; // Reset category selection
+        transactionAccountSelect.value = ""; // Reset account selection
+    });
+
     // Close modal with confirmation if there are unsaved changes
-    function closeAddTransactionModal() {
+    function closeTransactionModal() {
         if (isModalDirty) {
             Swal.fire({
                 title: 'You have unsaved changes.',
@@ -49,6 +69,35 @@
             resetModal();
         }
     }
+
+
+    // Close the edit modal with a confirmation prompt
+    function closeEditTransactionModal() {
+        Swal.fire({
+            title: 'You have unsaved changes.',
+            text: "Do you want to discard them?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, discard it!',
+            customClass: { popup: 'swal2-front' }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                resetModal();
+            }
+        });
+    }
+
+
+    // Close the modal when clicking outside of it
+    window.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            closeTransactionModal(); // Close the add transaction modal
+        } else if (event.target === editModal) {
+            closeEditTransactionModal(); // Close the edit transaction modal
+        }
+    });
 
     // Reset modal state
     function resetModal() {
@@ -88,21 +137,21 @@
         }
 
         const isExpense = type === 'Expense';
-        expenseButton.classList.toggle('bg-blue-500', isExpense);
-        expenseButton.classList.toggle('text-white', isExpense);
-        incomeButton.classList.toggle('bg-blue-500', !isExpense);
-        incomeButton.classList.toggle('text-white', !isExpense);
-        incomeButton.classList.toggle('bg-gray-200', isExpense);
-        incomeButton.classList.toggle('text-gray-800', isExpense);
+        createExpenseButton.classList.toggle('bg-blue-500', isExpense);
+        createExpenseButton.classList.toggle('text-white', isExpense);
+        createIncomeButton.classList.toggle('bg-blue-500', !isExpense);
+        createIncomeButton.classList.toggle('text-white', !isExpense);
+        createIncomeButton.classList.toggle('bg-gray-200', isExpense);
+        createIncomeButton.classList.toggle('text-gray-800', isExpense);
     }
 
     // Type selection buttons
-    expenseButton.addEventListener('click', () => {
+    createExpenseButton.addEventListener('click', () => {
         updateTypeSelection('Expense');
         filterCategories('Expense');
     });
 
-    incomeButton.addEventListener('click', () => {
+    createIncomeButton.addEventListener('click', () => {
         updateTypeSelection('Income');
         filterCategories('Income');
     });
@@ -241,24 +290,49 @@
 
                     const result = JSON.parse(responseText); // Parse the response text as JSON
 
-                    // Check if the deletion was successful
-                    if (result.success) {
-                        Swal.fire('Deleted!', 'Your transaction has been deleted.', 'success').then(() => {
-                            window.location.reload(); // Reload the page to reflect changes
+                    // Check if deletion was successful
+                    if (result.success || result.message === 'Transaction deleted successfully.') {
+                        await Swal.fire({
+                            title: 'Deleted!',
+                            text: 'Your transaction has been deleted.',
+                            icon: 'success',
+                            confirmButtonText: 'Okay'
                         });
+                        location.reload(); // Refresh the page
                     } else {
-                        Swal.fire('Error!', result.message, 'error'); // Show error message
+                        console.error('Deletion failed:', result.message);
+                        await Swal.fire({
+                            title: 'Error!',
+                            text: 'Deletion failed: ' + result.message,
+                            icon: 'error',
+                            confirmButtonText: 'Okay'
+                        });
                     }
                 } catch (error) {
-                    console.error('Error occurred while deleting transaction:', error);
-                    Swal.fire('Error!', 'Failed to delete transaction.', 'error');
+                    console.error('Error deleting transaction:', error);
+                    await Swal.fire({
+                        title: 'Error!',
+                        text: 'An error occurred while deleting the transaction.',
+                        icon: 'error',
+                        confirmButtonText: 'Okay'
+                    });
                 }
             }
         });
     });
 
-    // Attach event listeners for modal open and close actions
+    // Mark form as dirty when there are changes
+    transactionForm.addEventListener('input', () => {
+        isModalDirty = true;
+    });
+
+    // Event listeners for closing the modal
+    closeAddModalButton.addEventListener('click', closeTransactionModal);
+    closeEditModalButton.addEventListener('click', closeEditTransactionModal);
+
+    // Open the modal on button click
     addTransactionButton.addEventListener('click', openAddTransactionModal);
-    closeModalButton.addEventListener('click', closeAddTransactionModal);
-    transactionForm.addEventListener('submit', currentTransactionId ? handleEditTransaction : handleAddTransaction);
+
+    // Form submission event listener
+    transactionForm.addEventListener('submit', handleAddTransaction);
 });

@@ -29,8 +29,8 @@
             <div class="mb-6">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
                 <div class="flex space-x-4">
-                    <button type="button" id="expenseButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300">Expense</button>
-                    <button type="button" id="incomeButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300">Income</button>
+                    <button type="button" id="editExpenseButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300">Expense</button>
+                    <button type="button" id="editIncomeButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300">Income</button>
                 </div>
                 <input type="hidden" name="Type" id="editTransactionType" value="Expense" />
             </div>
@@ -90,10 +90,14 @@
             </div>
 
             <!-- Submit Button -->
-            <div class="mt-6">
-                <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 rounded-md">
+            <div class="flex mt-6">
+                <button type="submit" class="w-1/2 mr-3 bg-blue-500 hover:bg-blue-700 text-white  py-3 rounded-md">
                     Confirm
                 </button>
+                <button type="button" id="resetTransactionForm" class="w-1/2 ml-3 border-2 border-gray-500 text-gray-500 hover:bg-gray-100  py-3 rounded-md">
+                    Reset
+                </button>
+
             </div>
         </form>
     </div>
