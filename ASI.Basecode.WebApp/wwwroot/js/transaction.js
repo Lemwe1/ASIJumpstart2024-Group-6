@@ -1,19 +1,15 @@
 ﻿document.addEventListener("DOMContentLoaded", () => {
     const modal = document.getElementById('addTransactionModal');
-
+    const editModal = document.getElementById('editTransactionModal'); // New reference for the edit modal
     const addTransactionButton = document.getElementById('openAddTransactionModal');
     const closeModalButton = document.getElementById('closeTransactionModal');
-    const deleteTransactionButton = document.querySelectorAll('.deleteTransaction');
-
     const transactionForm = document.getElementById('transactionForm');
 
-    const createExpenseButton = document.getElementById('createExpenseButton');
-    const createIncomeButton = document.getElementById('createIncomeButton');
-
+    const expenseButton = document.getElementById('expenseButton');
+    const incomeButton = document.getElementById('incomeButton');
     const transactionCategorySelect = document.getElementById('transactionCategory');
     const transactionAccountSelect = document.getElementById('transactionAccount');
     const transactionType = document.getElementById('transactionType');
-
 
     let isModalDirty = false;
     let currentTransactionId = null; // Store the current transaction ID for edits
@@ -22,24 +18,16 @@
     function openAddTransactionModal() {
         modal.classList.remove('hidden');
         modal.classList.add('flex');
-        transactionForm.reset(); // Reset form when opening modal
-        currentTransactionId = null; // Ensure ID is null for add
-        transactionCategorySelect.value = "";
-        transactionAccountSelect.value = "";
+        resetTransactionForm();
         updateTypeSelection('Expense'); // Set default type to 'Expense'
         filterCategories('Expense'); // Filter categories based on type
-        isModalDirty = false; // Reset dirty flag
     }
 
     // Open modal for editing a transaction
     function openEditTransactionModal(transaction) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-        transactionForm.reset(); // Reset form before populating
-        populateTransactionData(transaction); // Populate form with transaction data
-        updateTypeSelection(transaction.Type); // Ensure correct type button is highlighted
-        filterCategories(transaction.Type); // Filter categories based on transaction type
-        isModalDirty = false; // Reset dirty flag
+        editModal.classList.remove('hidden');
+        editModal.classList.add('flex');
+        populateEditModalFields(transaction); // Populate fields with transaction data
     }
 
     // Close modal with confirmation if there are unsaved changes
@@ -53,13 +41,9 @@
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Yes, discard it!',
-                customClass: {
-                    popup: 'swal2-front' // Custom class to control z-index
-                }
+                customClass: { popup: 'swal2-front' }
             }).then((result) => {
-                if (result.isConfirmed) {
-                    resetModal();
-                }
+                if (result.isConfirmed) resetModal();
             });
         } else {
             resetModal();
@@ -70,11 +54,28 @@
     function resetModal() {
         modal.classList.add('hidden');
         modal.classList.remove('flex');
+        editModal.classList.add('hidden');
+        editModal.classList.remove('flex'); // Ensure edit modal is also hidden
+        resetTransactionForm();
+    }
+
+    // Reset the transaction form
+    function resetTransactionForm() {
         transactionForm.reset();
-        transactionCategorySelect.value = ""; // Reset category selection
-        transactionAccountSelect.value = ""; // Reset account selection
+        transactionCategorySelect.value = "";
+        transactionAccountSelect.value = "";
         isModalDirty = false; // Reset the dirty flag
         currentTransactionId = null; // Reset transaction ID
+    }
+
+    // Populate edit modal fields with transaction data
+    function populateEditModalFields(transaction) {
+        document.getElementById('editTransactionAmount').value = transaction.amount;
+        document.getElementById('editTransactionDate').value = new Date(transaction.transactionDate).toISOString().slice(0, 10); // Format date if necessary
+        document.getElementById('editTransactionNote').value = transaction.note || ''; // Use empty string if null
+        document.getElementById('editTransactionCategory').value = transaction.categoryId; // Set the selected category
+        document.getElementById('editTransactionAccount').value = transaction.deLiId; // Set the selected account
+        document.getElementById('editTransactionType').value = transaction.transactionType || 'Expense'; // Set the transaction type (default to Expense if null)
     }
 
     // Update the type button selection
@@ -86,24 +87,22 @@
             return;
         }
 
-        if (type === 'Expense') {
-            createExpenseButton.classList.add('bg-blue-500', 'text-white');
-            createIncomeButton.classList.remove('bg-blue-500', 'text-white');
-            createIncomeButton.classList.add('bg-gray-200', 'text-gray-800');
-        } else {
-            createIncomeButton.classList.add('bg-blue-500', 'text-white');
-            createExpenseButton.classList.remove('bg-blue-500', 'text-white');
-            createExpenseButton.classList.add('bg-gray-200', 'text-gray-800');
-        }
+        const isExpense = type === 'Expense';
+        expenseButton.classList.toggle('bg-blue-500', isExpense);
+        expenseButton.classList.toggle('text-white', isExpense);
+        incomeButton.classList.toggle('bg-blue-500', !isExpense);
+        incomeButton.classList.toggle('text-white', !isExpense);
+        incomeButton.classList.toggle('bg-gray-200', isExpense);
+        incomeButton.classList.toggle('text-gray-800', isExpense);
     }
 
     // Type selection buttons
-    createExpenseButton.addEventListener('click', () => {
+    expenseButton.addEventListener('click', () => {
         updateTypeSelection('Expense');
         filterCategories('Expense');
     });
 
-    createIncomeButton.addEventListener('click', () => {
+    incomeButton.addEventListener('click', () => {
         updateTypeSelection('Income');
         filterCategories('Income');
     });
@@ -111,136 +110,93 @@
     // Filter categories based on transaction type
     function filterCategories(type) {
         const options = transactionCategorySelect.querySelectorAll('option');
-
         options.forEach(option => {
-            if (option.dataset.type === type || option.value === "") {
-                option.style.display = 'block'; // Show relevant options
-            } else {
-                option.style.display = 'none'; // Hide irrelevant options
-            }
+            option.style.display = (option.dataset.type === type || option.value === "") ? 'block' : 'none';
         });
-
         transactionCategorySelect.value = ""; // Reset selection
-    }
-
-    // Populate modal fields with transaction data
-    function populateTransactionData(transaction) {
-        transactionForm.querySelector('input[name="TransactionId"]').value = transaction.transactionId; // Assuming Id is the primary key
-        transactionForm.querySelector('input[name="Amount"]').value = transaction.Amount;
-        transactionCategorySelect.value = transaction.CategoryId; // Assuming CategoryId exists in transaction
-        transactionAccountSelect.value = transaction.AccountId; // Assuming AccountId exists in transaction
     }
 
     // Handle adding a new transaction
     function handleAddTransaction(event) {
         event.preventDefault();
         const formData = new FormData(transactionForm); // Collect form data
-
-        fetch('/Transaction/Create', { // Adjust URL for adding transaction
-            method: 'POST',
-            body: formData
-        })
-            .then(response => {
-                if (!response.ok) {
-                    return response.clone().text().then(errorDetails => {
-                        console.error('Error adding transaction:', response.status, response.statusText);
-                        console.error('Raw response:', errorDetails);
-                        throw new Error('An error occurred while adding the transaction. Please try again later.');
-                    });
-                }
-                return response.json();
-            })
-            .then(result => {
-                if (result.success) {
-                    Swal.fire({
-                        title: 'Success',
-                        text: 'Transaction created successfully!',
-                        icon: 'success',
-                        customClass: {
-                            popup: 'swal2-front' // Custom class for z-index
-                        }
-                    }).then(() => {
-                        resetModal();
-                        window.location.reload();
-                    });
-                } else {
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'An error occurred while adding the transaction.',
-                        icon: 'error',
-                        customClass: {
-                            popup: 'swal2-front' // Custom class for z-index
-                        }
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Error adding transaction:', error);
-                Swal.fire({
-                    title: 'Error',
-                    text: error.message,
-                    icon: 'error',
-                    customClass: {
-                        popup: 'swal2-front' // Custom class for z-index
-                    }
-                });
-            });
+        fetch('/Transaction/Create', { method: 'POST', body: formData })
+            .then(handleResponse)
+            .catch(handleError);
     }
 
     // Handle editing an existing transaction
     function handleEditTransaction(event) {
         event.preventDefault();
         const formData = new FormData(transactionForm);
+        fetch(`/Transaction/Edit/${currentTransactionId}`, { method: 'POST', body: formData })
+            .then(handleResponse)
+            .catch(handleError);
+    }
 
-        fetch(`/Transaction/Edit/${currentTransactionId}`, {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => {
-                if (!response.ok) {
-                    return response.clone().text().then(errorDetails => {
-                        console.error('Error updating transaction:', response.status, response.statusText);
-                        console.error('Raw response:', errorDetails);
-                        throw new Error('An error occurred while updating the transaction. Please try again later.');
-                    });
-                }
-                return response.json();
-            })
-            .then(result => {
-                if (result.success) {
-                    Swal.fire({
-                        title: 'Success',
-                        text: 'Transaction updated successfully!',
-                        icon: 'success',
-                        customClass: {
-                            popup: 'swal2-front' // Custom class for z-index
-                        }
-                    }).then(() => {
-                        resetModal();
-                        window.location.reload();
-                    });
-                } else {
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'An error occurred while updating the transaction.',
-                        icon: 'error',
-                        customClass: {
-                            popup: 'swal2-front' // Custom class for z-index
-                        }
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Error updating transaction:', error);
+    // Response handler for adding/editing transactions
+    function handleResponse(response) {
+        if (!response.ok) {
+            throw new Error('An error occurred while processing your request.');
+        }
+        return response.json().then(result => {
+            if (result.success) {
+                Swal.fire({
+                    title: 'Success',
+                    text: result.message || 'Transaction processed successfully!',
+                    icon: 'success',
+                    customClass: { popup: 'swal2-front' }
+                }).then(() => {
+                    resetModal();
+                    window.location.reload();
+                });
+            } else {
                 Swal.fire({
                     title: 'Error',
-                    text: error.message,
+                    text: result.message || 'An error occurred.',
                     icon: 'error',
-                    customClass: {
-                        popup: 'swal2-front' // Custom class for z-index
-                    }
+                    customClass: { popup: 'swal2-front' }
                 });
-            });
+            }
+        });
+    }
+
+    // Error handler
+    function handleError(error) {
+        console.error('Transaction processing error:', error);
+        Swal.fire({
+            title: 'Error',
+            text: error.message || 'An unexpected error occurred.',
+            icon: 'error',
+            customClass: { popup: 'swal2-front' }
+        });
+    }
+
+    // Edit transaction buttons
+    document.querySelectorAll('.editTransaction').forEach(button => {
+        button.addEventListener('click', () => {
+            const transactionId = button.getAttribute('data-id');
+            fetchTransaction(transactionId);
+        });
+    });
+
+    // Function to fetch and open the transaction for editing
+    async function fetchTransaction(transactionId) {
+        try {
+            const response = await fetch(`/Transaction/GetTransaction/${transactionId}`);
+            const result = await response.json();
+
+            if (result.success) {
+                const transaction = result.data;
+                openEditTransactionModal(transaction); // Open edit modal with transaction data
+            } else {
+                console.error('Error fetching transaction:', result.message);
+                alert(result.message);
+            }
+        } catch (error) {
+            console.error('Error fetching transaction:', error);
+            alert('Error fetching transaction data.');
+        }
     }
 
     // Function to handle deletion of a transaction
@@ -285,52 +241,24 @@
 
                     const result = JSON.parse(responseText); // Parse the response text as JSON
 
-                    // Check if deletion was successful
-                    if (result.success || result.message === 'Transaction deleted successfully.') {
-                        await Swal.fire({
-                            title: 'Deleted!',
-                            text: 'Your transaction has been deleted.',
-                            icon: 'success',
-                            confirmButtonText: 'Okay'
+                    // Check if the deletion was successful
+                    if (result.success) {
+                        Swal.fire('Deleted!', 'Your transaction has been deleted.', 'success').then(() => {
+                            window.location.reload(); // Reload the page to reflect changes
                         });
-                        location.reload(); // Refresh the page
                     } else {
-                        console.error('Deletion failed:', result.message);
-                        await Swal.fire({
-                            title: 'Error!',
-                            text: 'Deletion failed: ' + result.message,
-                            icon: 'error',
-                            confirmButtonText: 'Okay'
-                        });
+                        Swal.fire('Error!', result.message, 'error'); // Show error message
                     }
                 } catch (error) {
-                    console.error('Error deleting transaction:', error);
-                    await Swal.fire({
-                        title: 'Error!',
-                        text: 'An error occurred while deleting the transaction.',
-                        icon: 'error',
-                        confirmButtonText: 'Okay'
-                    });
+                    console.error('Error occurred while deleting transaction:', error);
+                    Swal.fire('Error!', 'Failed to delete transaction.', 'error');
                 }
             }
         });
     });
 
-
-
-
-
-
-    // Event listeners
+    // Attach event listeners for modal open and close actions
     addTransactionButton.addEventListener('click', openAddTransactionModal);
     closeModalButton.addEventListener('click', closeAddTransactionModal);
     transactionForm.addEventListener('submit', currentTransactionId ? handleEditTransaction : handleAddTransaction);
-    transactionForm.addEventListener('change', () => { isModalDirty = true; }); // Set dirty flag on change
-
-    // Close modal when clicking outside of it
-    window.addEventListener('click', (event) => {
-        if (event.target === modal) { // Check if the click is on the modal background
-            closeAddTransactionModal();
-        }
-    });
 });

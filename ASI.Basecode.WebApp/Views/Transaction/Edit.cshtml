@@ -6,39 +6,39 @@
 @using ASI.Basecode.Services.ServiceModels
 
 <!-- Modal Structure -->
-<div id="addTransactionModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 items-center justify-center hidden z-50">
-    <div id="addModalContent" class="modal-content bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-auto">
+<div id="editTransactionModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 items-center justify-center hidden z-50">
+    <div id="editModalContent" class="modal-content bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-auto">
         <div class="flex justify-between items-center mb-4">
-            <h2 class="text-2xl font-bold">Add Transaction</h2>
-            <button id="closeTransactionModal" class="text-gray-400 hover:text-gray-600">
+            <h2 class="text-2xl font-bold">Edit Transaction</h2>
+            <button id="closeEditTransactionModal" class="text-gray-400 hover:text-gray-600">
                 <i class="fas fa-times"></i>
             </button>
         </div>
 
-        <p class="text-gray-600 mb-4">Fill out all the fields below to add a transaction</p>
+        <p class="text-gray-600 mb-4">Update the fields below to edit the transaction</p>
 
-        <form id="transactionForm" method="post" action="/Transaction/Create">
+        <form id="editTransactionForm" method="post" action="/Transaction/Edit">
             @Html.AntiForgeryToken()
 
             <!-- Amount Field -->
             <div class="mb-6">
-                <label for="transactionAmount" class="block text-sm font-medium text-gray-700">Amount</label>
-                <input type="number" id="transactionAmount" name="Amount" placeholder="Enter amount" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900" />
+                <label for="editTransactionAmount" class="block text-sm font-medium text-gray-700">Amount</label>
+                <input type="number" id="editTransactionAmount" name="Amount" placeholder="Enter amount" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900" />
             </div>
             <!-- Type Field -->
             <div class="mb-6">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
                 <div class="flex space-x-4">
-                    <button type="button" id="createExpenseButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300">Expense</button>
-                    <button type="button" id="createIncomeButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300">Income</button>
+                    <button type="button" id="expenseButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300">Expense</button>
+                    <button type="button" id="incomeButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300">Income</button>
                 </div>
-                <input type="hidden" name="Type" id="transactionType" value="Expense" />
+                <input type="hidden" name="Type" id="editTransactionType" value="Expense" />
             </div>
 
             <!-- Category Field -->
             <div class="mb-6">
-                <label for="transactionCategory" class="block text-sm font-medium text-gray-700">Category</label>
-                <select id="transactionCategory" name="CategoryId" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900">
+                <label for="editTransactionCategory" class="block text-sm font-medium text-gray-700">Category</label>
+                <select id="editTransactionCategory" name="CategoryId" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900">
                     <option value="" disabled>Select category</option>
 
                     @if (ViewData["Categories"] is List<MCategory> categories && categories.Any())
@@ -58,8 +58,8 @@
 
             <!-- Account Field -->
             <div class="mb-6">
-                <label for="transactionAccount" class="block text-sm font-medium text-gray-700">Account</label>
-                <select id="transactionAccount" name="DeLiId" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900">
+                <label for="editTransactionAccount" class="block text-sm font-medium text-gray-700">Account</label>
+                <select id="editTransactionAccount" name="DeLiId" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900">
                     <option value="" disabled>Select account</option>
 
                     @if (ViewData["DebitLiabilities"] is List<DebitLiabilityViewModel> debitLiabilities && debitLiabilities.Any())
@@ -77,17 +77,16 @@
                 </select>
             </div>
 
-
             <!-- Date Field -->
             <div class="mb-6">
-                <label for="transactionDate" class="block text-sm font-medium text-gray-700">Date</label>
-                <input type="date" id="transactionDate" name="TransactionDate" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900" />
+                <label for="editTransactionDate" class="block text-sm font-medium text-gray-700">Date</label>
+                <input type="date" id="editTransactionDate" name="TransactionDate" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900" />
             </div>
 
             <!-- Note Field -->
             <div class="mb-6">
-                <label for="transactionNote" class="block text-sm font-medium text-gray-700">Note</label>
-                <textarea id="transactionNote" name="Note" placeholder="Enter note" rows="4" class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900"></textarea>
+                <label for="editTransactionNote" class="block text-sm font-medium text-gray-700">Note</label>
+                <textarea id="editTransactionNote" name="Note" placeholder="Enter note" rows="4" class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900"></textarea>
             </div>
 
             <!-- Submit Button -->
