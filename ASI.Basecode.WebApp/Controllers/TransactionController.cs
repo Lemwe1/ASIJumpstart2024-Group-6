@@ -162,7 +162,6 @@ namespace ASI.Basecode.WebApp.Controllers
             }
 
             // Update the properties of the existing transaction based on the model
-            existingTransaction.Description = model.Description;
             existingTransaction.Amount = model.Amount;
             existingTransaction.TransactionDate = model.TransactionDate;
             existingTransaction.Note = model.Note;
@@ -177,13 +176,13 @@ namespace ASI.Basecode.WebApp.Controllers
         }
 
 
-        // POST: Delete a transaction by ID
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
+            
             await _transactionService.DeleteTransactionAsync(id);
-            return RedirectToAction("Index");
+            return Ok(new { message = "Transaction deleted successfully." });
         }
 
         // Helper method to get User ID

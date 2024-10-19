@@ -22,9 +22,6 @@ namespace ASI.Basecode.Services.ServiceModels
         [Required(ErrorMessage = "Type is required")]
         public string TransactionType { get; set; }
 
-        [Required(ErrorMessage = "Description is required")]
-        public string Description { get; set; }
-
         [Required(ErrorMessage = "Amount is required")]
         public decimal Amount { get; set; }
 

@@ -1,15 +1,19 @@
 ﻿document.addEventListener("DOMContentLoaded", () => {
     const modal = document.getElementById('addTransactionModal');
+
     const addTransactionButton = document.getElementById('openAddTransactionModal');
     const closeModalButton = document.getElementById('closeTransactionModal');
+    const deleteTransactionButton = document.querySelectorAll('.deleteTransaction');
+
     const transactionForm = document.getElementById('transactionForm');
+
     const createExpenseButton = document.getElementById('createExpenseButton');
     const createIncomeButton = document.getElementById('createIncomeButton');
+
     const transactionCategorySelect = document.getElementById('transactionCategory');
     const transactionAccountSelect = document.getElementById('transactionAccount');
-    const addDebitType = document.getElementById('addDebitType'); // Assuming element exists
-    const addBorrowedType = document.getElementById('addBorrowedType'); // Assuming element exists
     const transactionType = document.getElementById('transactionType');
+
 
     let isModalDirty = false;
     let currentTransactionId = null; // Store the current transaction ID for edits
@@ -20,9 +24,10 @@
         modal.classList.add('flex');
         transactionForm.reset(); // Reset form when opening modal
         currentTransactionId = null; // Ensure ID is null for add
+        transactionCategorySelect.value = "";
+        transactionAccountSelect.value = "";
         updateTypeSelection('Expense'); // Set default type to 'Expense'
         filterCategories('Expense'); // Filter categories based on type
-        filterAccounts('Expense'); // Filter accounts based on type
         isModalDirty = false; // Reset dirty flag
     }
 
@@ -34,16 +39,28 @@
         populateTransactionData(transaction); // Populate form with transaction data
         updateTypeSelection(transaction.Type); // Ensure correct type button is highlighted
         filterCategories(transaction.Type); // Filter categories based on transaction type
-        filterAccounts(transaction.Type); // Filter accounts based on transaction type
         isModalDirty = false; // Reset dirty flag
     }
 
     // Close modal with confirmation if there are unsaved changes
     function closeAddTransactionModal() {
         if (isModalDirty) {
-            if (confirm("You have unsaved changes. Do you want to discard them?")) {
-                resetModal();
-            }
+            Swal.fire({
+                title: 'You have unsaved changes.',
+                text: "Do you want to discard them?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, discard it!',
+                customClass: {
+                    popup: 'swal2-front' // Custom class to control z-index
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    resetModal();
+                }
+            });
         } else {
             resetModal();
         }
@@ -84,61 +101,31 @@
     createExpenseButton.addEventListener('click', () => {
         updateTypeSelection('Expense');
         filterCategories('Expense');
-        filterAccounts('Expense');
     });
 
     createIncomeButton.addEventListener('click', () => {
         updateTypeSelection('Income');
         filterCategories('Income');
-        filterAccounts('Income');
     });
 
     // Filter categories based on transaction type
     function filterCategories(type) {
         const options = transactionCategorySelect.querySelectorAll('option');
-        let hasCategories = false;
 
         options.forEach(option => {
             if (option.dataset.type === type || option.value === "") {
                 option.style.display = 'block'; // Show relevant options
-                if (option.value !== "") {
-                    hasCategories = true; // At least one category is available
-                }
             } else {
                 option.style.display = 'none'; // Hide irrelevant options
             }
         });
 
         transactionCategorySelect.value = ""; // Reset selection
-
-        if (!hasCategories) {
-            alert(`No ${type.toLowerCase()} categories available.`);
-        }
-    }
-
-    // Filter accounts based on transaction type
-    function filterAccounts(type) {
-        const options = transactionAccountSelect.querySelectorAll('option');
-        let hasAccounts = false;
-
-        options.forEach(option => {
-            option.style.display = 'block'; // Show all options for now
-            if (option.value !== "") {
-                hasAccounts = true; // At least one account is available
-            }
-        });
-
-        transactionAccountSelect.value = ""; // Reset selection
-
-        if (!hasAccounts) {
-            alert(`No ${type.toLowerCase()} accounts available.`);
-        }
     }
 
     // Populate modal fields with transaction data
     function populateTransactionData(transaction) {
         transactionForm.querySelector('input[name="TransactionId"]').value = transaction.transactionId; // Assuming Id is the primary key
-        transactionForm.querySelector('input[name="Description"]').value = transaction.Description;
         transactionForm.querySelector('input[name="Amount"]').value = transaction.Amount;
         transactionCategorySelect.value = transaction.CategoryId; // Assuming CategoryId exists in transaction
         transactionAccountSelect.value = transaction.AccountId; // Assuming AccountId exists in transaction
@@ -154,7 +141,6 @@
             body: formData
         })
             .then(response => {
-                // Check if the response is OK (status in the range 200-299)
                 if (!response.ok) {
                     return response.clone().text().then(errorDetails => {
                         console.error('Error adding transaction:', response.status, response.statusText);
@@ -166,30 +152,51 @@
             })
             .then(result => {
                 if (result.success) {
-                    alert("Transaction added successfully!");
-                    resetModal();
-                    window.location.reload(); // Reload the page to reflect the new transaction
+                    Swal.fire({
+                        title: 'Success',
+                        text: 'Transaction created successfully!',
+                        icon: 'success',
+                        customClass: {
+                            popup: 'swal2-front' // Custom class for z-index
+                        }
+                    }).then(() => {
+                        resetModal();
+                        window.location.reload();
+                    });
                 } else {
-                    alert("An error occurred while adding the transaction.");
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'An error occurred while adding the transaction.',
+                        icon: 'error',
+                        customClass: {
+                            popup: 'swal2-front' // Custom class for z-index
+                        }
+                    });
                 }
             })
             .catch(error => {
                 console.error('Error adding transaction:', error);
-                alert(error.message);
+                Swal.fire({
+                    title: 'Error',
+                    text: error.message,
+                    icon: 'error',
+                    customClass: {
+                        popup: 'swal2-front' // Custom class for z-index
+                    }
+                });
             });
     }
 
     // Handle editing an existing transaction
     function handleEditTransaction(event) {
         event.preventDefault();
-        const formData = new FormData(transactionForm); 
+        const formData = new FormData(transactionForm);
 
-        fetch(`/Transaction/Edit/${currentTransactionId}`, { 
+        fetch(`/Transaction/Edit/${currentTransactionId}`, {
             method: 'POST',
             body: formData
         })
             .then(response => {
-                // Check if the response is OK (status in the range 200-299)
                 if (!response.ok) {
                     return response.clone().text().then(errorDetails => {
                         console.error('Error updating transaction:', response.status, response.statusText);
@@ -201,50 +208,129 @@
             })
             .then(result => {
                 if (result.success) {
-                    alert("Transaction updated successfully!");
-                    resetModal();
-                    window.location.reload(); // Reload the page to reflect the updated transaction
+                    Swal.fire({
+                        title: 'Success',
+                        text: 'Transaction updated successfully!',
+                        icon: 'success',
+                        customClass: {
+                            popup: 'swal2-front' // Custom class for z-index
+                        }
+                    }).then(() => {
+                        resetModal();
+                        window.location.reload();
+                    });
                 } else {
-                    alert("An error occurred while updating the transaction.");
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'An error occurred while updating the transaction.',
+                        icon: 'error',
+                        customClass: {
+                            popup: 'swal2-front' // Custom class for z-index
+                        }
+                    });
                 }
             })
             .catch(error => {
                 console.error('Error updating transaction:', error);
-                alert(error.message);
+                Swal.fire({
+                    title: 'Error',
+                    text: error.message,
+                    icon: 'error',
+                    customClass: {
+                        popup: 'swal2-front' // Custom class for z-index
+                    }
+                });
             });
     }
 
-    // Event listeners for modal open and close
+    // Function to handle deletion of a transaction
+    document.querySelectorAll('.deleteTransaction').forEach(button => {
+        button.addEventListener('click', async () => {
+            const id = button.getAttribute('data-id'); // Get the transaction ID from data-id attribute
+
+            const { isConfirmed } = await Swal.fire({
+                title: 'Are you sure?',
+                text: 'Do you really want to delete this transaction?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!'
+            });
+
+            if (isConfirmed) {
+                const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
+                const token = tokenElement ? tokenElement.value : null;
+
+                try {
+                    const response = await fetch(`/Transaction/Delete/${id}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': token // CSRF token
+                        }
+                    });
+
+                    const responseText = await response.text(); // Get response as text
+
+                    if (!response.ok) {
+                        console.error('Server responded with an error:', response.status, responseText);
+                        await Swal.fire({
+                            title: 'Error!',
+                            text: 'Failed to delete transaction. Server responded with status ' + response.status,
+                            icon: 'error',
+                            confirmButtonText: 'Okay'
+                        });
+                        return;
+                    }
+
+                    const result = JSON.parse(responseText); // Parse the response text as JSON
+
+                    // Check if deletion was successful
+                    if (result.success || result.message === 'Transaction deleted successfully.') {
+                        await Swal.fire({
+                            title: 'Deleted!',
+                            text: 'Your transaction has been deleted.',
+                            icon: 'success',
+                            confirmButtonText: 'Okay'
+                        });
+                        location.reload(); // Refresh the page
+                    } else {
+                        console.error('Deletion failed:', result.message);
+                        await Swal.fire({
+                            title: 'Error!',
+                            text: 'Deletion failed: ' + result.message,
+                            icon: 'error',
+                            confirmButtonText: 'Okay'
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error deleting transaction:', error);
+                    await Swal.fire({
+                        title: 'Error!',
+                        text: 'An error occurred while deleting the transaction.',
+                        icon: 'error',
+                        confirmButtonText: 'Okay'
+                    });
+                }
+            }
+        });
+    });
+
+
+
+
+
+
+    // Event listeners
     addTransactionButton.addEventListener('click', openAddTransactionModal);
     closeModalButton.addEventListener('click', closeAddTransactionModal);
+    transactionForm.addEventListener('submit', currentTransactionId ? handleEditTransaction : handleAddTransaction);
+    transactionForm.addEventListener('change', () => { isModalDirty = true; }); // Set dirty flag on change
 
-    // Submit form for adding/editing transactions
-    transactionForm.addEventListener('submit', (event) => {
-        if (currentTransactionId) {
-            handleEditTransaction(event); // Edit flow
-        } else {
-            handleAddTransaction(event); // Add flow
-        }
-    });
-
-    // Track form changes to set the dirty flag
-    transactionForm.addEventListener('input', () => {
-        isModalDirty = true;
-    });
-
-    // Close modal when clicking outside
+    // Close modal when clicking outside of it
     window.addEventListener('click', (event) => {
-        if (event.target === modal) {
+        if (event.target === modal) { // Check if the click is on the modal background
             closeAddTransactionModal();
         }
-    });
-
-    document.querySelectorAll('.editTransaction').forEach(button => {
-        button.addEventListener('click', (event) => {
-            const transactionId = event.target.dataset.transactionId; // Get transaction ID from data attribute
-            const transaction = getTransactionById(transactionId); // Function to retrieve transaction data (implement accordingly)
-            openEditTransactionModal(transaction); // Open modal with transaction data
-            currentTransactionId = transactionId; // Set the current transaction ID for editing
-        });
     });
 });

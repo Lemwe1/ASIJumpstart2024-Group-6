@@ -117,8 +117,6 @@ namespace ASI.Basecode.Data
 
                 entity.Property(e => e.Amount).HasColumnType("decimal(10, 2)");
 
-                entity.Property(e => e.Description).HasMaxLength(100);
-
                 entity.Property(e => e.Note).HasMaxLength(255);
 
                 entity.Property(e => e.TransactionDate).HasColumnType("date");

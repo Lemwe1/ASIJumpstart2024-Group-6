@@ -29,12 +29,11 @@ public class TransactionService : ITransactionService
                 DeLiId = transaction.DeLiId,
                 UserId = transaction.UserId,
                 TransactionType = transaction.TransactionType,
-                Description = transaction.Description,
                 Amount = transaction.Amount,
                 TransactionDate = transaction.TransactionDate,
                 Note = transaction.Note,
-                CategoryName = transaction.Category?.Name ?? string.Empty, 
-                DebitLiabilityName = transaction.DeLi?.DeLiName ?? string.Empty 
+                CategoryName = transaction.Category?.Name ?? string.Empty,
+                DebitLiabilityName = transaction.DeLi?.DeLiName ?? string.Empty
             });
 
         return transactionViewModels;
@@ -50,14 +49,14 @@ public class TransactionService : ITransactionService
     // Add a new transaction
     public async Task AddTransactionAsync(TransactionViewModel transactionViewModel)
     {
-        var transaction = MapToModel(transactionViewModel); 
+        var transaction = MapToModel(transactionViewModel);
         await _transactionRepository.AddAsync(transaction);
     }
 
     // Update an existing transaction
     public async Task UpdateTransactionAsync(TransactionViewModel transactionViewModel)
     {
-        var transaction = MapToModel(transactionViewModel); 
+        var transaction = MapToModel(transactionViewModel);
         await _transactionRepository.UpdateAsync(transaction);
 
     }
@@ -78,7 +77,6 @@ public class TransactionService : ITransactionService
             DeLiId = model.DeLiId,
             UserId = model.UserId,
             TransactionType = model.TransactionType,
-            Description = model.Description,
             Amount = model.Amount,
             TransactionDate = model.TransactionDate,
             Note = model.Note
@@ -95,7 +93,6 @@ public class TransactionService : ITransactionService
             DeLiId = viewModel.DeLiId,
             UserId = viewModel.UserId,
             TransactionType = viewModel.TransactionType,
-            Description = viewModel.Description,
             Amount = viewModel.Amount,
             TransactionDate = viewModel.TransactionDate,
             Note = viewModel.Note

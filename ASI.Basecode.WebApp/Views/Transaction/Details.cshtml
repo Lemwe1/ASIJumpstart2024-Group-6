@@ -8,7 +8,6 @@
         <thead class="bg-gray-200">
             <tr>
                 <th class="p-4">Category</th>
-                <th class="p-4">Description</th>
                 <th class="p-4">Amount</th>
                 <th class="p-4">Account</th>
                 <th class="p-4">Date</th>
@@ -19,23 +18,27 @@
         <tbody>
             @if (ViewData["Transactions"] is List<TransactionViewModel> transactions)
             {
+
                 if (transactions.Count > 0)
                 {
+                    @Html.AntiForgeryToken()
                     foreach (var transaction in transactions)
                     {
                         <tr class="">
                             <td class=" px-4 py-3">@transaction.CategoryName</td>
-                            <td class=" px-4 py-3">@transaction.Description</td>
                             <td class=" px-4 py-3">₱ @transaction.Amount</td>
                             <td class=" px-4 py-3">@transaction.DebitLiabilityName</td>
                             <td class=" px-4 py-3">@transaction.TransactionDate.ToShortDateString()</td>
                             <td class=" px-4 py-3">@transaction.Note</td>
                             <td class=" px-4 py-3 flex justify-center space-x-2">
                                 <button data-id="@transaction.TransactionId"
-                                        class="editTransaction bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg transition duration-150">
+                                        class="editTransaction bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg transition duration-150 editTransaction">
                                     Edit
                                 </button>
-                                <button id="deleteTransaction" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-lg transition duration-150">Delete</button>
+                                <button data-id="@transaction.TransactionId"
+                                        class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-lg transition duration-150 deleteTransaction">
+                                    Delete
+                                </button>
                             </td>
                         </tr>
                     }
