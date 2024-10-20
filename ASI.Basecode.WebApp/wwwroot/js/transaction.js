@@ -33,8 +33,12 @@
     function openEditTransactionModal(transaction) {
         editModal.classList.remove('hidden');
         editModal.classList.add('flex');
-        populateEditModalFields(transaction); // Populate fields with transaction data
+        currentTransactionId = transaction.id; 
+        populateEditModalFields(transaction);
+        filterCategories(transaction.transactionType);
+        filterAccounts('debit'); 
     }
+
 
     // Reset form fields when the reset button is clicked
     document.getElementById('resetTransactionForm').addEventListener('click', function () {
@@ -46,8 +50,8 @@
         const transactionAccountSelect = document.getElementById('transactionAccount');
 
         // Resetting to default (assuming the first option is disabled)
-        transactionCategorySelect.value = ""; // Reset category selection
-        transactionAccountSelect.value = ""; // Reset account selection
+        transactionCategorySelect.value = ""; 
+        transactionAccountSelect.value = ""; 
     });
 
     // Close modal with confirmation if there are unsaved changes
@@ -58,9 +62,10 @@
                 text: "Do you want to discard them?",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, discard it!',
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#a6a6a6',
+                confirmButtonText: 'Discard',
+                cancelButtonText: 'Cancel',
                 customClass: { popup: 'swal2-front' }
             }).then((result) => {
                 if (result.isConfirmed) resetModal();
@@ -78,9 +83,10 @@
             text: "Do you want to discard them?",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, discard it!',
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#a6a6a6',
+            confirmButtonText: 'Discard',
+            cancelButtonText: 'Cancel',
             customClass: { popup: 'swal2-front' }
         }).then((result) => {
             if (result.isConfirmed) {
@@ -119,12 +125,28 @@
 
     // Populate edit modal fields with transaction data
     function populateEditModalFields(transaction) {
-        document.getElementById('editTransactionAmount').value = transaction.amount;
-        document.getElementById('editTransactionDate').value = new Date(transaction.transactionDate).toISOString().slice(0, 10); // Format date if necessary
-        document.getElementById('editTransactionNote').value = transaction.note || ''; // Use empty string if null
-        document.getElementById('editTransactionCategory').value = transaction.categoryId; // Set the selected category
-        document.getElementById('editTransactionAccount').value = transaction.deLiId; // Set the selected account
-        document.getElementById('editTransactionType').value = transaction.transactionType || 'Expense'; // Set the transaction type (default to Expense if null)
+        if (!transaction || typeof transaction !== 'object') {
+            console.error("Invalid transaction object");
+            return;
+        }
+
+        const { amount, transactionDate, note, categoryId, deLiId, transactionType } = transaction;
+
+        document.getElementById('editTransactionAmount').value = amount ? amount.toFixed(2) : '0.00';
+        document.getElementById('editTransactionDate').value = transactionDate ? new Date(transactionDate).toISOString().slice(0, 10) : '';
+        document.getElementById('editTransactionNote').value = note || '';
+        document.getElementById('editTransactionCategory').value = categoryId || '';
+        document.getElementById('editTransactionAccount').value = deLiId || '';
+        document.getElementById('editTransactionType').value = transactionType || 'Expense';
+    }
+
+
+    // Function to update button styles based on the type
+    function updateButtonStyles(button, isExpense) {
+        button.classList.toggle('bg-blue-500', isExpense);
+        button.classList.toggle('text-white', isExpense);
+        button.classList.toggle('bg-gray-200', !isExpense);
+        button.classList.toggle('text-gray-800', !isExpense);
     }
 
     // Update the type button selection
@@ -137,24 +159,42 @@
         }
 
         const isExpense = type === 'Expense';
-        createExpenseButton.classList.toggle('bg-blue-500', isExpense);
-        createExpenseButton.classList.toggle('text-white', isExpense);
-        createIncomeButton.classList.toggle('bg-blue-500', !isExpense);
-        createIncomeButton.classList.toggle('text-white', !isExpense);
-        createIncomeButton.classList.toggle('bg-gray-200', isExpense);
-        createIncomeButton.classList.toggle('text-gray-800', isExpense);
+
+        // Update styles for create buttons
+        updateButtonStyles(createExpenseButton, isExpense);
+        updateButtonStyles(createIncomeButton, !isExpense);
+
+        // Update styles for edit buttons
+        updateButtonStyles(editExpenseButton, isExpense);
+        updateButtonStyles(editIncomeButton, !isExpense);
     }
 
-    // Type selection buttons
+    // Type selection buttons for creating transactions
     createExpenseButton.addEventListener('click', () => {
         updateTypeSelection('Expense');
         filterCategories('Expense');
+        filterAccounts('debit');
     });
 
     createIncomeButton.addEventListener('click', () => {
         updateTypeSelection('Income');
         filterCategories('Income');
+        filterAccounts('debit');
     });
+
+    // Type selection buttons for editing transactions
+    editExpenseButton.addEventListener('click', () => {
+        updateTypeSelection('Expense');
+        filterCategories('Expense');
+        filterAccounts('debit');
+    });
+
+    editIncomeButton.addEventListener('click', () => {
+        updateTypeSelection('Income');
+        filterCategories('Income');
+        filterAccounts('debit');
+    });
+
 
     // Filter categories based on transaction type
     function filterCategories(type) {
@@ -163,6 +203,16 @@
             option.style.display = (option.dataset.type === type || option.value === "") ? 'block' : 'none';
         });
         transactionCategorySelect.value = ""; // Reset selection
+    }
+
+    // Filter accounts based on DeLiType (e.g., debit or borrowed)
+    function filterAccounts(deLiType) {
+        const options = transactionAccountSelect.querySelectorAll('option');
+        options.forEach(option => {
+            // Display only accounts that match the specified deLiType (e.g., 'debit')
+            option.style.display = (option.dataset.type === deLiType || option.value === "") ? 'block' : 'none';
+        });
+        transactionAccountSelect.value = ""; // Reset selection
     }
 
     // Handle adding a new transaction
@@ -178,6 +228,13 @@
     function handleEditTransaction(event) {
         event.preventDefault();
         const formData = new FormData(transactionForm);
+
+        // Log the form data for debugging
+        const dataToUpdate = {};
+        formData.forEach((value, key) => {
+            dataToUpdate[key] = value;
+        });
+        console.log('Data being updated:', dataToUpdate);
         fetch(`/Transaction/Edit/${currentTransactionId}`, { method: 'POST', body: formData })
             .then(handleResponse)
             .catch(handleError);
@@ -258,6 +315,8 @@
                 text: 'Do you really want to delete this transaction?',
                 icon: 'warning',
                 showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#a6a6a6',
                 confirmButtonText: 'Yes, delete it!',
                 cancelButtonText: 'No, cancel!'
             });
@@ -323,16 +382,19 @@
 
     // Mark form as dirty when there are changes
     transactionForm.addEventListener('input', () => {
-        isModalDirty = true;
+        isModalDirty = true; // Mark the modal as dirty when user interacts with the form
     });
 
-    // Event listeners for closing the modal
+    editTransactionForm.addEventListener('input', () => {
+        isModalDirty = true; // Mark the edit modal as dirty when user interacts with the form
+    });
+
+    // Attach event listeners for modal opening
+    addTransactionButton.addEventListener('click', openAddTransactionModal);
     closeAddModalButton.addEventListener('click', closeTransactionModal);
     closeEditModalButton.addEventListener('click', closeEditTransactionModal);
 
-    // Open the modal on button click
-    addTransactionButton.addEventListener('click', openAddTransactionModal);
-
-    // Form submission event listener
+    // Handle form submission
     transactionForm.addEventListener('submit', handleAddTransaction);
+    editTransactionForm.addEventListener('submit', handleEditTransaction);
 });

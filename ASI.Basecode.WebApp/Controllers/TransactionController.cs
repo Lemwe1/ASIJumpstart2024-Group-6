@@ -84,6 +84,7 @@ namespace ASI.Basecode.WebApp.Controllers
             var transactionViewModel = new TransactionViewModel
             {
                 TransactionId = transaction.TransactionId,
+                TransactionType = transaction.TransactionType,
                 Amount = transaction.Amount,
                 TransactionDate = transaction.TransactionDate,
                 Note = transaction.Note,
@@ -147,48 +148,57 @@ namespace ASI.Basecode.WebApp.Controllers
             var transactionViewModel = new TransactionViewModel
             {
                 TransactionId = transaction.TransactionId,
+                TransactionType = transaction.TransactionType,
                 Amount = transaction.Amount,
                 TransactionDate = transaction.TransactionDate,
                 Note = transaction.Note,
                 CategoryId = transaction.CategoryId,
-                // Add any other necessary properties here
+                DeLiId = transaction.DeLiId // Ensure this is set as well
             };
 
-            return Json(new { success = true, data = transactionViewModel }); // Return JSON for editing
+            // Ensure categories and debit liabilities are loaded
+            ViewData["Categories"] = await _categoryService.GetCategoriesAsync(userId.Value); // Pass user ID
+            ViewData["DebitLiabilities"] = await _debitLiabilitiesService.GetDebitLiabilitiesAsync(userId.Value); // Pass user ID
+
+            return View(transactionViewModel);
         }
+
+
 
         // POST: Update an existing transaction
         [HttpPost]
         public async Task<IActionResult> Edit(TransactionViewModel model)
         {
-            var userId = GetUserId();
+            var userId = GetUserId(); // Fetch the current user's ID
             if (userId == null)
             {
                 return BadRequest("Invalid user ID.");
             }
 
-            var existingTransaction = await _transactionService.GetTransactionByIdAsync(model.TransactionId);
-            if (existingTransaction == null || existingTransaction.UserId != userId)
+            var existingTransaction = await _transactionService.GetTransactionByIdAsync(model.TransactionId); // Fetch the existing transaction
+            if (existingTransaction == null || existingTransaction.UserId != userId) 
             {
                 return NotFound(); // Prevent unauthorized access
             }
 
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) // Check for validation errors
             {
                 return BadRequest(ModelState);
             }
 
             // Update the transaction properties
+            existingTransaction.TransactionType = model.TransactionType;
             existingTransaction.Amount = model.Amount;
             existingTransaction.TransactionDate = model.TransactionDate;
             existingTransaction.Note = model.Note;
             existingTransaction.CategoryId = model.CategoryId;
             existingTransaction.DeLiId = model.DeLiId;
 
-            await _transactionService.UpdateTransactionAsync(existingTransaction);
+            await _transactionService.UpdateTransactionAsync(existingTransaction); // Call the service to update the transaction
 
             return Ok(existingTransaction); // Return updated transaction as JSON
         }
+
 
         // POST: Delete a transaction
         [HttpPost]

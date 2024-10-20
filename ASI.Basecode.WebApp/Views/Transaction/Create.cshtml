@@ -55,7 +55,6 @@
 
                 </select>
             </div>
-
             <!-- Account Field -->
             <div class="mb-6">
                 <label for="transactionAccount" class="block text-sm font-medium text-gray-700">Account</label>
@@ -64,18 +63,28 @@
 
                     @if (ViewData["DebitLiabilities"] is List<DebitLiabilityViewModel> debitLiabilities && debitLiabilities.Any())
                     {
-                        foreach (var account in debitLiabilities)
+                        var debitAccounts = debitLiabilities.Where(account => account.DeLiType == "debit").ToList();
+
+                        if (debitAccounts.Any())
                         {
-                            <option value="@account.DeLiId" data-type="@account.DeLiType">@account.DeLiName</option>
+                            foreach (var account in debitAccounts)
+                            {
+                                <option value="@account.DeLiId" data-type="@account.DeLiType">@account.DeLiName</option>
+                            }
+                        }
+                        else
+                        {
+                            <option value="" disabled>No debit accounts available</option>
                         }
                     }
                     else
                     {
-                        <option value="" disabled>No Entries yet</option>
+                        <option value="" disabled>No entries yet</option>
                     }
 
                 </select>
             </div>
+
 
             <!-- Date Field -->
             <div class="mb-6">

@@ -23,7 +23,7 @@
             <!-- Amount Field -->
             <div class="mb-6">
                 <label for="editTransactionAmount" class="block text-sm font-medium text-gray-700">Amount</label>
-                <input type="number" id="editTransactionAmount" name="Amount" placeholder="Enter amount" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900" />
+                <input type="number"  step="0.01" id="editTransactionAmount" name="Amount" placeholder="Enter amount" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900" />
             </div>
             <!-- Type Field -->
             <div class="mb-6">
@@ -64,18 +64,27 @@
 
                     @if (ViewData["DebitLiabilities"] is List<DebitLiabilityViewModel> debitLiabilities && debitLiabilities.Any())
                     {
-                        foreach (var account in debitLiabilities)
+                        // Filter only borrowed accounts
+                        var borrowedAccounts = debitLiabilities.Where(account => account.DeLiType == "debit").ToList();
+                        if (borrowedAccounts.Any())
                         {
-                            <option value="@account.DeLiId" data-type="@account.DeLiType">@account.DeLiName</option>
+                            foreach (var account in borrowedAccounts)
+                            {
+                                <option value="@account.DeLiId" data-type="@account.DeLiType">@account.DeLiName</option>
+                            }
+                        }
+                        else
+                        {
+                            <option value="" disabled>No borrowed accounts available</option>
                         }
                     }
                     else
                     {
                         <option value="" disabled>No Entries yet</option>
                     }
-
                 </select>
             </div>
+
 
             <!-- Date Field -->
             <div class="mb-6">
