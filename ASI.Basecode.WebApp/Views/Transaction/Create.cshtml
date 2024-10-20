@@ -6,11 +6,11 @@
 @using ASI.Basecode.Services.ServiceModels
 
 <!-- Modal Structure -->
-<div id="addTransactionModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 items-center justify-center hidden">
+<div id="addTransactionModal" class="modal fixed inset-0 bg-gray-800 bg-opacity-50 items-center justify-center hidden">
     <div id="addModalContent" class="modal-content bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-auto">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-2xl font-bold">Add Transaction</h2>
-            <button id="closeTransactionModal" class="text-gray-400 hover:text-gray-600">
+            <button id="closeTransactionModal" class="text-gray-400 hover:bg-gray-200 p-2 w-10">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -29,11 +29,12 @@
             <div class="mb-6">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
                 <div class="flex space-x-4">
-                    <button type="button" id="createExpenseButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300">Expense</button>
-                    <button type="button" id="createIncomeButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300">Income</button>
+                    <button type="button" id="createExpenseButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800">Expense</button>
+                    <button type="button" id="createIncomeButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800">Income</button>
                 </div>
                 <input type="hidden" name="TransactionType" id="transactionType" value="Expense" />
             </div>
+
 
             <!-- Category Field -->
             <div class="mb-6">
@@ -104,7 +105,7 @@
                 <button type="submit" class="w-1/2 mr-3 bg-blue-500 hover:bg-blue-700 text-white  py-3 rounded-md">
                     Confirm
                 </button>
-                <button type="button" id="resetTransactionForm" class="w-1/2 ml-3 border-2 border-gray-500 text-gray-500 hover:bg-gray-100  py-3 rounded-md">
+                <button type="button" id="resetTransactionForm" class="w-1/2 ml-3 bg-gray-200 text-gray-800 hover:bg-gray-300  py-3 rounded-md">
                     Reset
                 </button>
 

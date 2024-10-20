@@ -6,11 +6,11 @@
 @using ASI.Basecode.Services.ServiceModels
 
 <!-- Modal Structure -->
-<div id="editTransactionModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 items-center justify-center hidden z-50">
+<div id="editTransactionModal" class="modal fixed inset-0 bg-gray-800 bg-opacity-50 items-center justify-center hidden z-50">
     <div id="editModalContent" class="modal-content bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-auto">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-2xl font-bold">Edit Transaction</h2>
-            <button id="closeEditTransactionModal" class="text-gray-400 hover:text-gray-600">
+            <button id="closeEditTransactionModal" class="text-gray-400 hover:bg-gray-200 p-2 w-10">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -20,6 +20,7 @@
         <form id="editTransactionForm" method="post" action="/Transaction/Edit">
             @Html.AntiForgeryToken()
 
+             <input type="hidden" name="TransactionId" id="editTransactionId" />
             <!-- Amount Field -->
             <div class="mb-6">
                 <label for="editTransactionAmount" class="block text-sm font-medium text-gray-700">Amount</label>

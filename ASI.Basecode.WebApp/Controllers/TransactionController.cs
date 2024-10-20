@@ -97,7 +97,7 @@ namespace ASI.Basecode.WebApp.Controllers
 
         // POST: Create a new transaction
         [HttpPost]
-        public async Task<IActionResult> Create(TransactionViewModel model)
+        public async Task<IActionResult> Create([FromBody] TransactionViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -164,29 +164,40 @@ namespace ASI.Basecode.WebApp.Controllers
         }
 
 
-
-        // POST: Update an existing transaction
+        // POST: /Transaction/Edit/{id}
         [HttpPost]
-        public async Task<IActionResult> Edit(TransactionViewModel model)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [FromForm] TransactionViewModel model)
         {
+            if (model == null)
+            {
+                return BadRequest(new { success = false, message = "Model is null" });
+            }
+
+            if (id != model.TransactionId)
+            {
+                return BadRequest(new { success = false, message = "ID mismatch" });
+            }
+
             var userId = GetUserId(); // Fetch the current user's ID
             if (userId == null)
             {
-                return BadRequest("Invalid user ID.");
+                return BadRequest(new { success = false, message = "Invalid user ID." });
             }
 
             var existingTransaction = await _transactionService.GetTransactionByIdAsync(model.TransactionId); // Fetch the existing transaction
-            if (existingTransaction == null || existingTransaction.UserId != userId) 
+            if (existingTransaction == null || existingTransaction.UserId != userId)
             {
-                return NotFound(); // Prevent unauthorized access
+                return NotFound(new { success = false, message = "Transaction not found or unauthorized." }); // Prevent unauthorized access
             }
 
             if (!ModelState.IsValid) // Check for validation errors
             {
-                return BadRequest(ModelState);
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                return BadRequest(new { success = false, errors });
             }
 
-            // Update the transaction properties
+            // Update the transaction
             existingTransaction.TransactionType = model.TransactionType;
             existingTransaction.Amount = model.Amount;
             existingTransaction.TransactionDate = model.TransactionDate;
@@ -196,8 +207,9 @@ namespace ASI.Basecode.WebApp.Controllers
 
             await _transactionService.UpdateTransactionAsync(existingTransaction); // Call the service to update the transaction
 
-            return Ok(existingTransaction); // Return updated transaction as JSON
+            return Json(new { success = true, data = existingTransaction }); // Return updated transaction as JSON
         }
+
 
 
         // POST: Delete a transaction

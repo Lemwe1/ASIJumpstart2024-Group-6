@@ -18,7 +18,7 @@
     const transactionType = document.getElementById('transactionType');
 
     let isModalDirty = false;
-    let currentTransactionId = null; // Store the current transaction ID for edits
+    
 
     // Open modal for adding a new transaction
     function openAddTransactionModal() {
@@ -31,13 +31,14 @@
 
     // Open modal for editing a transaction
     function openEditTransactionModal(transaction) {
-        editModal.classList.remove('hidden');
-        editModal.classList.add('flex');
-        currentTransactionId = transaction.id; 
-        populateEditModalFields(transaction);
-        filterCategories(transaction.transactionType);
-        filterAccounts('debit'); 
-    }
+    editModal.classList.remove('hidden');
+    editModal.classList.add('flex');
+    populateEditModalFields(transaction);
+    updateTypeSelection(transaction.transactionType);
+    filterCategories(transaction.transactionType);
+    filterAccounts('debit');
+}
+
 
 
     // Reset form fields when the reset button is clicked
@@ -50,8 +51,8 @@
         const transactionAccountSelect = document.getElementById('transactionAccount');
 
         // Resetting to default (assuming the first option is disabled)
-        transactionCategorySelect.value = ""; 
-        transactionAccountSelect.value = ""; 
+        transactionCategorySelect.value = "";
+        transactionAccountSelect.value = "";
     });
 
     // Close modal with confirmation if there are unsaved changes
@@ -130,8 +131,13 @@
             return;
         }
 
-        const { amount, transactionDate, note, categoryId, deLiId, transactionType } = transaction;
 
+
+        const { transactionId, amount, transactionDate, note, categoryId, deLiId, transactionType } = transaction;
+
+        currentTransactionId = transaction.transactionId;
+
+        document.getElementById('editTransactionId').value = transactionId;
         document.getElementById('editTransactionAmount').value = amount ? amount.toFixed(2) : '0.00';
         document.getElementById('editTransactionDate').value = transactionDate ? new Date(transactionDate).toISOString().slice(0, 10) : '';
         document.getElementById('editTransactionNote').value = note || '';
@@ -218,27 +224,70 @@
     // Handle adding a new transaction
     function handleAddTransaction(event) {
         event.preventDefault();
-        const formData = new FormData(transactionForm); // Collect form data
-        fetch('/Transaction/Create', { method: 'POST', body: formData })
+        const formData = new FormData(transactionForm);
+
+        // Convert FormData to a plain object (if needed)
+        const data = {};
+        formData.forEach((value, key) => {
+            data[key] = value;
+        });
+
+        // Send the request with JSON data
+        fetch('/Transaction/Create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
             .then(handleResponse)
             .catch(handleError);
     }
-
     // Handle editing an existing transaction
     function handleEditTransaction(event) {
         event.preventDefault();
-        const formData = new FormData(transactionForm);
 
-        // Log the form data for debugging
-        const dataToUpdate = {};
+        // Check if the currentTransactionId is set
+        if (!currentTransactionId) {
+            Swal.fire({
+                title: 'Error',
+                text: 'Transaction ID is not set. Please select a transaction to edit.',
+                icon: 'error',
+                customClass: { popup: 'swal2-front' }
+            });
+            return; // Exit the function if there is no transaction ID
+        }
+
+        // Collect form data
+        const formData = new FormData(editTransactionForm);
+        const data = {}; // Object to hold the JSON data
+
+        // Convert FormData to a plain object
         formData.forEach((value, key) => {
-            dataToUpdate[key] = value;
+            data[key] = value;
         });
-        console.log('Data being updated:', dataToUpdate);
-        fetch(`/Transaction/Edit/${currentTransactionId}`, { method: 'POST', body: formData })
+
+        // Add the TransactionId to the data object
+        data.TransactionId = currentTransactionId;
+
+        // Log the data being sent for debugging
+        console.log('Data being sent:', JSON.stringify(data));
+
+        // Send the request using JSON
+        fetch(`/Transaction/Edit/${currentTransactionId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json' // Set content type to JSON
+            },
+            body: JSON.stringify(data) // Send the data as a JSON string
+        })
             .then(handleResponse)
             .catch(handleError);
     }
+
+
+
+
 
     // Response handler for adding/editing transactions
     function handleResponse(response) {
@@ -251,6 +300,7 @@
                     title: 'Success',
                     text: result.message || 'Transaction processed successfully!',
                     icon: 'success',
+                    confirmButtonColor: '#3B82F6',
                     customClass: { popup: 'swal2-front' }
                 }).then(() => {
                     resetModal();
@@ -342,7 +392,8 @@
                             title: 'Error!',
                             text: 'Failed to delete transaction. Server responded with status ' + response.status,
                             icon: 'error',
-                            confirmButtonText: 'Okay'
+                            confirmButtonText: 'Okay',
+                            confirmButtonColor: '#3B82F6'
                         });
                         return;
                     }
@@ -355,7 +406,9 @@
                             title: 'Deleted!',
                             text: 'Your transaction has been deleted.',
                             icon: 'success',
-                            confirmButtonText: 'Okay'
+                            confirmButtonText: 'Okay',
+                            confirmButtonColor: '#3B82F6'
+                           
                         });
                         location.reload(); // Refresh the page
                     } else {

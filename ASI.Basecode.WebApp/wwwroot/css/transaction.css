@@ -4,15 +4,15 @@
 
 .modal {
     z-index: 1050;
-    display: none; /* Keep modals hidden by default */
+    display: none; 
     align-items: center;
     justify-content: center;
     padding: 20px;
 }
 
-    /* Show modal when it has 'flex' class */
+   
     .modal.flex {
-        display: flex; /* Change to flex when the modal is open */
+        display: flex; 
     }
 
 .modal-content {
@@ -25,6 +25,10 @@
     border-radius: 8px;
 }
 
+.transaction-table {
+    min-width: 800px; /* or whatever minimum width you desire */
+}
+
 @media (max-width: 768px) {
     .modal-content {
         max-width: 90%;
@@ -33,46 +37,3 @@
 }
 
 
-.custom-select {
-    position: relative;
-    cursor: pointer;
-}
-
-.selected-option {
-    padding: 10px;
-    border: 1px solid #ccc;
-    background-color: white;
-    display: flex;
-    align-items: center;
-}
-
-.options-container {
-    display: none; /* Hide options by default */
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    border: 1px solid #ccc;
-    background-color: white;
-    z-index: 10;
-}
-
-    .options-container.hidden {
-        display: none; /* Use this class to hide the container */
-    }
-
-.option {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-}
-
-    .option:hover {
-        background-color: #f0f0f0; /* Highlight option on hover */
-    }
-
-.icon {
-    width: 20px; /* Adjust icon size */
-    height: 20px;
-    margin-right: 10px; /* Space between icon and text */
-}
