@@ -54,10 +54,22 @@
             </div>
         </div>
 
+        <div class="relative">
+            <!-- Button -->
+            <a asp-controller="Transaction" asp-action="Index">
+                <button class="fixed bottom-8 right-8 bg-blue-500 text-white w-16 h-16 flex items-center justify-center rounded-full shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                    <i class="fas fa-plus text-2xl"></i>
+                </button>
+            </a>
+
+            <div id="dialog-message" class="fixed bottom-8 right-24 bg-white border-2 border-blue-200 text-gray-700 text-sm rounded-lg p-3 shadow-l transition-opacity duration-300 opacity-0 mr-2">
+                Click to add transaction!
+            </div>
+        </div>
+
+
 
     </div>
 </div>
-
-
 
 <script src="~/js/home.js" asp-append-version="true"></script>
