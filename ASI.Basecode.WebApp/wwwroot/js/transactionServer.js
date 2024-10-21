@@ -18,15 +18,36 @@
     const transactionType = document.getElementById('transactionType');
 
     let isModalDirty = false;
-    
+
+    // Function to filter table based on category
+    const filterTableByCategory = () => {
+        const categoryFilter = document.querySelector('select[name="filterByCategory"]').value; // Get the selected category
+        const rows = Array.from(document.querySelectorAll('.transaction-table tbody tr')); // Get all rows
+
+        // Show or hide rows based on selected category
+        rows.forEach(row => {
+            const rowCategory = row.dataset.category; // Get the category from the row
+            if (categoryFilter === 'All' || rowCategory === categoryFilter) {
+                row.style.display = ''; // Show matching row
+            } else {
+                row.style.display = 'none'; // Hide non-matching row
+            }
+        });
+    };
+
+    // Event listener for category filter
+    document.querySelector('select[name="filterByCategory"]').addEventListener('change', filterTableByCategory);
+
 
     // Open modal for adding a new transaction
     function openAddTransactionModal() {
         modal.classList.remove('hidden');
         modal.classList.add('flex');
         resetTransactionForm();
-        updateTypeSelection('Expense'); // Set default type to 'Expense'
-        filterCategories('Expense'); // Filter categories based on type
+        updateTypeSelection('Expense');
+        filterCategories('Expense'); 
+        transactionCategorySelect.value = "";
+        transactionAccountSelect.value = "";
     }
 
     // Open modal for editing a transaction
@@ -116,8 +137,8 @@
     // Reset the transaction form
     function resetTransactionForm() {
         transactionForm.reset();
-        transactionCategorySelect.value = "";
-        transactionAccountSelect.value = "";
+        transactionCategorySelect.selectedIndex = -1;
+        transactionAccountSelect.selectedIndex = -1; 
         isModalDirty = false; // Reset the dirty flag
         currentTransactionId = null; // Reset transaction ID
     }
@@ -176,31 +197,21 @@
         updateButtonStyles(editIncomeButton, !isExpense);
     }
 
-    // Type selection buttons for creating transactions
-    createExpenseButton.addEventListener('click', () => {
-        updateTypeSelection('Expense');
-        filterCategories('Expense');
+    // Function to set type and apply filters
+    function handleTypeSelection(type) {
+        updateTypeSelection(type);
+        filterCategories(type);
         filterAccounts('debit');
-    });
+    }
 
-    createIncomeButton.addEventListener('click', () => {
-        updateTypeSelection('Income');
-        filterCategories('Income');
-        filterAccounts('debit');
-    });
+    // Type selection buttons for creating transactions
+    createExpenseButton.addEventListener('click', () => handleTypeSelection('Expense'));
+    createIncomeButton.addEventListener('click', () => handleTypeSelection('Income'));
 
     // Type selection buttons for editing transactions
-    editExpenseButton.addEventListener('click', () => {
-        updateTypeSelection('Expense');
-        filterCategories('Expense');
-        filterAccounts('debit');
-    });
+    editExpenseButton.addEventListener('click', () => handleTypeSelection('Expense'));
+    editIncomeButton.addEventListener('click', () => handleTypeSelection('Income'));
 
-    editIncomeButton.addEventListener('click', () => {
-        updateTypeSelection('Income');
-        filterCategories('Income');
-        filterAccounts('debit');
-    });
 
 
     // Filter categories based on transaction type
