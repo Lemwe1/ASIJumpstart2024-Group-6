@@ -144,6 +144,9 @@
         document.getElementById('editTransactionCategory').value = categoryId || '';
         document.getElementById('editTransactionAccount').value = deLiId || '';
         document.getElementById('editTransactionType').value = transactionType || 'Expense';
+
+
+        console.log("Transaction Data:", transaction);
     }
 
 
@@ -243,7 +246,6 @@
             .then(handleResponse)
             .catch(handleError);
     }
-    // Handle editing an existing transaction
     function handleEditTransaction(event) {
         event.preventDefault();
 
@@ -267,8 +269,41 @@
             data[key] = value;
         });
 
+
+        // Log the values for debugging
+        console.log('CategoryId:', data.CategoryId);
+        console.log('DeLiId:', data.DeLiId);
+        console.log('TransactionType:', transactionType.value); // Get value from transactionType element
+        console.log('Amount:', data.Amount);
+        console.log('TransactionDate:', data.TransactionDate);
+
+        // Validate required fields with specific error messages
+        if (!data.CategoryId || !data.DeLiId || !transactionType.value || !data.Amount || !data.TransactionDate) { // Check transactionType.value
+            let errorMessage = 'Please fill in all required fields:';
+            if (!data.CategoryId) errorMessage += '\n- Category is required.';
+            if (!data.DeLiId) errorMessage += '\n- Debit/Liability is required.';
+            if (!transactionType.value) errorMessage += '\n- Transaction Type is required.'; // Check transactionType.value
+            if (!data.Amount) errorMessage += '\n- Amount is required.';
+            if (!data.TransactionDate) errorMessage += '\n- Transaction Date is required.';
+
+            Swal.fire({
+                title: 'Error',
+                text: errorMessage,
+                icon: 'error',
+                customClass: { popup: 'swal2-front' }
+            });
+            return; // Exit the function if required fields are missing
+        }
+
+        // Convert CategoryId and DeLiId to integers
+        data.CategoryId = parseInt(data.CategoryId, 10); // Use radix 10 for base-10 integers
+        data.DeLiId = parseInt(data.DeLiId, 10); // Use radix 10 for base-10 integers
+
         // Add the TransactionId to the data object
         data.TransactionId = currentTransactionId;
+
+        // Add TransactionType to the data object
+        data.TransactionType = transactionType.value; // Add this line
 
         // Log the data being sent for debugging
         console.log('Data being sent:', JSON.stringify(data));
@@ -286,13 +321,38 @@
     }
 
 
-
-
-
     // Response handler for adding/editing transactions
     function handleResponse(response) {
         if (!response.ok) {
-            throw new Error('An error occurred while processing your request.');
+            if (response.status === 400) {
+                return response.json().then(errorData => {
+                    if (errorData.errors) {
+                        let errorMessage = "Please correct the following errors:\n";
+                        for (const field in errorData.errors) {
+                            errorMessage += `- ${field}: ${errorData.errors[field].join(', ')}\n`;
+                        }
+                        Swal.fire({
+                            title: 'Error',
+                            text: errorMessage,
+                            icon: 'error',
+                            customClass: { popup: 'swal2-front' }
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: errorData.message || 'An error occurred.',
+                            icon: 'error',
+                            customClass: { popup: 'swal2-front' }
+                        });
+                    }
+                });
+            } else if (response.status === 401) {
+                throw new Error('Unauthorized access.');
+            } else if (response.status >= 500) {
+                throw new Error('Server error occurred.');
+            } else {
+                throw new Error('An error occurred while processing your request.');
+            }
         }
         return response.json().then(result => {
             if (result.success) {
@@ -314,6 +374,25 @@
                     customClass: { popup: 'swal2-front' }
                 });
             }
+        }).catch(error => {
+            console.error('Error handling response:', error);
+            Swal.fire({
+                title: 'Error',
+                text: error.message || 'An error occurred. Please try again later.',
+                icon: 'error',
+                customClass: { popup: 'swal2-front' }
+            });
+        });
+    }
+
+    // Handle network errors
+    function handleError(error) {
+        console.error('Network error:', error);
+        Swal.fire({
+            title: 'Error',
+            text: 'A network error occurred. Please try again later.',
+            icon: 'error',
+            customClass: { popup: 'swal2-front' }
         });
     }
 

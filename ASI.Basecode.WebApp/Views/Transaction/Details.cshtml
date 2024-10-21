@@ -3,8 +3,8 @@
 }
 @using ASI.Basecode.Services.ServiceModels
 
-<div class="overflow-x-auto shadow-md">
-    <table class="transaction-table min-w-full table-auto bg-white rounded-lg">
+<div class="shadow-md">
+    <table class="transaction-table w-full bg-white rounded-lg">
         <thead class="bg-gray-200">
             <tr>
                 <th class="p-4">Category</th>
@@ -12,7 +12,7 @@
                 <th class="p-4">Amount</th>
                 <th class="p-4">Account</th>
                 <th class="p-4">Date</th>
-                <th class="p-4">Note</th>
+                <th col ="7"class="p-4">Note</th>
                 <th class="p-4">Action</th>
             </tr>
         </thead>
@@ -55,9 +55,9 @@
                 }
                 else
                 {
-                    <tr>
-                        <td colspan="7" class="px-4 py-3 text-center">No entries yet.</td>
-                    </tr>
+                   <tr class="empty-row px-4 py-3 text-center" colspan="7"> 
+                    <td colspan="7" class="px-4 py-3 text-center">No entries yet.</td>
+                </tr>
                 }
             }
         </tbody>

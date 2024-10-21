@@ -81,5 +81,12 @@ namespace ASI.Basecode.Services.Services
                 UserId = viewModel.UserId
             };
         }
+
+        // Get debit/liability name by ID
+        public async Task<string> GetDebitLiabilityNameByIdAsync(int deLiId, int userId)
+        {
+            var debitLiability = await _debitLiabilitiesRepository.GetByIdAsync(deLiId);
+            return debitLiability?.DeLiName; // Return the category name or null if not found
+        }
     }
 }

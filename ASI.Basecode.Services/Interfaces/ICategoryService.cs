@@ -11,5 +11,6 @@ namespace ASI.Basecode.WebApp.Services.Interfaces
         Task<MCategory> GetCategoryByIdAsync(int id, string userId);
         Task UpdateCategoryAsync(MCategory category, string userId);
         Task DeleteCategoryAsync(int id, string userId);
+        Task<string> GetCategoryNameByIdAsync(int categoryId, int userId); // Add this method
     }
 }

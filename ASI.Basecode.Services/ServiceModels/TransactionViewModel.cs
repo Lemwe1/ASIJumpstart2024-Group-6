@@ -19,13 +19,15 @@ namespace ASI.Basecode.Services.ServiceModels
 
         public int UserId { get; set; }
 
-        [Required(ErrorMessage = "Type is required")]
+        [Required(ErrorMessage = "Transaction Type is required")]
         public string TransactionType { get; set; }
 
         [Required(ErrorMessage = "Amount is required")]
         public decimal Amount { get; set; }
 
+
         [Required(ErrorMessage = "Date is required")]
+        [DataType(DataType.Date)]
         public DateTime TransactionDate { get; set; }
 
         public string Note { get; set; }

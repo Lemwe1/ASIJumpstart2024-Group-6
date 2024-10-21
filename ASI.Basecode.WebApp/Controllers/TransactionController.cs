@@ -80,6 +80,10 @@ namespace ASI.Basecode.WebApp.Controllers
                 return NotFound(new { success = false, message = "Transaction not found." });
             }
 
+            // Retrieve category and debit/liability names
+            var categoryName = await _categoryService.GetCategoryNameByIdAsync(transaction.CategoryId, int.Parse(userId));
+            var debitLiabilityName = await _debitLiabilitiesService.GetDebitLiabilityNameByIdAsync(transaction.DeLiId, int.Parse(userId));
+
             // Map MTransaction to TransactionViewModel
             var transactionViewModel = new TransactionViewModel
             {
@@ -89,7 +93,9 @@ namespace ASI.Basecode.WebApp.Controllers
                 TransactionDate = transaction.TransactionDate,
                 Note = transaction.Note,
                 CategoryId = transaction.CategoryId,
-                DeLiId = transaction.DeLiId
+                DeLiId = transaction.DeLiId,
+                CategoryName = categoryName, 
+                DebitLiabilityName = debitLiabilityName 
             };
 
             return Json(new { success = true, data = transactionViewModel });
@@ -164,19 +170,15 @@ namespace ASI.Basecode.WebApp.Controllers
         }
 
 
+
         // POST: /Transaction/Edit/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [FromForm] TransactionViewModel model)
+        public async Task<IActionResult> Edit(int id, [FromBody] TransactionViewModel model)
         {
             if (model == null)
             {
                 return BadRequest(new { success = false, message = "Model is null" });
-            }
-
-            if (id != model.TransactionId)
-            {
-                return BadRequest(new { success = false, message = "ID mismatch" });
             }
 
             var userId = GetUserId(); // Fetch the current user's ID
@@ -185,7 +187,8 @@ namespace ASI.Basecode.WebApp.Controllers
                 return BadRequest(new { success = false, message = "Invalid user ID." });
             }
 
-            var existingTransaction = await _transactionService.GetTransactionByIdAsync(model.TransactionId); // Fetch the existing transaction
+            // Fetch the existing transaction using 'id' from the URL
+            var existingTransaction = await _transactionService.GetTransactionByIdAsync(id);
             if (existingTransaction == null || existingTransaction.UserId != userId)
             {
                 return NotFound(new { success = false, message = "Transaction not found or unauthorized." }); // Prevent unauthorized access
@@ -197,19 +200,24 @@ namespace ASI.Basecode.WebApp.Controllers
                 return BadRequest(new { success = false, errors });
             }
 
-            // Update the transaction
+            // Retrieve category and debit/liability names
+            var categoryName = await _categoryService.GetCategoryNameByIdAsync(model.CategoryId, userId.Value); // Use userId.Value
+            var debitLiabilityName = await _debitLiabilitiesService.GetDebitLiabilityNameByIdAsync(model.DeLiId, userId.Value); // Use userId.Value
+
+            // Update the transaction using the data from the 'model'
             existingTransaction.TransactionType = model.TransactionType;
             existingTransaction.Amount = model.Amount;
             existingTransaction.TransactionDate = model.TransactionDate;
             existingTransaction.Note = model.Note;
             existingTransaction.CategoryId = model.CategoryId;
             existingTransaction.DeLiId = model.DeLiId;
+            existingTransaction.CategoryName = categoryName ?? ""; // Assign retrieved names
+            existingTransaction.DebitLiabilityName = debitLiabilityName ?? "";
 
             await _transactionService.UpdateTransactionAsync(existingTransaction); // Call the service to update the transaction
 
             return Json(new { success = true, data = existingTransaction }); // Return updated transaction as JSON
         }
-
 
 
         // POST: Delete a transaction
