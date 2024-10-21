@@ -249,77 +249,69 @@
     function handleEditTransaction(event) {
         event.preventDefault();
 
-        // Check if the currentTransactionId is set
+        const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
+        const token = tokenElement ? tokenElement.value : null;
+
         if (!currentTransactionId) {
             Swal.fire({
                 title: 'Error',
                 text: 'Transaction ID is not set. Please select a transaction to edit.',
-                icon: 'error',
-                customClass: { popup: 'swal2-front' }
+                icon: 'error'
             });
-            return; // Exit the function if there is no transaction ID
+            return;
         }
 
-        // Collect form data
         const formData = new FormData(editTransactionForm);
-        const data = {}; // Object to hold the JSON data
+        const data = {};
 
-        // Convert FormData to a plain object
         formData.forEach((value, key) => {
             data[key] = value;
         });
 
-
-        // Log the values for debugging
-        console.log('CategoryId:', data.CategoryId);
-        console.log('DeLiId:', data.DeLiId);
-        console.log('TransactionType:', transactionType.value); // Get value from transactionType element
-        console.log('Amount:', data.Amount);
-        console.log('TransactionDate:', data.TransactionDate);
-
-        // Validate required fields with specific error messages
-        if (!data.CategoryId || !data.DeLiId || !transactionType.value || !data.Amount || !data.TransactionDate) { // Check transactionType.value
+        // Validate required fields
+        if (!data.CategoryId || !data.DeLiId || !transactionType.value || !data.Amount || !data.TransactionDate) {
             let errorMessage = 'Please fill in all required fields:';
             if (!data.CategoryId) errorMessage += '\n- Category is required.';
             if (!data.DeLiId) errorMessage += '\n- Debit/Liability is required.';
-            if (!transactionType.value) errorMessage += '\n- Transaction Type is required.'; // Check transactionType.value
+            if (!transactionType.value) errorMessage += '\n- Transaction Type is required.';
             if (!data.Amount) errorMessage += '\n- Amount is required.';
             if (!data.TransactionDate) errorMessage += '\n- Transaction Date is required.';
 
             Swal.fire({
                 title: 'Error',
                 text: errorMessage,
-                icon: 'error',
-                customClass: { popup: 'swal2-front' }
+                icon: 'error'
             });
-            return; // Exit the function if required fields are missing
+            return;
         }
 
-        // Convert CategoryId and DeLiId to integers
-        data.CategoryId = parseInt(data.CategoryId, 10); // Use radix 10 for base-10 integers
-        data.DeLiId = parseInt(data.DeLiId, 10); // Use radix 10 for base-10 integers
-
-        // Add the TransactionId to the data object
+        // Convert types and format date
+        data.CategoryId = parseInt(data.CategoryId, 10);
+        data.DeLiId = parseInt(data.DeLiId, 10);
         data.TransactionId = currentTransactionId;
+        data.TransactionType = transactionType.value;
+        data.TransactionDate = new Date(data.TransactionDate).toISOString(); // Ensure date format
 
-        // Add TransactionType to the data object
-        data.TransactionType = transactionType.value; // Add this line
+        console.log("Data to be sent:", JSON.stringify(data)); // Debugging line
 
-        // Log the data being sent for debugging
-        console.log('Data being sent:', JSON.stringify(data));
-
-        // Send the request using JSON
         fetch(`/Transaction/Edit/${currentTransactionId}`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json' // Set content type to JSON
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token
+                
             },
-            body: JSON.stringify(data) // Send the data as a JSON string
+            body: JSON.stringify(data)
         })
             .then(handleResponse)
-            .catch(handleError);
+            .catch(error => {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'An error occurred: ' + error.message,
+                    icon: 'error'
+                });
+            });
     }
-
 
     // Response handler for adding/editing transactions
     function handleResponse(response) {
