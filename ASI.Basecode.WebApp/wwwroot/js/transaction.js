@@ -38,9 +38,7 @@
     filterCategories(transaction.transactionType);
     filterAccounts('debit');
 }
-
-
-
+    
     // Reset form fields when the reset button is clicked
     document.getElementById('resetTransactionForm').addEventListener('click', function () {
         // Reset the form fields
@@ -223,6 +221,40 @@
         });
         transactionAccountSelect.value = ""; // Reset selection
     }
+
+    // Function to handle input limiting
+    const handleAmountInput = (inputElement) => {
+        inputElement.addEventListener('input', (event) => {
+            // Get the current value without formatting
+            let currentValue = inputElement.value;
+
+            // Remove all non-digit characters
+            currentValue = currentValue.replace(/[^0-9]/g, '');
+
+            // Check if the input value is greater than one trillion
+            if (currentValue && Number(currentValue) > 1e12) {
+                // Show SweetAlert error message
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Amount must be less than or equal to one trillion.',
+                    icon: 'error'
+                });
+
+                // Clear the input field
+                inputElement.value = ''; // Clear the input to prevent submission errors
+                return; // Exit the function to prevent further processing
+            }
+
+            // Set the cleaned value back to the input
+            inputElement.value = currentValue; // Update input with cleaned value
+        });
+    };
+
+    const transactionAmountInput = document.getElementById('transactionAmount');
+    const editTransactionAmountInput = document.getElementById('editTransactionAmount');
+
+    handleAmountInput(transactionAmountInput);
+    handleAmountInput(editTransactionAmountInput);
 
     // Handle adding a new transaction
     function handleAddTransaction(event) {

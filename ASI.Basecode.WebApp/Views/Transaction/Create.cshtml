@@ -27,7 +27,8 @@
             </div>
             <!-- Type Field -->
             <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                <label class="block text-sm font-medium text-gray-700 inline">Type</label>
+                <span class="text-gray-500 text-xs inline-block ml-2 mb-2">(Select A type)</span>
                 <div class="flex space-x-4">
                     <button type="button" id="createExpenseButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800">Expense</button>
                     <button type="button" id="createIncomeButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800">Income</button>
@@ -93,9 +94,11 @@
                 <input type="date" id="transactionDate" name="TransactionDate" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900" />
             </div>
 
-            <!-- Note Field -->
             <div class="mb-6">
-                <label for="transactionNote" class="block text-sm font-medium text-gray-700">Note</label>
+                <label for="transactionNote" class="block text-sm font-medium text-gray-700">
+                    Note
+                    <span class="text-gray-500 text-xs">(Optional)</span>
+                </label>
                 <textarea id="transactionNote" name="Note" placeholder="Enter note" rows="4" class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900"></textarea>
             </div>
 

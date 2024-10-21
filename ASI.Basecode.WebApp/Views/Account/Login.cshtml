@@ -32,19 +32,18 @@
                 </div>
             </div>
 
-            <div class="flex justify-between items-center mb-4">
-                <img src="~/img/logo.svg" class="w-48 mx-auto" alt="logo">
-            </div>
+       
 
             <!-- Heading -->
-            <h2 class="text-center text-2xl font-bold text-gray-900 dark:text-white mb-4">Login</h2>
+            <h2 class=" text-2xl font-semibold text-gray-900 dark:text-white ">Login to your Account</h2>
+            <h2 class=" text-l text-gray-800 dark:text-white mb-4">Please login to continue</h2>
 
             <!-- Error message container -->
             <div id="error-message" class="hidden text-center text-red-500 dark:text-red-400 text-sm font-semibold"></div>
              <!-- Success message container -->
             <div id="success-message" class="hidden text-center text-green-500 dark:text-green-400 text-sm font-semibold"></div>
 
-            <form id="loginForm" method="post" class="space-y-4">
+            <form id="loginForm" method="post" class="space-y-6 mt-5">
                 <div>
                     <label asp-for="UserCode" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
                     <input type="text" id="form2Example11" asp-for="UserCode" placeholder="Enter Username"
@@ -67,9 +66,9 @@
                 <button type="submit" id="submitButton" class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
                     @Login
                 </button>
-                <div class="text-center">
-                    <p class="mb-0 dark:text-white">@DontHaveAcc</p>
-                    <a asp-controller="Account" asp-action="Register" class="btn btn-outline-danger">@CreateNew</a>
+                <div class="text-center mt-4">
+                    <p class="mb-0 dark:text-white inline">@DontHaveAcc</p>
+                    <a asp-controller="Account" asp-action="Register" class="btn inline text-blue-500 hover:text-blue-800 ">Create an Account</a>
                 </div>
             </form>
 
