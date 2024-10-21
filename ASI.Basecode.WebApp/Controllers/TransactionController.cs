@@ -62,49 +62,74 @@ namespace ASI.Basecode.WebApp.Controllers
             return View(new TransactionViewModel()); // Ensure we return an empty model for the create view
         }
 
+        // GET: /Transaction/GetTransaction/{id}
+        [HttpGet]
+        public async Task<IActionResult> GetTransaction(int id)
+        {
+            // Get user ID
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            // Fetch the transaction by ID
+            var transaction = await _transactionService.GetTransactionByIdAsync(id);
+            if (transaction == null || transaction.UserId.ToString() != userId)
+            {
+                return NotFound(new { success = false, message = "Transaction not found." });
+            }
+
+            // Retrieve category and debit/liability names
+            var categoryName = await _categoryService.GetCategoryNameByIdAsync(transaction.CategoryId, int.Parse(userId));
+            var debitLiabilityName = await _debitLiabilitiesService.GetDebitLiabilityNameByIdAsync(transaction.DeLiId, int.Parse(userId));
+
+            // Map MTransaction to TransactionViewModel
+            var transactionViewModel = new TransactionViewModel
+            {
+                TransactionId = transaction.TransactionId,
+                TransactionType = transaction.TransactionType,
+                Amount = transaction.Amount,
+                TransactionDate = transaction.TransactionDate,
+                Note = transaction.Note,
+                CategoryId = transaction.CategoryId,
+                DeLiId = transaction.DeLiId,
+                CategoryName = categoryName, 
+                DebitLiabilityName = debitLiabilityName 
+            };
+
+            return Json(new { success = true, data = transactionViewModel });
+        }
+
+        // POST: Create a new transaction
         [HttpPost]
-        public async Task<IActionResult> Create(TransactionViewModel model)
+        public async Task<IActionResult> Create([FromBody] TransactionViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                // Capture detailed validation errors
                 var errors = ModelState.ToDictionary(
                     kvp => kvp.Key,
                     kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
                 );
 
-                // Log the validation errors
-                foreach (var key in errors.Keys)
-                {
-                    foreach (var error in errors[key])
-                    {
-                        Console.WriteLine($"Validation Error - {key}: {error}");
-                    }
-                }
-
-                // Return the validation errors in the response
                 return Json(new { success = false, message = "Validation failed.", errors = errors });
             }
 
-            // Get the currently logged-in user's ID
             var userClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId");
             if (userClaim == null)
             {
                 return Json(new { success = false, message = "User not authenticated." });
             }
 
-            // Parse the user ID and assign it to the model
             model.UserId = int.Parse(userClaim.Value);
 
             try
             {
-                // Proceed with adding the transaction
                 await _transactionService.AddTransactionAsync(model);
                 return Json(new { success = true, message = "Transaction added successfully!", data = model });
             }
             catch (Exception ex)
             {
-                // Log the exception message (optional: use a logging framework)
                 return StatusCode(500, new { success = false, message = $"Server error: {ex.Message}" });
             }
         }
@@ -113,77 +138,106 @@ namespace ASI.Basecode.WebApp.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
+            var userId = GetUserId();
+            if (userId == null)
+            {
+                return BadRequest("Invalid user ID.");
+            }
+
             var transaction = await _transactionService.GetTransactionByIdAsync(id);
-            if (transaction == null)
+            if (transaction == null || transaction.UserId != userId)
             {
                 return NotFound();
             }
 
-            var userId = GetUserId();
-            if (userId == null)
+            // Map the existing transaction to TransactionViewModel
+            var transactionViewModel = new TransactionViewModel
             {
-                return BadRequest("Invalid user ID.");
-            }
+                TransactionId = transaction.TransactionId,
+                TransactionType = transaction.TransactionType,
+                Amount = transaction.Amount,
+                TransactionDate = transaction.TransactionDate,
+                Note = transaction.Note,
+                CategoryId = transaction.CategoryId,
+                DeLiId = transaction.DeLiId // Ensure this is set as well
+            };
 
-            // Ensure that the transaction belongs to the logged-in user
-            if (transaction.UserId != userId.Value)
-            {
-                return Forbid(); // or return NotFound()
-            }
+            // Ensure categories and debit liabilities are loaded
+            ViewData["Categories"] = await _categoryService.GetCategoriesAsync(userId.Value); // Pass user ID
+            ViewData["DebitLiabilities"] = await _debitLiabilitiesService.GetDebitLiabilitiesAsync(userId.Value); // Pass user ID
 
-            await LoadDropdownsForUser(userId.Value);
-
-            // Return the existing transaction directly as a model for editing
-            return View(transaction); // Assuming the view is expecting the transaction type or it's a suitable model
+            return View(transactionViewModel);
         }
 
-        // POST: Update an existing transaction
+
+
+        // POST: /Transaction/Edit/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(TransactionViewModel model)
+        public async Task<IActionResult> Edit(int id, [FromBody] TransactionViewModel model)
         {
-            var userId = GetUserId();
+            if (model == null)
+            {
+                return BadRequest(new { success = false, message = "Model is null" });
+            }
+
+            var userId = GetUserId(); // Fetch the current user's ID
             if (userId == null)
             {
-                return BadRequest("Invalid user ID.");
+                return BadRequest(new { success = false, message = "Invalid user ID." });
             }
 
-            // Ensure the transaction belongs to the current user
-            var existingTransaction = await _transactionService.GetTransactionByIdAsync(model.TransactionId);
+            // Fetch the existing transaction using 'id' from the URL
+            var existingTransaction = await _transactionService.GetTransactionByIdAsync(id);
             if (existingTransaction == null || existingTransaction.UserId != userId)
             {
-                return Forbid(); // Prevent unauthorized access
+                return NotFound(new { success = false, message = "Transaction not found or unauthorized." }); // Prevent unauthorized access
             }
 
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) // Check for validation errors
             {
-                await LoadDropdownsForUser(userId.Value); // Load dropdowns if the model is invalid
-                return View(existingTransaction); // Return existing transaction if model state is invalid
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                return BadRequest(new { success = false, errors });
             }
 
-            // Update the properties of the existing transaction based on the model
-            existingTransaction.Description = model.Description;
+            // Retrieve category and debit/liability names
+            var categoryName = await _categoryService.GetCategoryNameByIdAsync(model.CategoryId, userId.Value); // Use userId.Value
+            var debitLiabilityName = await _debitLiabilitiesService.GetDebitLiabilityNameByIdAsync(model.DeLiId, userId.Value); // Use userId.Value
+
+            // Update the transaction using the data from the 'model'
+            existingTransaction.TransactionType = model.TransactionType;
             existingTransaction.Amount = model.Amount;
             existingTransaction.TransactionDate = model.TransactionDate;
             existingTransaction.Note = model.Note;
             existingTransaction.CategoryId = model.CategoryId;
-            // ... add other properties as necessary
+            existingTransaction.DeLiId = model.DeLiId;
+            existingTransaction.CategoryName = categoryName ?? ""; // Assign retrieved names
+            existingTransaction.DebitLiabilityName = debitLiabilityName ?? "";
 
-            // Call the service to update the transaction
-            await _transactionService.UpdateTransactionAsync(existingTransaction);
+            await _transactionService.UpdateTransactionAsync(existingTransaction); // Call the service to update the transaction
 
-            // Redirect to the Index page upon success
-            return RedirectToAction("Index");
+            return Json(new { success = true, data = existingTransaction }); // Return updated transaction as JSON
         }
 
 
-        // POST: Delete a transaction by ID
+        // POST: Delete a transaction
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
+            var userId = GetUserId();
+            if (userId == null)
+            {
+                return BadRequest("Invalid user ID.");
+            }
+
+            var existingTransaction = await _transactionService.GetTransactionByIdAsync(id);
+            if (existingTransaction == null || existingTransaction.UserId != userId)
+            {
+                return NotFound(); // Prevent unauthorized access
+            }
+
             await _transactionService.DeleteTransactionAsync(id);
-            return RedirectToAction("Index");
+            return Ok(new { message = "Transaction deleted successfully." });
         }
 
         // Helper method to get User ID

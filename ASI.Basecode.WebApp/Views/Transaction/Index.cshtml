@@ -9,7 +9,7 @@
 <!-- Sidebar and Content -->
 <div class="flex min-h-screen">
     <!-- Main Content Area -->
-    <div id="transaction-content" class="flex-1 p-6">
+    <div id="transaction-content" class="flex-1 p-6 overflow-x-auto">
 
         <!-- Search Bar -->
         <div class="flex justify-between items-center mt-2">
@@ -26,7 +26,7 @@
                 <div class="flex items-center space-x-4">
                     <div>
                         <label for="category-filter" class="text-gray-700 font-semibold mr-2">Filter by category:</label>
-                        <select id="category-filter" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring focus:ring-blue-500">
+                        <select id="category-filter" class="border border-gray-300 rounded-lg px-4 py-2">
                             <option value="all">All</option>
                             <option value="food">Food</option>
                             <option value="transport">Transport</option>
@@ -49,3 +49,4 @@
 @Html.Partial("Create")
 @Html.Partial("Edit")
 <script src="~/js/transaction.js" asp-append-version="true"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

@@ -2,20 +2,20 @@
     background: #f8f8f8;
 }
 
-#addTransactionModal {
-    z-index: 99999;
-    display: none; /* Keep it hidden by default */
+.modal {
+    z-index: 1050;
+    display: none; 
     align-items: center;
     justify-content: center;
     padding: 20px;
 }
 
-    /* Show modal when it has 'flex' class */
-    #addTransactionModal.flex {
-        display: flex; /* Change to flex when the modal is open */
+   
+    .modal.flex {
+        display: flex; 
     }
 
-#addModalContent {
+.modal-content {
     max-width: 700px;
     width: 100%;
     height: 90%;
@@ -25,9 +25,15 @@
     border-radius: 8px;
 }
 
+.empty-row {
+    width: 100%;
+}
+
 @media (max-width: 768px) {
-    #addModalContent {
+    .modal-content {
         max-width: 90%;
         padding: 20px;
     }
 }
+
+

@@ -18,6 +18,7 @@ namespace ASI.Basecode.WebApp.Services
             _context = context;
         }
 
+
         public async Task<List<MCategory>> GetCategoriesAsync(int userId)
         {
             if (userId <= 0)
@@ -100,6 +101,14 @@ namespace ASI.Basecode.WebApp.Services
             {
                 throw new KeyNotFoundException($"Category with ID {id} not found for user {userId}.");
             }
+        }
+
+        // Get category name by ID
+        public async Task<string> GetCategoryNameByIdAsync(int categoryId, int userId)
+        {
+            var category = await _context.MCategories
+                                         .FirstOrDefaultAsync(c => c.CategoryId == categoryId && c.UserId == userId);
+            return category?.Name; // Return the category name or null if not found
         }
     }
 }

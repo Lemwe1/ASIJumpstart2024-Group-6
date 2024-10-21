@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace ASI.Basecode.Data.Models
 {
@@ -10,7 +9,6 @@ namespace ASI.Basecode.Data.Models
         public int DeLiId { get; set; }
         public int UserId { get; set; }
         public string TransactionType { get; set; }
-        public string Description { get; set; }
         public decimal Amount { get; set; }
         public DateTime TransactionDate { get; set; }
         public string Note { get; set; }

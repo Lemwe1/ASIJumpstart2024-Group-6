@@ -11,5 +11,6 @@ namespace ASI.Basecode.Services.Interfaces
         Task AddDebitLiabilityAsync(DebitLiabilityViewModel model);
         Task UpdateDebitLiabilityAsync(DebitLiabilityViewModel model);
         Task DeleteDebitLiabilityAsync(int id);
+        Task<string> GetDebitLiabilityNameByIdAsync(int deLiId, int userId); // Add this method
     }
 }
