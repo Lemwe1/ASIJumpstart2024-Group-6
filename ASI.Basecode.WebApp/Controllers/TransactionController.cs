@@ -2,6 +2,7 @@
 using ASI.Basecode.Services.ServiceModels;
 using ASI.Basecode.WebApp.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Security.Claims;
@@ -169,54 +170,49 @@ namespace ASI.Basecode.WebApp.Controllers
             return View(transactionViewModel);
         }
 
-
-
-        // POST: /Transaction/Edit/{id}
+        // POST: EDIT a transaction
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [FromBody] TransactionViewModel model)
         {
-            if (model == null)
+            try
             {
-                return BadRequest(new { success = false, message = "Model is null" });
-            }
+                if (model == null)
+                {
+                    return BadRequest(new { success = false, message = "Model is null." });
+                }
 
-            var userId = GetUserId(); // Fetch the current user's ID
-            if (userId == null)
+                // Check for ID mismatch
+                if (id != model.TransactionId)
+                {
+                    return BadRequest(new { success = false, message = "Transaction ID mismatch." });
+                }
+
+                var existingTransaction = await _transactionService.GetTransactionByIdAsync(id);
+                if (existingTransaction == null)
+                {
+                    return NotFound(new { success = false, message = "Transaction not found." });
+                }
+
+                // Update properties of the existing transaction
+                existingTransaction.TransactionType = model.TransactionType;
+                existingTransaction.Amount = model.Amount;
+                existingTransaction.TransactionDate = model.TransactionDate;
+                existingTransaction.Note = model.Note;
+                existingTransaction.CategoryId = model.CategoryId;
+                existingTransaction.DeLiId = model.DeLiId;
+
+                // Call the service to update the transaction
+                await _transactionService.UpdateTransactionAsync(existingTransaction);
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
             {
-                return BadRequest(new { success = false, message = "Invalid user ID." });
+                // Log the exception
+                Console.Error.WriteLine($"Error in Edit method: {ex.Message}");
+                return StatusCode(500, new { success = false, message = "Internal server error", details = ex.Message });
             }
-
-            // Fetch the existing transaction using 'id' from the URL
-            var existingTransaction = await _transactionService.GetTransactionByIdAsync(id);
-            if (existingTransaction == null || existingTransaction.UserId != userId)
-            {
-                return NotFound(new { success = false, message = "Transaction not found or unauthorized." }); // Prevent unauthorized access
-            }
-
-            if (!ModelState.IsValid) // Check for validation errors
-            {
-                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
-                return BadRequest(new { success = false, errors });
-            }
-
-            // Retrieve category and debit/liability names
-            var categoryName = await _categoryService.GetCategoryNameByIdAsync(model.CategoryId, userId.Value); // Use userId.Value
-            var debitLiabilityName = await _debitLiabilitiesService.GetDebitLiabilityNameByIdAsync(model.DeLiId, userId.Value); // Use userId.Value
-
-            // Update the transaction using the data from the 'model'
-            existingTransaction.TransactionType = model.TransactionType;
-            existingTransaction.Amount = model.Amount;
-            existingTransaction.TransactionDate = model.TransactionDate;
-            existingTransaction.Note = model.Note;
-            existingTransaction.CategoryId = model.CategoryId;
-            existingTransaction.DeLiId = model.DeLiId;
-            existingTransaction.CategoryName = categoryName ?? ""; // Assign retrieved names
-            existingTransaction.DebitLiabilityName = debitLiabilityName ?? "";
-
-            await _transactionService.UpdateTransactionAsync(existingTransaction); // Call the service to update the transaction
-
-            return Json(new { success = true, data = existingTransaction }); // Return updated transaction as JSON
         }
 
 

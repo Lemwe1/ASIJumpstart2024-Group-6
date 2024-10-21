@@ -36,7 +36,14 @@ namespace ASI.Basecode.Data.Repositories
 
         public async Task UpdateAsync(MTransaction transaction)
         {
-            // Update an existing transaction asynchronously
+            var existingTransaction = await _context.MTransactions.FindAsync(transaction.TransactionId);
+
+            if (existingTransaction != null)
+            {
+                _context.Entry(existingTransaction).State = EntityState.Detached; // Detach the tracked entity
+            }
+
+            // Attach and update the transaction
             _context.MTransactions.Update(transaction);
             await _context.SaveChangesAsync();
         }

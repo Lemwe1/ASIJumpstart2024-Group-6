@@ -53,13 +53,32 @@ public class TransactionService : ITransactionService
         await _transactionRepository.AddAsync(transaction);
     }
 
-    // Update an existing transaction
-    public async Task UpdateTransactionAsync(TransactionViewModel transactionViewModel)
+    public async Task UpdateTransactionAsync(TransactionViewModel model)
     {
-        var transaction = MapToModel(transactionViewModel);
-        await _transactionRepository.UpdateAsync(transaction);
+        // Map the view model to the transaction entity (MTransaction)
+        var transaction = MapToModel(model);
 
+        // Use the repository to fetch the existing transaction
+        var existingTransaction = await _transactionRepository.GetByIdAsync(transaction.TransactionId);
+
+        if (existingTransaction != null)
+        {
+            // Update properties from the incoming model
+            existingTransaction.TransactionType = transaction.TransactionType;
+            existingTransaction.Amount = transaction.Amount;
+            existingTransaction.TransactionDate = transaction.TransactionDate;
+            existingTransaction.Note = transaction.Note;
+            existingTransaction.CategoryId = transaction.CategoryId;
+            existingTransaction.DeLiId = transaction.DeLiId;
+
+            // Call the repository to update the transaction
+            await _transactionRepository.UpdateAsync(existingTransaction);
+        }
     }
+
+
+
+
 
     // Delete a transaction by ID
     public async Task DeleteTransactionAsync(int transactionId)
