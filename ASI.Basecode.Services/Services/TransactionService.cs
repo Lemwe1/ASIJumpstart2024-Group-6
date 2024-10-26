@@ -3,15 +3,18 @@ using ASI.Basecode.Data.Models;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Threading.Tasks;
+
 public class TransactionService : ITransactionService
 {
     private readonly ITransactionRepository _transactionRepository;
+    private readonly IDebitLiabilitiesRepository _debitLiabilityRepository;
 
-    public TransactionService(ITransactionRepository transactionRepository)
+    public TransactionService(ITransactionRepository transactionRepository, IDebitLiabilitiesRepository debitLiabilityRepository)
     {
         _transactionRepository = transactionRepository;
+        _debitLiabilityRepository = debitLiabilityRepository;
     }
 
     public async Task<IEnumerable<TransactionViewModel>> GetAllTransactionsAsync(int userId)
@@ -46,10 +49,34 @@ public class TransactionService : ITransactionService
         return transaction != null ? MapToViewModel(transaction) : null;
     }
 
-    // Add a new transaction
+    // Add a new transaction with deduction/addition logic based on TransactionType
     public async Task AddTransactionAsync(TransactionViewModel transactionViewModel)
     {
         var transaction = MapToModel(transactionViewModel);
+
+        // Check if this transaction is an expense or income and adjust the amount accordingly
+        if (transaction.TransactionType == "Expense") // Assuming "Expense" indicates deduction
+        {
+            // Deduct from the relevant debit liability
+            var debitLiability = await _debitLiabilityRepository.GetByIdAsync(transaction.DeLiId);
+            if (debitLiability != null)
+            {
+                debitLiability.DeLiBalance -= transaction.Amount; // Deduct amount for expense
+                await _debitLiabilityRepository.UpdateAsync(debitLiability); // Save updated debit liability
+            }
+        }
+        else if (transaction.TransactionType == "Income") // Assuming "Income" indicates addition
+        {
+            // Add to the relevant debit liability
+            var debitLiability = await _debitLiabilityRepository.GetByIdAsync(transaction.DeLiId);
+            if (debitLiability != null)
+            {
+                debitLiability.DeLiBalance += transaction.Amount; // Add amount for income
+                await _debitLiabilityRepository.UpdateAsync(debitLiability); // Save updated debit liability
+            }
+        }
+
+        // Add the new transaction to the repository
         await _transactionRepository.AddAsync(transaction);
     }
 
@@ -75,10 +102,6 @@ public class TransactionService : ITransactionService
             await _transactionRepository.UpdateAsync(existingTransaction);
         }
     }
-
-
-
-
 
     // Delete a transaction by ID
     public async Task DeleteTransactionAsync(int transactionId)
