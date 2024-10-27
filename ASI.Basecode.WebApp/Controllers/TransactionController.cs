@@ -1,4 +1,5 @@
-﻿using ASI.Basecode.Services.Interfaces;
+﻿using ASI.Basecode.Data.Models;
+using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 using ASI.Basecode.WebApp.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -41,12 +42,25 @@ namespace ASI.Basecode.WebApp.Controllers
             var debitLiabilities = await _debitLiabilitiesService.GetDebitLiabilitiesAsync(userId.Value);
             var transactions = await _transactionService.GetAllTransactionsAsync(userId.Value);
 
+            // Calculate total categories and total expense amount
+            var categoryCount = await _transactionService.CountCategoriesAsync(userId.Value);
+            var totalExpenseAmount = await _transactionService.GetTotalExpenseAmountAsync(userId.Value);
+
             // Pass data to the view
+            ViewBag.CategoryCount = categoryCount;
+            ViewBag.TotalExpenseAmount = totalExpenseAmount;
             ViewData["Categories"] = categories;
             ViewData["DebitLiabilities"] = debitLiabilities.ToList();
             ViewData["Transactions"] = transactions.ToList();
 
-            return View();
+            // Prepare model (if necessary, though not currently used in the view)
+            var model = new TransactionViewModel
+            {
+                // Optionally populate properties if needed
+            };
+
+            return View(transactions);
+
         }
 
         // GET: Display the create transaction form
@@ -94,6 +108,7 @@ namespace ASI.Basecode.WebApp.Controllers
                 TransactionDate = transaction.TransactionDate,
                 Note = transaction.Note,
                 CategoryId = transaction.CategoryId,
+
                 DeLiId = transaction.DeLiId,
                 CategoryName = categoryName, 
                 DebitLiabilityName = debitLiabilityName 
@@ -234,6 +249,31 @@ namespace ASI.Basecode.WebApp.Controllers
 
             await _transactionService.DeleteTransactionAsync(id);
             return Ok(new { message = "Transaction deleted successfully." });
+        }
+
+        // GET: Get category count and total expense amount
+        [HttpGet]
+        public async Task<IActionResult> GetStatistics()
+        {
+            try
+            {
+               
+                var userId = GetUserId(); 
+
+                if (userId == null)
+                {
+                    return BadRequest(new { success = false, message = "Invalid user ID." });
+                }
+
+                var categoryCount = await _transactionService.CountCategoriesAsync(userId.Value);
+                var totalExpenses = await _transactionService.GetTotalExpenseAmountAsync(userId.Value);
+
+                return Json(new { success = true, categoryCount = categoryCount, totalExpenses = totalExpenses });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = $"Server error: {ex.Message}" });
+            }
         }
 
         // Helper method to get User ID

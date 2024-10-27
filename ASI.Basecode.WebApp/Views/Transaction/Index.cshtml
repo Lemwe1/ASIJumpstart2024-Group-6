@@ -6,6 +6,8 @@
     <link rel="stylesheet" href="~/css/transaction.css" />
 }
 @using ASI.Basecode.Data.Models
+@using ASI.Basecode.Services.ServiceModels
+
 <!-- Sidebar and Content -->
 <div class="flex min-h-screen">
     <!-- Main Content Area -->
@@ -19,7 +21,10 @@
         <div class="my-4">
             <h2 class="text-2xl font-bold">Transactions</h2>
         </div>
-
+        <div>
+            <p><strong>Total Categories:</strong> @ViewBag.CategoryCount</p>
+            <p><strong>Total Expense Amount:</strong> $@ViewBag.TotalExpenseAmount</p>
+        </div>
         <!-- Transactions Table -->
         <div class="overflow-x-auto  rounded-lg">
             <div class="flex justify-between items-center mb-4">

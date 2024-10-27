@@ -109,6 +109,29 @@ public class TransactionService : ITransactionService
         await _transactionRepository.DeleteAsync(transactionId);
     }
 
+   // Get the total number of distinct categories for a specific user
+public async Task<int> CountCategoriesAsync(int userId)
+{
+    var categories = await _transactionRepository.GetAllAsync();
+    var distinctCategoryCount = categories
+        .Where(t => t.UserId == userId) // Filter by userId
+        .Select(t => t.CategoryId)
+        .Distinct()
+        .Count();
+    return distinctCategoryCount;
+}
+
+// Get the total amount for all expenses for a specific user
+public async Task<decimal> GetTotalExpenseAmountAsync(int userId)
+{
+    var transactions = await _transactionRepository.GetAllAsync();
+    var totalExpenses = transactions
+        .Where(t => t.UserId == userId && t.TransactionType == "Expense") // Filter by userId
+        .Sum(t => t.Amount);
+    return totalExpenses;
+}
+
+
     // Mapping from MTransaction to TransactionViewModel
     private TransactionViewModel MapToViewModel(MTransaction model)
     {
