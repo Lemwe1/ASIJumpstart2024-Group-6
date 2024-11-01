@@ -29,6 +29,10 @@
     width: 100%;
 }
 
+select option:disabled {
+    color: #9ca3af;
+}
+
 @media (max-width: 768px) {
     .modal-content {
         max-width: 90%;

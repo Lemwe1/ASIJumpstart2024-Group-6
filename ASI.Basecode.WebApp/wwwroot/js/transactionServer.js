@@ -14,7 +14,7 @@
     const editIncomeButton = document.getElementById('editIncomeButton');
 
     const transactionCategorySelect = document.getElementById('transactionCategory');
-    const transactionAccountSelect = document.getElementById('transactionAccount');
+    const transactionWalletSelect = document.getElementById('transactionWallet');
     const transactionType = document.getElementById('transactionType');
 
     let isModalDirty = false;
@@ -45,33 +45,33 @@
         modal.classList.add('flex');
         resetTransactionForm();
         updateTypeSelection('Expense');
-        filterCategories('Expense'); 
+        filterCategories('Expense');
         transactionCategorySelect.value = "";
-        transactionAccountSelect.value = "";
+        transactionWalletSelect.value = "";
     }
 
     // Open modal for editing a transaction
     function openEditTransactionModal(transaction) {
-    editModal.classList.remove('hidden');
-    editModal.classList.add('flex');
-    populateEditModalFields(transaction);
-    updateTypeSelection(transaction.transactionType);
-    filterCategories(transaction.transactionType);
-    filterAccounts('debit');
-}
-    
+        editModal.classList.remove('hidden');
+        editModal.classList.add('flex');
+        populateEditModalFields(transaction);
+        updateTypeSelection(transaction.transactionType);
+        filterCategories(transaction.transactionType);
+    }
+
+
     // Reset form fields when the reset button is clicked
     document.getElementById('resetTransactionForm').addEventListener('click', function () {
         // Reset the form fields
         document.getElementById('transactionForm').reset();
 
-        // Reset category and account selections
+        // Reset category and wallet selections
         const transactionCategorySelect = document.getElementById('transactionCategory');
-        const transactionAccountSelect = document.getElementById('transactionAccount');
+        const transactionWalletSelect = document.getElementById('transactionWallet');
 
         // Resetting to default (assuming the first option is disabled)
         transactionCategorySelect.value = "";
-        transactionAccountSelect.value = "";
+        transactionWalletSelect.value = "";
     });
 
     // Close modal with confirmation if there are unsaved changes
@@ -138,7 +138,7 @@
     function resetTransactionForm() {
         transactionForm.reset();
         transactionCategorySelect.selectedIndex = -1;
-        transactionAccountSelect.selectedIndex = -1; 
+        transactionWalletSelect.selectedIndex = -1;
         isModalDirty = false; // Reset the dirty flag
         currentTransactionId = null; // Reset transaction ID
     }
@@ -152,7 +152,7 @@
 
 
 
-        const { transactionId, amount, transactionDate, note, categoryId, deLiId, transactionType } = transaction;
+        const { transactionId, amount, transactionDate, note, categoryId, walletId, transactionType } = transaction;
 
         currentTransactionId = transaction.transactionId;
 
@@ -161,7 +161,7 @@
         document.getElementById('editTransactionDate').value = transactionDate ? new Date(transactionDate).toISOString().slice(0, 10) : '';
         document.getElementById('editTransactionNote').value = note || '';
         document.getElementById('editTransactionCategory').value = categoryId || '';
-        document.getElementById('editTransactionAccount').value = deLiId || '';
+        document.getElementById('editTransactionWallet').value = walletId || '';
         document.getElementById('editTransactionType').value = transactionType || 'Expense';
 
 
@@ -201,7 +201,6 @@
     function handleTypeSelection(type) {
         updateTypeSelection(type);
         filterCategories(type);
-        filterAccounts('debit');
     }
 
     // Type selection buttons for creating transactions
@@ -223,15 +222,7 @@
         transactionCategorySelect.value = ""; // Reset selection
     }
 
-    // Filter accounts based on DeLiType (e.g., debit or borrowed)
-    function filterAccounts(deLiType) {
-        const options = transactionAccountSelect.querySelectorAll('option');
-        options.forEach(option => {
-            // Display only accounts that match the specified deLiType (e.g., 'debit')
-            option.style.display = (option.dataset.type === deLiType || option.value === "") ? 'block' : 'none';
-        });
-        transactionAccountSelect.value = ""; // Reset selection
-    }
+
 
     // Function to handle input limiting
     const handleAmountInput = (inputElement) => {
@@ -312,10 +303,10 @@
         });
 
         // Validate required fields
-        if (!data.CategoryId || !data.DeLiId || !transactionType.value || !data.Amount || !data.TransactionDate) {
+        if (!data.CategoryId || !data.walletId || !transactionType.value || !data.Amount || !data.TransactionDate) {
             let errorMessage = 'Please fill in all required fields:';
             if (!data.CategoryId) errorMessage += '\n- Category is required.';
-            if (!data.DeLiId) errorMessage += '\n- Debit/Liability is required.';
+            if (!data.walletId) errorMessage += '\n- Wallet is required.';
             if (!transactionType.value) errorMessage += '\n- Transaction Type is required.';
             if (!data.Amount) errorMessage += '\n- Amount is required.';
             if (!data.TransactionDate) errorMessage += '\n- Transaction Date is required.';
@@ -330,7 +321,7 @@
 
         // Convert types and format date
         data.CategoryId = parseInt(data.CategoryId, 10);
-        data.DeLiId = parseInt(data.DeLiId, 10);
+        data.walletId = parseInt(data.walletId, 10);
         data.TransactionId = currentTransactionId;
         data.TransactionType = transactionType.value;
         data.TransactionDate = new Date(data.TransactionDate).toISOString(); // Ensure date format
@@ -342,7 +333,7 @@
             headers: {
                 'Content-Type': 'application/json',
                 'RequestVerificationToken': token
-                
+
             },
             body: JSON.stringify(data)
         })
@@ -522,7 +513,7 @@
                             icon: 'success',
                             confirmButtonText: 'Okay',
                             confirmButtonColor: '#3B82F6'
-                           
+
                         });
                         location.reload(); // Refresh the page
                     } else {

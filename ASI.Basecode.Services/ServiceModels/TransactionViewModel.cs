@@ -13,9 +13,9 @@ namespace ASI.Basecode.Services.ServiceModels
         public string CategoryName { get; set; } 
 
         [Required(ErrorMessage = "Account is required")]
-        public int DeLiId { get; set; }
+        public int WalletId { get; set; }
 
-        public string DebitLiabilityName { get; set; } 
+        public string WalletName { get; set; } 
 
         public int UserId { get; set; }
 
