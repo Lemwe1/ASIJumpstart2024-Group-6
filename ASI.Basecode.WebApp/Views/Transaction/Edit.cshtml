@@ -58,31 +58,22 @@
                 </select>
             </div>
 
-            <!-- Account Field -->
+            <!-- Wallet Field -->
             <div class="mb-6">
-                <label for="editTransactionAccount" class="block text-sm font-medium text-gray-700">Account</label>
-                <select id="editTransactionAccount" name="DeLiId" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900">
-                    <option value="" disabled>Select account</option>
+                <label for="editTransactionWallet" class="block text-sm font-medium text-gray-700">Wallet</label>
+                <select id="editTransactionWallet" name="WalletId" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900">
+                    <option value="" disabled>Select Wallet</option>
 
-                    @if (ViewData["DebitLiabilities"] is List<DebitLiabilityViewModel> debitLiabilities && debitLiabilities.Any())
+                    @if (ViewData["Wallets"] is List<WalletViewModel> wallets && wallets.Any())
                     {
-                        // Filter only borrowed accounts
-                        var borrowedAccounts = debitLiabilities.Where(account => account.DeLiType == "debit").ToList();
-                        if (borrowedAccounts.Any())
+                        foreach (var wallet in wallets)
                         {
-                            foreach (var account in borrowedAccounts)
-                            {
-                                <option value="@account.DeLiId" data-type="@account.DeLiType">@account.DeLiName</option>
-                            }
-                        }
-                        else
-                        {
-                            <option value="" disabled>No borrowed accounts available</option>
+                            <option value="@wallet.WalletId">@wallet.WalletName</option>
                         }
                     }
                     else
                     {
-                        <option value="" disabled>No Entries yet</option>
+                        <option value="" disabled>No entries yet</option>
                     }
                 </select>
             </div>

@@ -59,24 +59,5 @@ namespace ASI.Basecode.Data.Repositories
                 await _context.SaveChangesAsync();
             }
         }
-        // New implementation for CountCategoriesAsync
-        public async Task<int> CountCategoriesAsync()
-        {
-            // Count unique categories in the transactions
-            return await _context.MTransactions
-                .Select(t => t.CategoryId)
-                .Distinct()
-                .CountAsync();
-        }
-
-        // New implementation for GetTotalExpenseAmountAsync
-        public async Task<decimal> GetTotalExpenseAmountAsync()
-        {
-            // Sum amounts for transactions marked as expenses
-            return await _context.MTransactions
-                .Where(t => t.TransactionType == "Expense") // Assuming "Expense" is the type identifier for expenses
-                .SumAsync(t => t.Amount);
-        }
-
     }
 }

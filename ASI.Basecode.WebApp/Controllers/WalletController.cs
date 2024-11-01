@@ -10,45 +10,36 @@ using System.Threading.Tasks;
 
 namespace ASI.Basecode.WebApp.Controllers
 {
-    public class DebitLiabilitiesController : Controller
+    public class WalletController : Controller
     {
-        private readonly IDebitLiabilitiesService _debitLiabilitiesService;
+        private readonly IWalletService _walletService;
 
-        public DebitLiabilitiesController(IDebitLiabilitiesService debitLiabilitiesService)
+        public WalletController(IWalletService walletService)
         {
-            _debitLiabilitiesService = debitLiabilitiesService ?? throw new ArgumentNullException(nameof(debitLiabilitiesService));
+            _walletService = walletService ?? throw new ArgumentNullException(nameof(walletService));
         }
 
-        // GET: /DebitLiabilities/
+        // GET: /Wallet/
         public async Task<IActionResult> Index()
         {
             // Get the logged-in user's ID
             int userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "UserId").Value);
 
             // Fetch the debit liabilities belonging to the logged-in user
-            var debitLiabilities = await _debitLiabilitiesService.GetDebitLiabilitiesAsync(userId);
+            var wallet = await _walletService.GetWalletAsync(userId);
 
             // Filter the list after awaiting the async method and convert to a List
-            var userDebitLiabilities = debitLiabilities
+            var userWallet = wallet
                 .Where(x => x.UserId == userId)
                 .ToList(); // Convert to List<DebitLiabilityViewModel>
 
-            // Calculate totals
-            var totalDebit = userDebitLiabilities.Where(x => x.DeLiType == "debit").Sum(x => x.DeLiBalance);
-            var totalLiabilities = userDebitLiabilities.Where(x => x.DeLiType == "borrowed").Sum(x => x.DeLiBalance);
-            var netWorth = totalDebit - totalLiabilities;
-
-            ViewBag.TotalDebit = totalDebit;
-            ViewBag.TotalLiabilities = totalLiabilities;
-            ViewBag.NetWorth = netWorth;
-
-            return View(userDebitLiabilities);
+            return View(userWallet);
         }
 
-        // POST: /DebitLiabilities/Create
+        // POST: /Wallet/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([FromBody] DebitLiabilityViewModel model)
+        public async Task<IActionResult> Create([FromBody] WalletViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -67,13 +58,8 @@ namespace ASI.Basecode.WebApp.Controllers
                 int userId = int.Parse(userClaim.Value);
                 model.UserId = userId;
 
-                // Handle specific properties for borrowed accounts if applicable
-                if (model.DeLiType == "borrowed" && (model.DeLiHapp == null || model.DeLiDue == null))
-                {
-                    return BadRequest(new { success = false, message = "Happening date and due date are required for borrowed accounts." });
-                }
 
-                await _debitLiabilitiesService.AddDebitLiabilityAsync(model);
+                await _walletService.AddWalletAsync(model);
                 return Json(new { success = true, message = "Debit Liability created successfully." });
             }
             catch (Exception ex)
@@ -83,17 +69,17 @@ namespace ASI.Basecode.WebApp.Controllers
             }
         }
 
-        // POST: /DebitLiabilities/Edit/{id}
+        // POST: /Wallet/Edit/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [FromBody] DebitLiabilityViewModel model)
+        public async Task<IActionResult> Edit(int id, [FromBody] WalletViewModel model)
         {
             if (model == null)
             {
                 return BadRequest(new { success = false, message = "Model is null" });
             }
 
-            if (id != model.DeLiId)
+            if (id != model.WalletId)
             {
                 return BadRequest(new { success = false, message = "ID mismatch" });
             }
@@ -116,7 +102,7 @@ namespace ASI.Basecode.WebApp.Controllers
 
             try
             {
-                await _debitLiabilitiesService.UpdateDebitLiabilityAsync(model);
+                await _walletService.UpdateWalletAsync(model);
                 return Json(new { success = true });
             }
             catch (KeyNotFoundException knfEx)
@@ -129,7 +115,7 @@ namespace ASI.Basecode.WebApp.Controllers
             }
         }
 
-        // POST: /DebitLiabilities/Delete/{id}
+        // POST: /Wallet/Delete/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -143,7 +129,7 @@ namespace ASI.Basecode.WebApp.Controllers
                     return Unauthorized(new { success = false, message = "User is not authenticated." });
                 }
 
-                await _debitLiabilitiesService.DeleteDebitLiabilityAsync(id);
+                await _walletService.DeleteWalletAsync(id);
                 return Json(new { success = true, message = "Debit liability deleted successfully." });
             }
             catch (KeyNotFoundException knfEx)

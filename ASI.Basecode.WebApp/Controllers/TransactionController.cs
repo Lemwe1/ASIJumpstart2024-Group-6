@@ -13,15 +13,15 @@ namespace ASI.Basecode.WebApp.Controllers
 {
     public class TransactionController : Controller
     {
-        private readonly IDebitLiabilitiesService _debitLiabilitiesService;
+        private readonly IWalletService _walletService;
         private readonly ICategoryService _categoryService;
         private readonly ITransactionService _transactionService;
 
-        public TransactionController(IDebitLiabilitiesService debitLiabilitiesService,
+        public TransactionController(IWalletService walletService,
                                      ICategoryService categoryService,
                                      ITransactionService transactionService)
         {
-            _debitLiabilitiesService = debitLiabilitiesService;
+            _walletService = walletService;
             _categoryService = categoryService;
             _transactionService = transactionService;
         }
@@ -37,20 +37,16 @@ namespace ASI.Basecode.WebApp.Controllers
 
             ViewData["Title"] = "Transactions";
 
-            // Fetch categories, debit liabilities, and transactions for the user
+            // Fetch categories, wallets, and transactions for the user
             var categories = await _categoryService.GetCategoriesAsync(userId.Value);
-            var debitLiabilities = await _debitLiabilitiesService.GetDebitLiabilitiesAsync(userId.Value);
+            var wallets = await _walletService.GetWalletAsync(userId.Value);
             var transactions = await _transactionService.GetAllTransactionsAsync(userId.Value);
 
-            // Calculate total categories and total expense amount
-            var categoryCount = await _transactionService.CountCategoriesAsync(userId.Value);
-            var totalExpenseAmount = await _transactionService.GetTotalExpenseAmountAsync(userId.Value);
+           
 
             // Pass data to the view
-            ViewBag.CategoryCount = categoryCount;
-            ViewBag.TotalExpenseAmount = totalExpenseAmount;
             ViewData["Categories"] = categories;
-            ViewData["DebitLiabilities"] = debitLiabilities.ToList();
+            ViewData["Wallets"] = wallets.ToList();
             ViewData["Transactions"] = transactions.ToList();
 
             // Prepare model (if necessary, though not currently used in the view)
@@ -74,7 +70,7 @@ namespace ASI.Basecode.WebApp.Controllers
             }
 
             await LoadDropdownsForUser(userId.Value);
-            return View(new TransactionViewModel()); // Ensure we return an empty model for the create view
+            return View(new TransactionViewModel());
         }
 
         // GET: /Transaction/GetTransaction/{id}
@@ -95,9 +91,9 @@ namespace ASI.Basecode.WebApp.Controllers
                 return NotFound(new { success = false, message = "Transaction not found." });
             }
 
-            // Retrieve category and debit/liability names
+            // Retrieve category and wallets/liability names
             var categoryName = await _categoryService.GetCategoryNameByIdAsync(transaction.CategoryId, int.Parse(userId));
-            var debitLiabilityName = await _debitLiabilitiesService.GetDebitLiabilityNameByIdAsync(transaction.DeLiId, int.Parse(userId));
+            var walletName = await _walletService.GetWalletNameByIdAsync(transaction.WalletId, int.Parse(userId));
 
             // Map MTransaction to TransactionViewModel
             var transactionViewModel = new TransactionViewModel
@@ -108,10 +104,9 @@ namespace ASI.Basecode.WebApp.Controllers
                 TransactionDate = transaction.TransactionDate,
                 Note = transaction.Note,
                 CategoryId = transaction.CategoryId,
-
-                DeLiId = transaction.DeLiId,
+                WalletId = transaction.WalletId,
                 CategoryName = categoryName, 
-                DebitLiabilityName = debitLiabilityName 
+                WalletName = walletName 
             };
 
             return Json(new { success = true, data = transactionViewModel });
@@ -175,12 +170,12 @@ namespace ASI.Basecode.WebApp.Controllers
                 TransactionDate = transaction.TransactionDate,
                 Note = transaction.Note,
                 CategoryId = transaction.CategoryId,
-                DeLiId = transaction.DeLiId // Ensure this is set as well
+                WalletId = transaction.WalletId 
             };
 
-            // Ensure categories and debit liabilities are loaded
+            // Ensure categories and wallets liabilities are loaded
             ViewData["Categories"] = await _categoryService.GetCategoriesAsync(userId.Value); // Pass user ID
-            ViewData["DebitLiabilities"] = await _debitLiabilitiesService.GetDebitLiabilitiesAsync(userId.Value); // Pass user ID
+            ViewData["Wallets"] = await _walletService.GetWalletAsync(userId.Value); // Pass user ID
 
             return View(transactionViewModel);
         }
@@ -215,7 +210,7 @@ namespace ASI.Basecode.WebApp.Controllers
                 existingTransaction.TransactionDate = model.TransactionDate;
                 existingTransaction.Note = model.Note;
                 existingTransaction.CategoryId = model.CategoryId;
-                existingTransaction.DeLiId = model.DeLiId;
+                existingTransaction.WalletId = model.WalletId;
 
                 // Call the service to update the transaction
                 await _transactionService.UpdateTransactionAsync(existingTransaction);
@@ -251,31 +246,6 @@ namespace ASI.Basecode.WebApp.Controllers
             return Ok(new { message = "Transaction deleted successfully." });
         }
 
-        // GET: Get category count and total expense amount
-        [HttpGet]
-        public async Task<IActionResult> GetStatistics()
-        {
-            try
-            {
-               
-                var userId = GetUserId(); 
-
-                if (userId == null)
-                {
-                    return BadRequest(new { success = false, message = "Invalid user ID." });
-                }
-
-                var categoryCount = await _transactionService.CountCategoriesAsync(userId.Value);
-                var totalExpenses = await _transactionService.GetTotalExpenseAmountAsync(userId.Value);
-
-                return Json(new { success = true, categoryCount = categoryCount, totalExpenses = totalExpenses });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { success = false, message = $"Server error: {ex.Message}" });
-            }
-        }
-
         // Helper method to get User ID
         private int? GetUserId()
         {
@@ -287,13 +257,13 @@ namespace ASI.Basecode.WebApp.Controllers
             return null;
         }
 
-        // Helper method to load categories and debit liabilities for the dropdowns
+        // Helper method to load categories and wallets for the dropdowns
         private async Task LoadDropdownsForUser(int userId)
         {
             var categories = await _categoryService.GetCategoriesAsync(userId);
-            var debitLiabilities = await _debitLiabilitiesService.GetDebitLiabilitiesAsync(userId);
+            var wallets = await _walletService.GetWalletAsync(userId);
             ViewBag.Categories = categories;
-            ViewBag.DebitLiabilities = debitLiabilities;
+            ViewBag.Wallets = wallets;
         }
     }
 }

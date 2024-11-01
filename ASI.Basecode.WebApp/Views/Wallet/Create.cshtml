@@ -1,4 +1,4 @@
-﻿@model List<ASI.Basecode.Services.ServiceModels.DebitLiabilityViewModel>
+﻿@model List<ASI.Basecode.Services.ServiceModels.WalletViewModel>
 
 
 @{
@@ -9,18 +9,11 @@
 <!-- Add Account Modal -->
 <div id="addAccountModal" class="fixed z-50 inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
     <div class="bg-white p-6 rounded-lg max-w-md w-full" id="modalContent">
-        <h2 class="text-xl font-bold mb-4">Add Account</h2>
+        <h2 class="text-xl font-bold mb-4">Add Wallet</h2>
         <div class="modal-body max-h-96 overflow-y-auto p-4">
             <form id="addAccountForm">
                 @Html.AntiForgeryToken()
                 <div class="mb-4">
-                    <label class="block">Type</label>
-                    <div class="flex space-x-4">
-                        <button type="button" class="w-full p-2 bg-blue-500 text-white" id="addDebitType">Debit</button>
-                        <button type="button" class="w-full p-2 bg-gray-100 text-black" id="addBorrowedType">Borrowed</button>
-                    </div>
-                    <input type="hidden" id="selectedAccountType" value="debit">
-                </div>
                 <div id="addFormFields"></div>
                 <div class="text-right mt-4">
                     <button type="submit" class="px-4 py-2 bg-blue-500 text-white">Confirm</button>
