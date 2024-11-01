@@ -1,4 +1,4 @@
-﻿@model List<ASI.Basecode.Services.ServiceModels.DebitLiabilityViewModel>
+﻿@model List<ASI.Basecode.Services.ServiceModels.WalletViewModel>
 
 
 @{
@@ -14,13 +14,6 @@
             <form id="addAccountForm">
                 @Html.AntiForgeryToken()
                 <div class="mb-4">
-                    <label class="block">Type</label>
-                    <div class="flex space-x-4">
-                        <button type="button" class="w-full p-2 bg-blue-500 text-white" id="addDebitType">Debit</button>
-                        <button type="button" class="w-full p-2 bg-gray-100 text-black" id="addBorrowedType">Borrowed</button>
-                    </div>
-                    <input type="hidden" id="selectedAccountType" value="debit">
-                </div>
                 <div id="addFormFields"></div>
                 <div class="text-right mt-4">
                     <button type="submit" class="px-4 py-2 bg-blue-500 text-white">Confirm</button>

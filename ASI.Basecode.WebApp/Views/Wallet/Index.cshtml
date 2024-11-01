@@ -1,4 +1,4 @@
-﻿@model List<ASI.Basecode.Services.ServiceModels.DebitLiabilityViewModel>
+﻿@model List<ASI.Basecode.Services.ServiceModels.WalletViewModel>
 
 
 @{
@@ -6,11 +6,11 @@
 }
 
 @section styles {
-    <link rel="stylesheet" href="~/css/debitliabilities.css">
+    <link rel="stylesheet" href="~/css/wallet.css">
 }
 
 @section scripts {
-    <script src="~/js/debitliabilities.js"></script>
+    <script src="~/js/wallet.js"></script>
 }
 
 <!-- Content -->
@@ -28,15 +28,6 @@
                 <i class="fas fa-plus"></i>
                 Add Account
             </button>
-        </div>
-    </div>
-
-    <!-- Net Worth Section -->
-    <div id="netWorthSection" class="mb-6">
-        <h2 class="text-2xl font-bold">Net Worth: ₱@ViewBag.NetWorth.ToString("0.00")</h2>
-        <div>
-            <p>Total Debit: ₱@ViewBag.TotalDebit.ToString("0.00")</p>
-            <p>Total Liabilities: ₱@ViewBag.TotalLiabilities.ToString("0.00")</p>
         </div>
     </div>
 

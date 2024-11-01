@@ -8,7 +8,8 @@ namespace ASI.Basecode.Data.Models
         public MUser()
         {
             MCategories = new HashSet<MCategory>();
-            MDebitLiabs = new HashSet<MDebitLiab>();
+            MTransactions = new HashSet<MTransaction>();
+            MWallets = new HashSet<MWallet>();
         }
 
         public int UserId { get; set; }
@@ -27,18 +28,14 @@ namespace ASI.Basecode.Data.Models
         public string Mail { get; set; }
         public int? UserRole { get; set; }
         public string Remarks { get; set; }
-
-        // Fields for password reset functionality
         public string PasswordResetToken { get; set; }
         public DateTime? PasswordResetExpiration { get; set; }
-
-        // Fields for email verification functionality
+        public bool isVerified { get; set; }
         public string VerificationToken { get; set; }
         public DateTime? VerificationTokenExpiration { get; set; }
 
-        public bool isVerified { get; set; }
-
         public virtual ICollection<MCategory> MCategories { get; set; }
-        public virtual ICollection<MDebitLiab> MDebitLiabs { get; set; }
+        public virtual ICollection<MTransaction> MTransactions { get; set; }
+        public virtual ICollection<MWallet> MWallets { get; set; }
     }
 }

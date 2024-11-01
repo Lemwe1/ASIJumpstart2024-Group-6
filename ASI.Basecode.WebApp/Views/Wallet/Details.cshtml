@@ -1,0 +1,33 @@
+﻿@model List<ASI.Basecode.Services.ServiceModels.WalletViewModel>
+
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<!-- Debit Sections -->
+<div id="debitSection" class="mb-6">
+    <h3 id="debitSectionTitle" class="text-xl font-semibold mb-8">Debit</h3>
+    <div id="debitAccounts" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        @foreach (var debit in Model)
+        {
+            <div class="accountCard relative" style="background-color: @debit.WalletColor">
+                <button class="absolute top-2 right-2 bg-gray-200 text-black rounded-full p-1"
+                        onclick="openEditModal({
+            WalletId: '@debit.WalletId',
+            WalletName: '@debit.WalletName',
+            WalletBalance: '@debit.WalletBalance',
+            WalletColor: '@debit.WalletColor',
+            WalletIcon: '@debit.WalletIcon',
+            WalletType: 'debit'
+        })">
+                    <i class="fas fa-edit"></i>
+                </button>
+
+                <i class="@debit.WalletIcon text-lg"></i>
+                <h3 class="font-bold text-lg">@debit.WalletName</h3>
+                <p>₱@debit.WalletBalance</p>
+            </div>
+        }
+    </div>
+</div>

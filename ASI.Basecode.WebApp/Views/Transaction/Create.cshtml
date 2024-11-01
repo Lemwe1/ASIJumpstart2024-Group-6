@@ -60,10 +60,10 @@
             <!-- Account Field -->
             <div class="mb-6">
                 <label for="transactionAccount" class="block text-sm font-medium text-gray-700">Account</label>
-                <select id="transactionAccount" name="DeLiId" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900">
+@*                 <select id="transactionAccount" name="DeLiId" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900">
                     <option value="" disabled>Select account</option>
 
-                    @if (ViewData["DebitLiabilities"] is List<DebitLiabilityViewModel> debitLiabilities && debitLiabilities.Any())
+                    @if (ViewData["DebitLiabilities"] is List<WalletViewModel> debitLiabilities && debitLiabilities.Any())
                     {
                         var debitAccounts = debitLiabilities.Where(account => account.DeLiType == "debit").ToList();
 
@@ -85,7 +85,7 @@
                     }
 
                 </select>
-            </div>
+ *@            </div>
 
 
             <!-- Date Field -->

@@ -12,11 +12,11 @@ namespace ASI.Basecode.WebApp.Controllers
 {
     public class TransactionController : Controller
     {
-        private readonly IDebitLiabilitiesService _debitLiabilitiesService;
+        private readonly IWalletService _debitLiabilitiesService;
         private readonly ICategoryService _categoryService;
         private readonly ITransactionService _transactionService;
 
-        public TransactionController(IDebitLiabilitiesService debitLiabilitiesService,
+        public TransactionController(IWalletService debitLiabilitiesService,
                                      ICategoryService categoryService,
                                      ITransactionService transactionService)
         {
@@ -38,7 +38,7 @@ namespace ASI.Basecode.WebApp.Controllers
 
             // Fetch categories, debit liabilities, and transactions for the user
             var categories = await _categoryService.GetCategoriesAsync(userId.Value);
-            var debitLiabilities = await _debitLiabilitiesService.GetDebitLiabilitiesAsync(userId.Value);
+            var debitLiabilities = await _debitLiabilitiesService.GetWalletAsync(userId.Value);
             var transactions = await _transactionService.GetAllTransactionsAsync(userId.Value);
 
             // Pass data to the view
@@ -83,7 +83,7 @@ namespace ASI.Basecode.WebApp.Controllers
 
             // Retrieve category and debit/liability names
             var categoryName = await _categoryService.GetCategoryNameByIdAsync(transaction.CategoryId, int.Parse(userId));
-            var debitLiabilityName = await _debitLiabilitiesService.GetDebitLiabilityNameByIdAsync(transaction.DeLiId, int.Parse(userId));
+            //var debitLiabilityName = await _debitLiabilitiesService.GetDebitLiabilityNameByIdAsync(transaction.DeLiId, int.Parse(userId));
 
             // Map MTransaction to TransactionViewModel
             var transactionViewModel = new TransactionViewModel
@@ -96,7 +96,7 @@ namespace ASI.Basecode.WebApp.Controllers
                 CategoryId = transaction.CategoryId,
                 DeLiId = transaction.DeLiId,
                 CategoryName = categoryName, 
-                DebitLiabilityName = debitLiabilityName 
+                //DebitLiabilityName = debitLiabilityName 
             };
 
             return Json(new { success = true, data = transactionViewModel });
@@ -165,7 +165,7 @@ namespace ASI.Basecode.WebApp.Controllers
 
             // Ensure categories and debit liabilities are loaded
             ViewData["Categories"] = await _categoryService.GetCategoriesAsync(userId.Value); // Pass user ID
-            ViewData["DebitLiabilities"] = await _debitLiabilitiesService.GetDebitLiabilitiesAsync(userId.Value); // Pass user ID
+            //ViewData["DebitLiabilities"] = await _debitLiabilitiesService.GetDebitLiabilitiesAsync(userId.Value); // Pass user ID
 
             return View(transactionViewModel);
         }
@@ -251,9 +251,9 @@ namespace ASI.Basecode.WebApp.Controllers
         private async Task LoadDropdownsForUser(int userId)
         {
             var categories = await _categoryService.GetCategoriesAsync(userId);
-            var debitLiabilities = await _debitLiabilitiesService.GetDebitLiabilitiesAsync(userId);
+           // var debitLiabilities = await _debitLiabilitiesService.GetDebitLiabilitiesAsync(userId);
             ViewBag.Categories = categories;
-            ViewBag.DebitLiabilities = debitLiabilities;
+           // ViewBag.DebitLiabilities = debitLiabilities;
         }
     }
 }

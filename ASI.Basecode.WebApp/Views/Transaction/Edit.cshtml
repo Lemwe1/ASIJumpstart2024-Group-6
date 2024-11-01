@@ -62,9 +62,9 @@
             <div class="mb-6">
                 <label for="editTransactionAccount" class="block text-sm font-medium text-gray-700">Account</label>
                 <select id="editTransactionAccount" name="DeLiId" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900">
-                    <option value="" disabled>Select account</option>
+                    @* <option value="" disabled>Select account</option>
 
-                    @if (ViewData["DebitLiabilities"] is List<DebitLiabilityViewModel> debitLiabilities && debitLiabilities.Any())
+                    @if (ViewData["DebitLiabilities"] is List<WalletViewModel> debitLiabilities && debitLiabilities.Any())
                     {
                         // Filter only borrowed accounts
                         var borrowedAccounts = debitLiabilities.Where(account => account.DeLiType == "debit").ToList();
@@ -84,7 +84,7 @@
                     {
                         <option value="" disabled>No Entries yet</option>
                     }
-                </select>
+                </select> *@
             </div>
 
 
