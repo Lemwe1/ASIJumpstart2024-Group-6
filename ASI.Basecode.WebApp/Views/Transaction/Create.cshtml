@@ -20,6 +20,11 @@
         <form id="transactionForm" method="post" action="/Transaction/Create">
             @Html.AntiForgeryToken()
 
+            <!-- Amount Field -->
+            <div class="mb-6">
+                <label for="transactionAmount" class="block text-sm font-medium text-gray-700">Amount</label>
+                <input type="number" step="0.01" id="transactionAmount" name="Amount" placeholder="0.00" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900" />
+            </div>
             <!-- Type Field -->
             <div class="mb-6">
                 <label class="block text-sm font-medium text-gray-700 inline">Type</label>
@@ -31,11 +36,6 @@
                 <input type="hidden" name="TransactionType" id="transactionType" value="Expense" />
             </div>
 
-            <!-- Amount Field -->
-            <div class="mb-6">
-                <label for="transactionAmount" class="block text-sm font-medium text-gray-700">Amount</label>
-                <input type="number" step="0.01" id="transactionAmount" name="Amount" placeholder="Enter amount" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900" />
-            </div>
 
             <!-- Category Field -->
             <div class="mb-6">
@@ -60,7 +60,7 @@
             <!-- Wallet Field -->
             <div class="mb-6">
                 <label for="transactionWallet" class="block text-sm font-medium text-gray-700">Wallet</label>
-                <select id="transactionWallet" name="WalletId" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900">
+                <select id="transactionWallet" name="walletId" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900">
                     <option class="text-gray-500" value="" disabled>Select Wallet</option>
 
                     @if (ViewData["Wallets"] is List<WalletViewModel> wallets && wallets.Any())

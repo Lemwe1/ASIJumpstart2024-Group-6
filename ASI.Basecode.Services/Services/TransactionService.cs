@@ -79,63 +79,83 @@ public class TransactionService : ITransactionService
         await _transactionRepository.AddAsync(transaction);
     }
 
+
     public async Task UpdateTransactionAsync(TransactionViewModel model)
     {
-        // Get the existing transaction to determine the previous amount and type
-        var existingTransaction = await _transactionRepository.GetByIdAsync(model.TransactionId);
-        if (existingTransaction == null)
-        {
-            throw new Exception("Transaction not found");
-        }
+        // Map the view model to the transaction entity (MTransaction)
+        var transaction = MapToModel(model);
 
-        // Retrieve the associated wallets
-        var previousWallet = await _walletRepository.GetByIdAsync(existingTransaction.WalletId);
-        var newWallet = await _walletRepository.GetByIdAsync(model.WalletId);
+        // Use the repository to fetch the existing transaction
+        var existingTransaction = await _transactionRepository.GetByIdAsync(transaction.TransactionId);
 
-        if (previousWallet == null || newWallet == null)
+        if (existingTransaction != null)
         {
-            throw new Exception("Wallet not found");
-        }
+            // Calculate the amount change based on transaction type
+            var amountChange = transaction.Amount - existingTransaction.Amount; // Calculate the difference
 
-        // Adjust the previous wallet's balance based on the existing transaction
-        if (existingTransaction.TransactionType == "Expense")
-        {
-            previousWallet.WalletBalance += existingTransaction.Amount; // Revert original expense deduction
-        }
-        else if (existingTransaction.TransactionType == "Income")
-        {
-            previousWallet.WalletBalance -= existingTransaction.Amount; // Revert original income addition
-        }
+            // Store the previous wallet ID for balance adjustments
+            var previousWalletId = existingTransaction.WalletId;
 
-        // Update the transaction properties
-        existingTransaction.TransactionType = model.TransactionType;
-        existingTransaction.Amount = model.Amount;
-        existingTransaction.TransactionDate = model.TransactionDate;
-        existingTransaction.Note = model.Note;
-        existingTransaction.CategoryId = model.CategoryId;
+            // Update properties from the incoming model
+            existingTransaction.TransactionType = transaction.TransactionType;
+            existingTransaction.TransactionDate = transaction.TransactionDate;
+            existingTransaction.Note = transaction.Note;
+            existingTransaction.CategoryId = transaction.CategoryId;
+            existingTransaction.WalletId = transaction.WalletId; // This can be changed
 
-        // If the WalletId has changed, adjust the new wallet's balance
-        if (existingTransaction.WalletId != model.WalletId)
-        {
-            // Apply the new transaction's impact on the new wallet
-            if (model.TransactionType == "Expense")
+            // Call the repository to fetch the previous wallet associated with the transaction
+            var previousWallet = await _walletRepository.GetByIdAsync(previousWalletId);
+            if (previousWallet == null)
             {
-                newWallet.WalletBalance -= model.Amount; // Deduct for new expense
+                throw new Exception("Previous wallet not found");
             }
-            else if (model.TransactionType == "Income")
-            {
-                newWallet.WalletBalance += model.Amount; // Add for new income
-            }
-        }
 
-        // Save updates for both wallets and the transaction
-        await _walletRepository.UpdateAsync(previousWallet);
-        if (existingTransaction.WalletId != model.WalletId)
-        {
-            await _walletRepository.UpdateAsync(newWallet);
+            // Adjust the previous wallet balance based on the transaction type
+            if (existingTransaction.TransactionType == "Expense")
+            {
+                previousWallet.WalletBalance += existingTransaction.Amount; // Return the old amount
+            }
+            else if (existingTransaction.TransactionType == "Income")
+            {
+                previousWallet.WalletBalance -= existingTransaction.Amount; // Deduct the old amount
+            }
+
+            // If the wallet ID has changed, adjust the new wallet's balance as well
+            if (transaction.WalletId != previousWalletId)
+            {
+                var newWallet = await _walletRepository.GetByIdAsync(transaction.WalletId);
+                if (newWallet == null)
+                {
+                    throw new Exception("New wallet not found");
+                }
+
+                // Adjust the new wallet balance based on the transaction type
+                if (existingTransaction.TransactionType == "Expense")
+                {
+                    newWallet.WalletBalance -= amountChange; // Deduct the new amount for expense transactions
+                }
+                else if (existingTransaction.TransactionType == "Income")
+                {
+                    newWallet.WalletBalance += amountChange; // Add the new amount for income transactions
+                }
+
+                // Update the new wallet balance
+                await _walletRepository.UpdateAsync(newWallet);
+            }
+
+            // Update the previous wallet balance
+            await _walletRepository.UpdateAsync(previousWallet);
+
+            // Call the repository to update the transaction
+            await _transactionRepository.UpdateAsync(existingTransaction);
         }
-        await _transactionRepository.UpdateAsync(existingTransaction);
+        else
+        {
+            // Log if the existing transaction is not found
+            Console.Error.WriteLine($"Transaction ID {transaction.TransactionId} not found for update.");
+        }
     }
+
 
     public async Task DeleteTransactionAsync(int transactionId)
     {
@@ -169,6 +189,9 @@ public class TransactionService : ITransactionService
         // Now delete the transaction
         await _transactionRepository.DeleteAsync(transactionId);
     }
+
+
+
 
 
     // Mapping from MTransaction to TransactionViewModel

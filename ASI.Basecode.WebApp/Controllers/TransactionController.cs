@@ -187,6 +187,7 @@ namespace ASI.Basecode.WebApp.Controllers
         {
             try
             {
+                // Validate the incoming model
                 if (model == null)
                 {
                     return BadRequest(new { success = false, message = "Model is null." });
@@ -198,11 +199,18 @@ namespace ASI.Basecode.WebApp.Controllers
                     return BadRequest(new { success = false, message = "Transaction ID mismatch." });
                 }
 
+                // Check model state
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(new { success = false, message = "Invalid model state.", errors = ModelState });
+                }
+
                 var existingTransaction = await _transactionService.GetTransactionByIdAsync(id);
                 if (existingTransaction == null)
                 {
                     return NotFound(new { success = false, message = "Transaction not found." });
                 }
+
 
                 // Update properties of the existing transaction
                 existingTransaction.TransactionType = model.TransactionType;
@@ -224,6 +232,7 @@ namespace ASI.Basecode.WebApp.Controllers
                 return StatusCode(500, new { success = false, message = "Internal server error", details = ex.Message });
             }
         }
+
 
 
         // POST: Delete a transaction

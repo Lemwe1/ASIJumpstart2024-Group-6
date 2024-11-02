@@ -35,7 +35,7 @@
             <!-- Amount Field -->
             <div class="mb-6">
                 <label for="editTransactionAmount" class="block text-sm font-medium text-gray-700">Amount</label>
-                <input type="number" step="0.01" id="editTransactionAmount" name="Amount" placeholder="Enter amount" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900" />
+                <input type="number" step="0.01" id="editTransactionAmount" name="Amount" placeholder="0.00" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900" />
             </div>
 
             <!-- Category Field -->
@@ -62,7 +62,7 @@
             <!-- Wallet Field -->
             <div class="mb-6">
                 <label for="editTransactionWallet" class="block text-sm font-medium text-gray-700">Wallet</label>
-                <select id="editTransactionWallet" name="WalletId" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900">
+                <select id="editTransactionWallet" name="walletId" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900">
                     <option value="" disabled>Select Wallet</option>
 
                     @if (ViewData["Wallets"] is List<WalletViewModel> wallets && wallets.Any())

@@ -318,8 +318,7 @@
         formData.forEach((value, key) => {
             data[key] = value;
         });
-        // Extract walletId 
-        data.walletId = document.getElementById('editTransactionWallet').value;
+
         // Validate required fields
         if (!data.CategoryId || !data.walletId || !transactionType.value || !data.Amount || !data.TransactionDate) {
             let errorMessage = 'Please fill in all required fields:';
@@ -337,12 +336,9 @@
             return;
         }
 
-    
-
-
         // Convert types and format date
         data.CategoryId = parseInt(data.CategoryId, 10);
-        data.walletId = parseInt(data.walletId, 10);
+        data.walletId = parseInt(data.walletId, 10); 
         data.TransactionId = currentTransactionId;
         data.TransactionType = transactionType.value;
         data.TransactionDate = new Date(data.TransactionDate).toISOString(); // Ensure date format
@@ -354,7 +350,6 @@
             headers: {
                 'Content-Type': 'application/json',
                 'RequestVerificationToken': token
-
             },
             body: JSON.stringify(data)
         })
@@ -367,6 +362,7 @@
                 });
             });
     }
+
 
     // Response handler for adding/editing transactions
     function handleResponse(response) {

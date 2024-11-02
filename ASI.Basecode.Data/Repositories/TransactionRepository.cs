@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using ASI.Basecode.Data.Interfaces;
 using ASI.Basecode.Data.Models;
 using System.Linq;
+using System;
 
 namespace ASI.Basecode.Data.Repositories
 {
@@ -37,17 +38,36 @@ namespace ASI.Basecode.Data.Repositories
 
         public async Task UpdateAsync(MTransaction transaction)
         {
+            // Fetch the existing transaction from the database
             var existingTransaction = await _context.MTransactions.FindAsync(transaction.TransactionId);
 
             if (existingTransaction != null)
             {
-                _context.Entry(existingTransaction).State = EntityState.Detached; // Detach the tracked entity
-            }
+                // Log the existing transaction's wallet ID for debugging
+                Console.WriteLine($"Updating Transaction ID: {existingTransaction.TransactionId} with new Wallet ID: {transaction.WalletId}");
 
-            // Attach and update the transaction
-            _context.MTransactions.Update(transaction);
-            await _context.SaveChangesAsync();
+                // Update properties explicitly
+                existingTransaction.TransactionType = transaction.TransactionType;
+                existingTransaction.Amount = transaction.Amount;
+                existingTransaction.TransactionDate = transaction.TransactionDate;
+                existingTransaction.Note = transaction.Note;
+                existingTransaction.CategoryId = transaction.CategoryId;
+                existingTransaction.WalletId = transaction.WalletId;
+
+                // Mark the entity as modified
+                _context.Entry(existingTransaction).State = EntityState.Modified;
+
+                // Save changes to the database
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                // Log if the existing transaction is not found
+                Console.Error.WriteLine($"Transaction ID {transaction.TransactionId} not found for update.");
+            }
         }
+
+
 
         public async Task DeleteAsync(int transactionId)
         {
