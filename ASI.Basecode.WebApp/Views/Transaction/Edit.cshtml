@@ -21,11 +21,6 @@
             @Html.AntiForgeryToken()
 
              <input type="hidden" name="TransactionId" id="editTransactionId" />
-            <!-- Amount Field -->
-            <div class="mb-6">
-                <label for="editTransactionAmount" class="block text-sm font-medium text-gray-700">Amount</label>
-                <input type="number"  step="0.01" id="editTransactionAmount" name="Amount" placeholder="Enter amount" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900" />
-            </div>
             <!-- Type Field -->
             <div class="mb-6">
                 <label class="block text-sm font-medium text-gray-700 inline">Type</label>
@@ -35,6 +30,12 @@
                     <button type="button" id="editIncomeButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800">Income</button>
                 </div>
                 <input type="hidden" name="Type" id="editTransactionType" value="Expense" />
+            </div>
+
+            <!-- Amount Field -->
+            <div class="mb-6">
+                <label for="editTransactionAmount" class="block text-sm font-medium text-gray-700">Amount</label>
+                <input type="number" step="0.01" id="editTransactionAmount" name="Amount" placeholder="Enter amount" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900" />
             </div>
 
             <!-- Category Field -->

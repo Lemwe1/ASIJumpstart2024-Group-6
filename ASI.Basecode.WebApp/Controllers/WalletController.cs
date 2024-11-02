@@ -20,7 +20,7 @@ namespace ASI.Basecode.WebApp.Controllers
         }
 
         // GET: /Wallet/
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(bool json = false)
         {
             // Get the logged-in user's ID
             int userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "UserId").Value);
@@ -33,8 +33,15 @@ namespace ASI.Basecode.WebApp.Controllers
                 .Where(x => x.UserId == userId)
                 .ToList(); // Convert to List<DebitLiabilityViewModel>
 
-            return View(userWallet);
+            if (json)
+            {
+                return Json(userWallet); // Return JSON data if requested
+            }
+
+            return View(userWallet); // Return the view otherwise
         }
+
+
 
         // POST: /Wallet/Create
         [HttpPost]

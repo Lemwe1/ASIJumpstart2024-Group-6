@@ -170,15 +170,25 @@
 
 
     // Function to update button styles based on the type
-    function updateButtonStyles(button, isExpense) {
-        button.classList.toggle('bg-blue-500', isExpense);
-        button.classList.toggle('text-white', isExpense);
-        button.classList.toggle('bg-gray-200', !isExpense);
-        button.classList.toggle('text-gray-800', !isExpense);
+    function updateButtonStyles(button, isSelected, isExpense) {
+        // Remove all color classes to avoid overlap
+        button.classList.remove('bg-red-400', 'bg-green-500', 'text-white', 'bg-gray-200', 'text-gray-800');
+
+        if (isSelected) {
+            // Apply styles based on whether the button is for expense or income
+            if (isExpense) {
+                button.classList.add('bg-red-400', 'text-white'); // Red for selected expense
+            } else {
+                button.classList.add('bg-green-500', 'text-white'); // Green for selected income
+            }
+        } else {
+            button.classList.add('bg-gray-200', 'text-gray-800'); // Gray for not selected
+        }
     }
 
     // Update the type button selection
     function updateTypeSelection(type) {
+        // Ensure transactionType element is found
         if (transactionType) {
             transactionType.value = type;
         } else {
@@ -189,12 +199,12 @@
         const isExpense = type === 'Expense';
 
         // Update styles for create buttons
-        updateButtonStyles(createExpenseButton, isExpense);
-        updateButtonStyles(createIncomeButton, !isExpense);
+        updateButtonStyles(createExpenseButton, isExpense, true);
+        updateButtonStyles(createIncomeButton, !isExpense, false);
 
         // Update styles for edit buttons
-        updateButtonStyles(editExpenseButton, isExpense);
-        updateButtonStyles(editIncomeButton, !isExpense);
+        updateButtonStyles(editExpenseButton, isExpense, true);
+        updateButtonStyles(editIncomeButton, !isExpense, false);
     }
 
     // Function to set type and apply filters
