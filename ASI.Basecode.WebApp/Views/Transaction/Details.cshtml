@@ -25,17 +25,46 @@
                     foreach (var transaction in transactions)
                     {
                         <tr data-category="@transaction.CategoryId">
-                            <td class="px-4 py-3 w-1/6">@transaction.CategoryName</td>
-                            <td class="px-4 py-3 w-1/6">
+                            <td class="px-4 py-4 w-1/6">
+                                <div class="flex items-center space-x-4">
+                                    <span class="flex items-center justify-center p-2 w-12 h-12 rounded-full border border-gray-300" style="background-color: @transaction.CategoryColor;">
+                                        <i class="@transaction.CategoryIcon" style="color: white;"></i>
+                                    </span>
+                                    <span>@transaction.CategoryName</span>
+                                </div>
+                            </td>
+
+                            <td class="pl-4 pr-2 py-3 w-1/6">
                                 <span class="inline-block px-2 py-1 @(transaction.TransactionType == "Expense" ? "bg-red-400 text-white" : "bg-green-500 text-white") rounded">
                                     @transaction.TransactionType
                                 </span>
                             </td>
-                            <td class="px-4 py-4 w-1/6 flex space-x-2">
-                                <span class="flex-none">₱</span>
-                                <span class="flex-1">@transaction.Amount</span>
+
+                            <td class="px-4 py-4 w-1/6">
+                                <div class="flex items-center space-x-1">
+
+                                    @if (transaction.TransactionType == "Expense")
+                                    {
+                                        <span>-₱</span>
+                                        <span>@transaction.Amount</span>
+                                    }
+                                    else
+                                    {
+                                        <span>&nbsp;₱</span>
+                                        <span>@transaction.Amount</span>
+                                    }
+                                </div>
                             </td>
-                            <td class="px-4 py-3 w-1/6">@transaction.WalletName</td>
+
+                            <td class="px-4 py-4 w-1/6">
+                                <div class="flex items-center space-x-4">
+                                    <span class="flex items-center justify-center p-2 w-12 h-12 rounded-full border border-gray-300" style="background-color: @transaction.WalletColor;">
+                                        <i class="@transaction.WalletIcon" style="color: white;"></i>
+                                    </span>
+                                    <span>@transaction.WalletName</span>
+                                </div>
+                            </td>
+
                             <td class="px-4 py-3 w-1/6">@transaction.TransactionDate.ToShortDateString()</td>
                             <td class="px-4 py-3 w-2/6">@transaction.Note</td>
                             <td class="px-4 py-3">

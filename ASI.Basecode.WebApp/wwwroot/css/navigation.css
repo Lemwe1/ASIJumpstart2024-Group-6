@@ -36,10 +36,7 @@
         padding-left: 0;
     }
 
-    #navigation-content a:hover {
-        color: #065AD8;
-        text-decoration: none;
-    }
+
 
     ul {
         list-style-type: none;
@@ -63,9 +60,6 @@
         color: inherit; 
     }
 
-        #logout-item a:hover {
-            color: red; /* Change color on hover */
-        }
 
 @media (max-width: 768px) {
     #navigation-content {

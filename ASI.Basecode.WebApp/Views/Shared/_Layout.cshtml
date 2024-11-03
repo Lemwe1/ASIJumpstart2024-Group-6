@@ -73,6 +73,8 @@
     <script src="https://kit.fontawesome.com/832b27a645.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         // Configure Toastr options
         toastr.options = {
@@ -93,6 +95,23 @@
             const sidebarMenu = document.getElementById('sidebar-menu');
             sidebarMenu.classList.add('hidden'); // Hide sidebar when close button is clicked
         });
+        document.getElementById('logoutLink').addEventListener('click', function (event) {
+            event.preventDefault();
+
+            Swal.fire({
+                text: "Are you sure you want to log out?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Logout'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = this.getAttribute('href');
+                }
+            });
+        });
+
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

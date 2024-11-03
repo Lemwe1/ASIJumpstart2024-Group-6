@@ -10,12 +10,20 @@ namespace ASI.Basecode.Services.ServiceModels
         [Required(ErrorMessage = "Category is required")]
         public int CategoryId { get; set; }
 
-        public string CategoryName { get; set; } 
+        public string CategoryName { get; set; }
+
+        public string CategoryIcon { get; set; }
+
+        public string CategoryColor { get; set; }
 
         [Required(ErrorMessage = "Wallet is required")]
         public int WalletId { get; set; }
 
-        public string WalletName { get; set; } 
+        public string WalletName { get; set; }
+
+        public string WalletIcon { get; set; }
+        public string WalletColor { get; set; }
+
 
         public int UserId { get; set; }
 
