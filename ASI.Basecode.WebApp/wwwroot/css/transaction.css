@@ -24,6 +24,13 @@
     background-color: white;
     border-radius: 8px;
 }
+@media (max-width: 768px) {
+    .modal-content {
+        max-width: 90%;
+        padding: 20px;
+    }
+}
+
 
 .empty-row {
     width: 100%;
@@ -33,11 +40,5 @@ select option:disabled {
     color: #9ca3af;
 }
 
-@media (max-width: 768px) {
-    .modal-content {
-        max-width: 90%;
-        padding: 20px;
-    }
-}
 
 
