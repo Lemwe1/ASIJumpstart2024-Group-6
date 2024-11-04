@@ -6,6 +6,10 @@ const modalContent = document.getElementById('modalContent');
 // Form field elements
 const addFormFields = document.getElementById('addFormFields');
 
+// Close buttons for the modals
+const closeAddModal = document.getElementById('closeAddModal');
+const closeEditModal = document.getElementById('closeEditModal');
+
 // Arrays to store accounts (can be removed if stored in the DB)
 let debitAccounts = [];
 
@@ -25,6 +29,41 @@ function resetAddFormFields() {
     document.getElementById('accountBalance').value = '';
     document.getElementById('createIcon').value = '';
     document.getElementById('accountColor').value = '#000000'; // Default color
+}
+
+// Function to show confirmation dialog
+async function showConfirmationDialog(modal, resetFunction) {
+    const { isConfirmed } = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you want to discard them?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#a6a6a6',
+        confirmButtonText: 'Yes, discard it!',
+        cancelButtonText: 'No, cancel!'
+    });
+
+    if (isConfirmed) {
+        closeModal(modal);
+        if (resetFunction) {
+            resetFunction(); 
+        }
+    }
+}
+
+// Close button for Add Account Modal
+if (closeAddModal) {
+    closeAddModal.addEventListener('click', () => {
+        showConfirmationDialog(addAccountModal, resetAddFormFields); // Show confirmation and reset form
+    });
+}
+
+// Close button for Edit Account Modal
+if (closeEditModal) {
+    closeEditModal.addEventListener('click', () => {
+        showConfirmationDialog(editAccountModal, null); // Show confirmation, no reset needed
+    });
 }
 
 // Function to open modal
@@ -84,11 +123,11 @@ if (addAccountModal) {
                 cancelButtonText: 'Cancel',
                 customClass: { popup: 'swal2-front' }
             }).then((result) => {
-                if (result.isConfirmed)
+                if (result.isConfirmed) {
                     closeModal(addAccountModal);
                     resetAddFormFields();
+                }
             });
- 
         }
     });
 } else {
@@ -255,7 +294,9 @@ if (editAccountModal) {
                 cancelButtonText: 'Cancel',
                 customClass: { popup: 'swal2-front' }
             }).then((result) => {
-                if (result.isConfirmed) closeModal(editAccountModal);;
+                if (result.isConfirmed) {
+                    closeModal(editAccountModal)
+                };
             });
         }
     });
@@ -267,11 +308,11 @@ if (editAccountModal) {
         customClass: { popup: 'swal2-front' }
     });
     Swal.fire({
-        title: 'Error',
-        text: result.message || 'An error occurred.',
-        icon: 'error',
-        customClass: { popup: 'swal2-front' }
-    });
+    title: 'Error',
+    text: result.message || 'An error occurred.',
+    icon: 'error',
+    customClass: { popup: 'swal2-front' }
+});
 }
 
 // Handle form submission for editing an account
@@ -350,9 +391,6 @@ document.getElementById('editAccountForm').addEventListener('submit', async (e) 
             });
         }
     }
-    else {
-        closeModal(editAccountModal)
-    }
 });
 
 // Handle account deletion
@@ -418,9 +456,7 @@ document.getElementById('deleteAccountButton').addEventListener('click', async (
             });
         }
     }
-    else {
-        closeModal(editAccountModal)
-    }
+    
 });
 
 // Load accounts on page load
