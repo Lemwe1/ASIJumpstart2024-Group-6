@@ -228,7 +228,6 @@ function loadDebitForm() {
 }
 
 
-
 // Handle form submission for adding an account
 document.getElementById('addAccountForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -240,19 +239,33 @@ document.getElementById('addAccountForm').addEventListener('submit', async (e) =
     const color = document.getElementById('accountColor').value;
     const icon = document.getElementById('createIcon').value;
 
-    let data = {
-        WalletIcon: icon,
-        WalletColor: color,
-        WalletBalance: 0,
-        WalletName: name
-    };
-
-    const balance = parseFloat(document.getElementById('accountBalance').value);
-    data.WalletBalance = balance;
-
-    console.log('Sending data:', JSON.stringify(data));
-
+    // Preliminary check for existing wallet
     try {
+        const existingWalletResponse = await fetch(`/Wallet/Exists?name=${encodeURIComponent(name)}`);
+        const existingWalletResult = await existingWalletResponse.json();
+
+        if (existingWalletResult.exists) {
+            Swal.fire({
+                title: 'Error',
+                text: 'A wallet with this name already exists. Please choose a different name.',
+                icon: 'error',
+                customClass: { popup: 'swal2-front' }
+            });
+            return; // Stop the process if wallet already exists
+        }
+
+        let data = {
+            WalletIcon: icon,
+            WalletColor: color,
+            WalletBalance: 0,
+            WalletName: name
+        };
+
+        const balance = parseFloat(document.getElementById('accountBalance').value);
+        data.WalletBalance = balance;
+
+        console.log('Sending data:', JSON.stringify(data));
+
         const response = await fetch('/Wallet/Create', {
             method: 'POST',
             headers: {
@@ -284,14 +297,16 @@ document.getElementById('addAccountForm').addEventListener('submit', async (e) =
             });
         }
     } catch (error) {
+        console.error('Error during wallet creation:', error);
         Swal.fire({
             title: 'Error',
-            text: result.message || 'An error occurred.',
+            text: 'An unexpected error occurred. Please try again later.',
             icon: 'error',
             customClass: { popup: 'swal2-front' }
         });
     }
 });
+
 
 // Function to load accounts from the server and render them
 async function loadAccounts() {
@@ -398,7 +413,7 @@ document.getElementById('editAccountForm').addEventListener('submit', async (e) 
         WalletIcon: icon,
         WalletColor: color,
         WalletName: name,
-        WalletBalance: 0 // Set this dynamically for debit or borrowed
+        WalletBalance: 0 
     };
 
     const balance = parseFloat(document.getElementById('editAccountBalance').value);

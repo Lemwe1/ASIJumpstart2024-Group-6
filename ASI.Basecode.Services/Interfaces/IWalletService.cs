@@ -11,6 +11,8 @@ namespace ASI.Basecode.Services.Interfaces
         Task AddWalletAsync(WalletViewModel model);
         Task UpdateWalletAsync(WalletViewModel model);
         Task DeleteWalletAsync(int id);
-        Task<string> GetWalletNameByIdAsync(int walletId, int userId); // Add this method
+        Task<string> GetWalletNameByIdAsync(int walletId, int userId);
+        Task<bool> WalletExistsAsync(int userId, string walletName);
+
     }
 }
