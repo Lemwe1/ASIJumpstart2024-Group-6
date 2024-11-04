@@ -6,34 +6,17 @@ const modalContent = document.getElementById('modalContent');
 // Form field elements
 const addFormFields = document.getElementById('addFormFields');
 
-// Sections Titles
-const debitSectionTitle = document.getElementById('debitSectionTitle');
-
 // Arrays to store accounts (can be removed if stored in the DB)
 let debitAccounts = [];
 
-// Function to render debit accounts
-function renderAccounts() {
-    // Clear existing accounts
-    document.getElementById('debitAccounts').innerHTML = '';
+function updateNetWorth() {
+    // Calculate the total debit and total liabilities
+    let totalDebit = debitAccounts.reduce((acc, account) => acc + account.WalletBalance, 0);
 
-    // Render debit accounts
-    debitAccounts.forEach(account => {
-        document.getElementById('debitAccounts').innerHTML += `
-            <div class="accountCard" style="background-color: ${account.DeLiColor}">
-                <i class="${account.DeLiIcon} text-lg"></i>
-                <h3 class="font-bold text-lg">${account.DeLiName}</h3>
-                <p>₱${account.DeLiBalance.toFixed(2)}</p>
-                <button class="editButton" onclick="openEditModal(${JSON.stringify(account)})">Edit</button>
-            </div>
-        `;
-    });
-}
-
-// Function to toggle visibility of the Debit header
-function toggleSectionTitles() {
-    // Show or hide the "Debit" header
-    debitSectionTitle.classList.toggle('hidden', debitAccounts.length === 0);
+    // Update the net worth section in the HTML
+    document.getElementById('balanceSection').innerHTML = `
+        <h2 class="text-2xl font-bold">Net Worth: ₱${totalDebit.toFixed(2)}</h2>
+    `;
 }
 
 // Function to open modal

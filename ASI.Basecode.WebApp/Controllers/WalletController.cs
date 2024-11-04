@@ -38,6 +38,11 @@ namespace ASI.Basecode.WebApp.Controllers
                 return Json(userWallet); // Return JSON data if requested
             }
 
+            // Calculate totals
+            var totalDebit = userWallet.Sum(x => x.WalletBalance);
+
+            ViewBag.TotalDebit = totalDebit;
+
             return View(userWallet); // Return the view otherwise
         }
 
