@@ -8,7 +8,7 @@
 <!-- Debit Sections -->
 <div id="debitSection" class="mb-6">
     <div id="debitAccounts" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div id="addAccountButton" class="category-card p-6 rounded-lg flex items-center justify-center cursor-pointer relative border-4 border-dashed border-gray-400 dark:border-gray-600" onclick="openModal(addAccountModal)">
+        <div id="addAccountButton" class="category-card p-6 rounded-lg flex items-center justify-center cursor-pointer relative border-4 border-dashed border-gray-400 dark:border-gray-600" onclick="openModal(addAccountModal)">
             <i class="fas fa-plus text-6xl text-gray-400 dark:text-gray-600"></i>
         </div>
         @foreach (var debit in Model)
@@ -16,20 +16,26 @@
             <div class="accountCard relative" style="background-color: @debit.WalletColor">
                 <button class="absolute top-2 right-2 bg-gray-200 text-black rounded-full p-1"
                         onclick="openEditModal({
-            WalletId: '@debit.WalletId',
-            WalletName: '@debit.WalletName',
-            WalletBalance: '@debit.WalletBalance',
-            WalletColor: '@debit.WalletColor',
-            WalletIcon: '@debit.WalletIcon',
-            WalletType: 'debit'
-        })">
+                            WalletId: '@debit.WalletId',
+                            WalletName: '@debit.WalletName',
+                            WalletBalance: '@debit.WalletBalance',
+                            WalletColor: '@debit.WalletColor',
+                            WalletIcon: '@debit.WalletIcon',
+                            WalletType: 'debit'
+                        })">
                     <i class="fas fa-edit"></i>
                 </button>
 
-                <p class="spacing">Balance: ₱@debit.WalletBalance</p>
+                <p class="spacing">
+                    Balance:&nbsp;
+                    <span class="balance-value" data-visible="true">₱@debit.WalletBalance</span>
+                    <i class="fas fa-eye cursor-pointer toggle-balance" data-account-id="@debit.WalletId"></i>
+                </p>
                 <h3 class="font-bold text-lg">@debit.WalletName</h3>
                 <i class="@debit.WalletIcon text-lg absolute bottom-2 right-2"></i>
             </div>
         }
     </div>
 </div>
+
+
