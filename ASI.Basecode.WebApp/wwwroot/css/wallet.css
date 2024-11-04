@@ -7,60 +7,31 @@
 /* Button styles */
 #addAccountButton {
     padding: 0.5rem 1rem;
-    background-color: #3b82f6;
+    background-color: transparent; /* or none */
     color: #fff;
     border-radius: 0.5rem;
 }
 
 /* Style for modal body */
 #modalContent .modal-body {
-    max-height: 400px; /* Set max height for modal body */
-    overflow-y: auto; /* Enable vertical scrolling */
+    max-height: 400px; 
+    overflow-y: auto; 
 }
 
-/* Add New Account Button */
-#addAccountButton {
-    padding: 0.5rem 1rem;
+
+/* Balance Section */
+#balanceSection {
+    margin-top: 50px;
     background-color: #3b82f6;
     color: #fff;
+    padding: 2rem;
     border-radius: 0.5rem;
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
 }
 
-
-/* Net Worth Section */
-#netWorthSection {
-    background-color: #3b82f6;
-    color: #fff;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.spacing {
+    margin-bottom: 2rem; /* Adjust the value as needed */
 }
 
-/* Account Cards */
-#debitAccounts .accountCard,
-#borrowedAccounts .accountCard {
-    padding: 1rem;
-    border-radius: 0.5rem;
-}
-
-#debitAccounts .cashCard {
-    background-color: #d1fae5;
-}
-
-#debitAccounts .goTymeCard {
-    background-color: #bfdbfe;
-}
-
-#debitAccounts .bpiCard {
-    background-color: #fecaca;
-}
-
-#borrowedAccounts .iphoneCard {
-    background-color: #d1fae5;
-}
-
-#borrowedAccounts .airPodsCard {
-    background-color: #bfdbfe;
-}

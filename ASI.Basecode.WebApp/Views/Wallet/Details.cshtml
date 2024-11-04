@@ -7,8 +7,10 @@
 
 <!-- Debit Sections -->
 <div id="debitSection" class="mb-6">
-    <h3 id="debitSectionTitle" class="text-xl font-semibold mb-8">Debit</h3>
     <div id="debitAccounts" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div id="addAccountButton" class="category-card p-6 rounded-lg flex items-center justify-center cursor-pointer relative border-4 border-dashed border-gray-400 dark:border-gray-600" onclick="openModal(addAccountModal)">
+            <i class="fas fa-plus text-6xl text-gray-400 dark:text-gray-600"></i>
+        </div>
         @foreach (var debit in Model)
         {
             <div class="accountCard relative" style="background-color: @debit.WalletColor">
@@ -24,9 +26,9 @@
                     <i class="fas fa-edit"></i>
                 </button>
 
-                <i class="@debit.WalletIcon text-lg"></i>
+                <p class="spacing">Balance: ₱@debit.WalletBalance</p>
                 <h3 class="font-bold text-lg">@debit.WalletName</h3>
-                <p>₱@debit.WalletBalance</p>
+                <i class="@debit.WalletIcon text-lg absolute bottom-2 right-2"></i>
             </div>
         }
     </div>

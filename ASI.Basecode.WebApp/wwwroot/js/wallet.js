@@ -6,34 +6,64 @@ const modalContent = document.getElementById('modalContent');
 // Form field elements
 const addFormFields = document.getElementById('addFormFields');
 
-// Sections Titles
-const debitSectionTitle = document.getElementById('debitSectionTitle');
+// Close buttons for the modals
+const closeAddModal = document.getElementById('closeAddModal');
+const closeEditModal = document.getElementById('closeEditModal');
 
 // Arrays to store accounts (can be removed if stored in the DB)
 let debitAccounts = [];
 
-// Function to render debit accounts
-function renderAccounts() {
-    // Clear existing accounts
-    document.getElementById('debitAccounts').innerHTML = '';
+function updateNetWorth() {
+    // Calculate the total debit and total liabilities
+    let totalDebit = debitAccounts.reduce((acc, account) => acc + account.WalletBalance, 0);
 
-    // Render debit accounts
-    debitAccounts.forEach(account => {
-        document.getElementById('debitAccounts').innerHTML += `
-            <div class="accountCard" style="background-color: ${account.DeLiColor}">
-                <i class="${account.DeLiIcon} text-lg"></i>
-                <h3 class="font-bold text-lg">${account.DeLiName}</h3>
-                <p>₱${account.DeLiBalance.toFixed(2)}</p>
-                <button class="editButton" onclick="openEditModal(${JSON.stringify(account)})">Edit</button>
-            </div>
-        `;
+    // Update the net worth section in the HTML
+    document.getElementById('balanceSection').innerHTML = `
+        <h2 class="text-2xl font-bold">Net Worth: ₱${totalDebit.toFixed(2)}</h2>
+    `;
+}
+
+// Function to reset the Add Account form fields
+function resetAddFormFields() {
+    document.getElementById('accountName').value = '';
+    document.getElementById('accountBalance').value = '';
+    document.getElementById('createIcon').value = '';
+    document.getElementById('accountColor').value = '#000000'; // Default color
+}
+
+// Function to show confirmation dialog
+async function showConfirmationDialog(modal, resetFunction) {
+    const { isConfirmed } = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you want to discard them?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#a6a6a6',
+        confirmButtonText: 'Yes, discard it!',
+        cancelButtonText: 'No, cancel!'
+    });
+
+    if (isConfirmed) {
+        closeModal(modal);
+        if (resetFunction) {
+            resetFunction(); 
+        }
+    }
+}
+
+// Close button for Add Account Modal
+if (closeAddModal) {
+    closeAddModal.addEventListener('click', () => {
+        showConfirmationDialog(addAccountModal, resetAddFormFields); // Show confirmation and reset form
     });
 }
 
-// Function to toggle visibility of the Debit header
-function toggleSectionTitles() {
-    // Show or hide the "Debit" header
-    debitSectionTitle.classList.toggle('hidden', debitAccounts.length === 0);
+// Close button for Edit Account Modal
+if (closeEditModal) {
+    closeEditModal.addEventListener('click', () => {
+        showConfirmationDialog(editAccountModal, null); // Show confirmation, no reset needed
+    });
 }
 
 // Function to open modal
@@ -41,7 +71,12 @@ function openModal(modal) {
     if (modal) {
         modal.classList.remove('hidden');
     } else {
-        console.error('Modal element not found.');
+        Swal.fire({
+            title: 'Error',
+            text: result.message || 'An error occurred.',
+            icon: 'error',
+            customClass: { popup: 'swal2-front' }
+        });
     }
 }
 
@@ -50,7 +85,12 @@ function closeModal(modal) {
     if (modal) {
         modal.classList.add('hidden');
     } else {
-        console.error('Modal element not found.');
+        Swal.fire({
+            title: 'Error',
+            text: result.message || 'An error occurred.',
+            icon: 'error',
+            customClass: { popup: 'swal2-front' }
+        });
     }
 }
 
@@ -60,18 +100,43 @@ if (addAccountButton) {
         openModal(addAccountModal);
     });
 } else {
-    console.error('Add Account Button not found.');
+    Swal.fire({
+        title: 'Error',
+        text: result.message || 'An error occurred.',
+        icon: 'error',
+        customClass: { popup: 'swal2-front' }
+    });
 }
 
 // Close the modal if the background (not the modal content) is clicked
 if (addAccountModal) {
     addAccountModal.addEventListener('click', (e) => {
         if (e.target === addAccountModal) { // Only close if clicked outside modal content
-            closeModal(addAccountModal);
+            Swal.fire({
+                title: 'You have unsaved changes.',
+                text: "Do you want to discard them?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#a6a6a6',
+                confirmButtonText: 'Discard',
+                cancelButtonText: 'Cancel',
+                customClass: { popup: 'swal2-front' }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    closeModal(addAccountModal);
+                    resetAddFormFields();
+                }
+            });
         }
     });
 } else {
-    console.error('Add Account Modal not found.');
+    Swal.fire({
+        title: 'Error',
+        text: result.message || 'An error occurred.',
+        icon: 'error',
+        customClass: { popup: 'swal2-front' }
+    });
 }
 
 // Function to load Debit form fields
@@ -143,14 +208,31 @@ document.getElementById('addAccountForm').addEventListener('submit', async (e) =
         const result = await response.json();
         if (result.success) {
             closeModal(addAccountModal);
-            await loadAccounts(); // Fetch updated accounts from the server and render them
-            // Automatically refresh the page
-            location.reload();
+            Swal.fire({
+                title: 'Success',
+                text: 'Wallet Created successfully!',
+                icon: 'success',
+                confirmButtonColor: '#3B82F6',
+                customClass: { popup: 'swal2-front' }
+            }).then(() => {
+                loadAccounts();
+                window.location.reload();
+            });
         } else {
-            console.error(result.errors);
+            Swal.fire({
+                title: 'Error',
+                text: result.message || 'An error occurred.',
+                icon: 'error',
+                customClass: { popup: 'swal2-front' }
+            });
         }
     } catch (error) {
-        console.error('Error saving account:', error);
+        Swal.fire({
+            title: 'Error',
+            text: result.message || 'An error occurred.',
+            icon: 'error',
+            customClass: { popup: 'swal2-front' }
+        });
     }
 });
 
@@ -165,7 +247,18 @@ async function loadAccounts() {
         // Render the updated accounts
         renderAccounts();
     } catch (error) {
-        console.error('Error fetching accounts:', error);
+        Swal.fire({
+            title: 'Error',
+            text: result.message || 'An error occurred.',
+            icon: 'error',
+            customClass: { popup: 'swal2-front' }
+        });
+        Swal.fire({
+            title: 'Error',
+            text: result.message || 'An error occurred.',
+            icon: 'error',
+            customClass: { popup: 'swal2-front' }
+        });
     }
 }
 
@@ -190,11 +283,36 @@ function openEditModal(account) {
 if (editAccountModal) {
     editAccountModal.addEventListener('click', (e) => {
         if (e.target === editAccountModal) { // Only close if clicked outside modal content
-            closeModal(editAccountModal);
+            Swal.fire({
+                title: 'You have unsaved changes.',
+                text: "Do you want to discard them?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#a6a6a6',
+                confirmButtonText: 'Discard',
+                cancelButtonText: 'Cancel',
+                customClass: { popup: 'swal2-front' }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    closeModal(editAccountModal)
+                };
+            });
         }
     });
 } else {
-    console.error('Edit Account Modal not found.');
+    Swal.fire({
+        title: 'Error',
+        text: result.message || 'An error occurred.',
+        icon: 'error',
+        customClass: { popup: 'swal2-front' }
+    });
+    Swal.fire({
+    title: 'Error',
+    text: result.message || 'An error occurred.',
+    icon: 'error',
+    customClass: { popup: 'swal2-front' }
+});
 }
 
 // Handle form submission for editing an account
@@ -222,27 +340,56 @@ document.getElementById('editAccountForm').addEventListener('submit', async (e) 
 
     console.log('Sending data:', JSON.stringify(data));
 
-    try {
-        const response = await fetch(`/Wallet/Edit/${id}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'RequestVerificationToken': token
-            },
-            body: JSON.stringify(data)
-        });
+    const { isConfirmed } = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you really want to edit this walet?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#a6a6a6',
+        confirmButtonText: 'Yes, edit it!',
+        cancelButtonText: 'No, cancel!'
+    });
+    if (isConfirmed) {
+        try {
+            const response = await fetch(`/Wallet/Edit/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                },
+                body: JSON.stringify(data)
+            });
 
-        const result = await response.json();
-        if (result.success) {
-            closeModal(editAccountModal);
-            await loadAccounts(); // Fetch updated accounts from the server and render them
-            // Automatically refresh the page
-            location.reload();
-        } else {
-            console.error(result.errors);
+            const result = await response.json();
+            if (result.success) {
+                closeModal(editAccountModal);
+                Swal.fire({
+                    title: 'Success',
+                    text: 'Wallet Edited successfully!',
+                    icon: 'success',
+                    confirmButtonColor: '#3B82F6',
+                    customClass: { popup: 'swal2-front' }
+                }).then(() => {
+                    loadAccounts();
+                    window.location.reload();
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error',
+                    text: result.message || 'An error occurred.',
+                    icon: 'error',
+                    customClass: { popup: 'swal2-front' }
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                title: 'Error',
+                text: result.message || 'An error occurred.',
+                icon: 'error',
+                customClass: { popup: 'swal2-front' }
+            });
         }
-    } catch (error) {
-        console.error('Error updating account:', error);
     }
 });
 
@@ -255,30 +402,61 @@ document.getElementById('deleteAccountButton').addEventListener('click', async (
         return;
     }
 
-    const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
-    const token = tokenElement ? tokenElement.value : null;
+    const { isConfirmed } = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you really want to delete this Wallet?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#a6a6a6',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, cancel!'
+    });
 
-    try {
-        const response = await fetch(`/Wallet/Delete/${id}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'RequestVerificationToken': token
+    if (isConfirmed) {
+        const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
+        const token = tokenElement ? tokenElement.value : null;
+
+        try {
+            const response = await fetch(`/Wallet/Delete/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                }
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                closeModal(editAccountModal);
+                Swal.fire({
+                    title: 'Success',
+                    text: 'Wallet Deleted successfully!',
+                    icon: 'success',
+                    confirmButtonColor: '#3B82F6',
+                    customClass: { popup: 'swal2-front' }
+                }).then(() => {
+                    loadAccounts();
+                    window.location.reload();
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error',
+                    text: result.message || 'An error occurred.',
+                    icon: 'error',
+                    customClass: { popup: 'swal2-front' }
+                });
             }
-        });
-
-        const result = await response.json();
-        if (result.success) {
-            closeModal(editAccountModal);
-            await loadAccounts(); // Fetch updated accounts from the server and render them
-            // Automatically refresh the page
-            location.reload();
-        } else {
-            console.error(result.errors);
+        } catch (error) {
+            Swal.fire({
+                title: 'Error',
+                text: result.message || 'An error occurred.',
+                icon: 'error',
+                customClass: { popup: 'swal2-front' }
+            });
         }
-    } catch (error) {
-        console.error('Error deleting account:', error);
     }
+    
 });
 
 // Load accounts on page load

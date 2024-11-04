@@ -133,7 +133,7 @@
         modal.classList.add('hidden');
         modal.classList.remove('flex');
         editModal.classList.add('hidden');
-        editModal.classList.remove('flex'); // Ensure edit modal is also hidden
+        editModal.classList.remove('flex'); 
         resetTransactionForm();
     }
 
@@ -191,7 +191,7 @@
 
     // Update the type button selection
     function updateTypeSelection(type) {
-        // Ensure transactionType element is found
+       
         if (transactionType) {
             transactionType.value = type;
         } else {
@@ -350,7 +350,7 @@
         data.walletId = parseInt(data.walletId, 10); 
         data.TransactionId = currentTransactionId;
         data.TransactionType = transactionType.value;
-        data.TransactionDate = new Date(data.TransactionDate).toISOString(); // Ensure date format
+        data.TransactionDate = new Date(data.TransactionDate).toISOString();
 
         console.log("Data to be sent:", JSON.stringify(data)); // Debugging line
 

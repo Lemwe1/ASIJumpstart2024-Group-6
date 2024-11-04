@@ -24,6 +24,7 @@ namespace ASI.Basecode.Services.ServiceModels
         public string WalletIcon { get; set; }
         public string WalletColor { get; set; }
 
+        public decimal WalletBalance { get; set; }
 
         public int UserId { get; set; }
 
