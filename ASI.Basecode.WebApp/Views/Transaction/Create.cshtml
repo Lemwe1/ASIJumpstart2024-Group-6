@@ -1,0 +1,108 @@
+﻿@{
+    ViewData["Title"] = "Create";
+}
+
+@using ASI.Basecode.Data.Models
+@using ASI.Basecode.Services.ServiceModels
+
+<!-- Modal Structure -->
+<div id="addTransactionModal" class="modal fixed inset-0 bg-gray-800 bg-opacity-50 items-center justify-center hidden">
+    <div id="addModalContent" class="modal-content bg-white p-6 rounded-lg shadow-lg w-full max-w-lg mx-auto">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-bold">Add Transaction</h2>
+            <button id="closeTransactionModal" class="absolute top-2 right-2 text-gray-400 hover:bg-gray-200 p-2 w-10 rounded-full">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <p class="text-gray-600 mb-4">Fill out all the fields below to add a transaction</p>
+
+        <form id="transactionForm" method="post" action="/Transaction/Create">
+            @Html.AntiForgeryToken()
+
+            <!-- Amount Field -->
+            <div class="mb-6">
+                <label for="transactionAmount" class="block text-sm font-medium text-gray-700">Amount</label>
+                <input type="number" step="0.01" id="transactionAmount" name="Amount" placeholder="0.00" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900" />
+            </div>
+            <!-- Type Field -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 inline">Type</label>
+                <span class="text-gray-500 text-xs inline-block mb-2">(Select A type)</span>
+                <div class="flex space-x-4">
+                    <button type="button" id="createExpenseButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800">Expense</button>
+                    <button type="button" id="createIncomeButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800">Income</button>
+                </div>
+                <input type="hidden" name="TransactionType" id="transactionType" value="Expense" />
+            </div>
+
+
+            <!-- Category Field -->
+            <div class="mb-6">
+                <label for="transactionCategory" class="block text-sm font-medium text-gray-700">Category</label>
+                <select id="transactionCategory" name="CategoryId" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900">
+                    <option class="text-gray-500" value="" disabled>Select category</option>
+
+                    @if (ViewData["Categories"] is List<MCategory> categories && categories.Any())
+                    {
+                        foreach (var category in categories)
+                        {
+                            <option value="@category.CategoryId" data-type="@category.Type">@category.Name</option>
+                        }
+                    }
+                    else
+                    {
+                        <option value="" disabled>No Entries yet</option>
+                    }
+
+                </select>
+            </div>
+            <!-- Wallet Field -->
+            <div class="mb-6">
+                <label for="transactionWallet" class="block text-sm font-medium text-gray-700">Wallet</label>
+                <select id="transactionWallet" name="walletId" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900">
+                    <option class="text-gray-500" value="" disabled>Select Wallet</option>
+
+                    @if (ViewData["Wallets"] is List<WalletViewModel> wallets && wallets.Any())
+                    {
+                        foreach (var wallet in wallets)
+                        {
+                            <option value="@wallet.WalletId">@wallet.WalletName</option>
+                        }
+                    }
+                    else
+                    {
+                        <option value="" disabled>No entries yet</option>
+                    }
+
+                </select>
+            </div>
+            <!-- Date Field -->
+            <div class="mb-6">
+                <label for="transactionDate" class="block text-sm font-medium text-gray-700">Date</label>
+                <input type="date" id="transactionDate" name="TransactionDate" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900" />
+            </div>
+
+            <div class="mb-6">
+                <label for="transactionNote" class="block text-sm font-medium text-gray-700">
+                    Note
+                    <span class="text-gray-500 text-xs">(Optional)</span>
+                </label>
+                <textarea id="transactionNote" name="Note" placeholder="Enter note" rows="4" class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900"></textarea>
+            </div>
+            <!-- Submit and Reset Buttons -->
+            <div class="flex mt-6">
+                <button type="button" id="resetTransactionFormButton" class="w-1/2 mr-3 bg-gray-200 text-gray-800 hover:bg-gray-300  py-3 rounded-md">
+                    Reset
+                </button>
+
+                <button type="submit" class="w-1/2 ml-3 bg-blue-500 hover:bg-blue-700 text-white  py-3 rounded-md">
+                    Confirm
+                </button>
+                
+
+            </div>
+
+        </form>
+    </div>
+</div>

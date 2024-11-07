@@ -20,21 +20,19 @@
             <h2 class="text-2xl font-bold">Dashboard</h2>
         </div>
 
-      
-
         <!-- Dashboard Cards -->
         <div class="grid grid-cols-3 gap-6 mb-8">
             <div class="bg-green-500 shadow-md text-white p-6 rounded-lg">
-                <h3 class="text-xl font-bold">Current Balance</h3>
-                <p class="text-3xl">₱ 8,200</p>
+                <h3 class="text-s">Current Balance</h3>
+                <p class="mt-10 text-3xl font-bold">₱ 8,200</p>
             </div>
             <div class="bg-red-500 shadow-md text-white p-6 rounded-lg">
-                <h3 class="text-xl font-bold">Total Expenses</h3>
-                <p class="text-3xl">₱ 1,500</p>
+                <h3 class="text-s font-bold">Total Expenses</h3>
+                <p class="mt-10 text-3xl">₱ 1,500</p>
             </div>
             <div class="bg-blue-500 text-white p-6 rounded-lg">
-                <h3 class="text-xl font-bold">Total Income</h3>
-                <p class="text-3xl">₱ 5,210</p>
+                <h3 class="text-s font-bold">Total Income</h3>
+                <p class="mt-10 text-3xl">₱ 5,210</p>
             </div>
         </div>
 
@@ -54,117 +52,24 @@
             </div>
         </div>
 
-        <!-- Transactions Table -->
-        <div class="bg-white p-6 shadow-md rounded-lg">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold">Transactions</h2>
-
-                <div class="flex items-center space-x-4">
-                    <div>
-                        <label for="category-filter" class="text-gray-700 font-semibold mr-2">Filter by category:</label>
-                        <select id="category-filter" class="border border-gray-300 rounded-lg px-4 py-2">
-                            <option value="all">All</option>
-                            <option value="food">Food</option>
-                            <option value="transport">Transport</option>
-                            <option value="entertainment">Entertainment</option>
-                            <!-- Add more categories as needed -->
-                        </select>
-                    </div>
-
-                    <button id="openAddTransactionModal" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none">
-                        + Add
-                    </button>
-                </div>
-            </div>
-
-            <table class="min-w-full table-auto">
-                <thead class="bg-gray-200">
-                    <tr>
-                        <th class="px-4 py-2">Category</th>
-                        <th class="px-4 py-2">Description</th>
-                        <th class="px-4 py-2">Amount</th>
-                        <th class="px-4 py-2">Account</th>
-                        <th class="px-4 py-2">Date</th>
-                        <th class="px-4 py-2">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="border px-4 py-2">Food</td>
-                        <td class="border px-4 py-2">Dinner</td>
-                        <td class="border px-4 py-2">₱ 100.00</td>
-                        <td class="border px-4 py-2">Cash</td>
-                        <td class="border px-4 py-2">10-22-25</td>
-                        <td class="border px-4 py-2">
-                            <button class="bg-blue-500 text-white px-3 py-1 rounded-lg">Edit</button>
-                        </td>
-                    </tr>
-                    <!-- More rows as needed -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Structure -->
-<div id="addTransactionModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 items-center justify-center hidden z-50">
-    <div id="addModalContent" class="modal-content bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-auto p-6">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-2xl font-bold">Add Transaction</h2>
-            <button id="closeTransactionModal" class="text-gray-400 hover:text-gray-600">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-
-        <p class="text-gray-600 mb-4">Fill out all the fields below to add a transaction</p>
-
-        <form id="transactionForm">
-            <!-- Amount Field -->
-            <div class="mb-6">
-                <label for="transactionAmount" class="block text-sm font-medium text-gray-700">Amount</label>
-                <input type="number" id="transactionAmount" name="Amount" placeholder="Enter amount" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900" />
-            </div>
-
-            <!-- Type Field -->
-            <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700">Type</label>
-                <div class="flex space-x-4 mt-2">
-                    <button type="button" id="createExpenseButton" class="type-button px-4 py-2 border rounded-md bg-blue-500 text-white">Expense</button>
-                    <button type="button" id="createIncomeButton" class="type-button px-4 py-2 border rounded-md bg-white text-gray-700">Income</button>
-                </div>
-            </div>
-
-            <!-- Category Field -->
-            <div class="mb-6">
-                <label for="transactionCategory" class="block text-sm font-medium text-gray-700">Category</label>
-                <select id="transactionCategory" name="Category" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900">
-                    <option value="" disabled selected>Select category</option>
-                    <option value="food">Food</option>
-                    <option value="transport">Transport</option>
-                    <option value="entertainment">Entertainment</option>
-                    <!-- Add more categories as needed -->
-                </select>
-            </div>
-
-            <!-- Date Field -->
-            <div class="mb-6">
-                <label for="transactionDate" class="block text-sm font-medium text-gray-700">Date</label>
-                <input type="date" id="transactionDate" name="Date" required class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900" />
-            </div>
-
-            <!-- Note Field -->
-            <div class="mb-6">
-                <label for="transactionNote" class="block text-sm font-medium text-gray-700">Note</label>
-                <textarea id="transactionNote" name="Note" placeholder="Enter note" rows="4" class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900"></textarea>
-            </div>
-
-            <!-- Submit Button -->
-            <div class="mt-6">
-                <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 rounded-md">
-                    Confirm
+        <div class="relative">
+            <!-- Button -->
+            <a asp-controller="Transaction" asp-action="Index">
+                <button class="fixed bottom-8 right-8 bg-blue-500 text-white w-16 h-16 flex items-center justify-center rounded-full shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                    <i class="fas fa-plus text-2xl"></i>
                 </button>
-            </div>
-        </form>
+            </a>
+
+            <a asp-controller="Transaction" asp-action="Index">
+                <div id="dialog-message" class="fixed bottom-8 right-24 bg-white border-2 border-blue-200 text-gray-700 text-sm rounded-lg p-3 shadow-l transition-opacity duration-300 opacity-0 mr-2">
+                    Click to add transaction!
+                </div>
+            </a>
+
+        </div>
+
+
+
     </div>
 </div>
 

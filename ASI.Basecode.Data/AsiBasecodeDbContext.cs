@@ -18,17 +18,16 @@ namespace ASI.Basecode.Data
         }
 
         public virtual DbSet<MCategory> MCategories { get; set; }
-        public virtual DbSet<MDebitLiab> MDebitLiabs { get; set; }
-        public virtual DbSet<MRole> MRoles { get; set; }
         public virtual DbSet<MTransaction> MTransactions { get; set; }
         public virtual DbSet<MUser> MUsers { get; set; }
+        public virtual DbSet<MWallet> MWallets { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=localhost;Database=AsiBasecodeDb;Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer("Server=NI¥O\\SQLEXPRESS;Database=AsiBasecodeDb;Trusted_Connection=True;");
             }
         }
 
@@ -37,7 +36,7 @@ namespace ASI.Basecode.Data
             modelBuilder.Entity<MCategory>(entity =>
             {
                 entity.HasKey(e => e.CategoryId)
-                    .HasName("PK__M_Catego__19093A0B4546A1B0");
+                    .HasName("PK__M_Catego__19093A0B120367F6");
 
                 entity.ToTable("M_Category");
 
@@ -58,82 +57,40 @@ namespace ASI.Basecode.Data
                     .HasConstraintName("FK_MCategory_MUser_UserId");
             });
 
-            modelBuilder.Entity<MDebitLiab>(entity =>
-            {
-                entity.HasKey(e => e.DeLiId)
-                    .HasName("PK__M_DebitL__B2BE78F2AA1F2BD2");
-
-                entity.ToTable("M_DebitLiab");
-
-                entity.Property(e => e.DeLiBalance).HasColumnType("decimal(10, 2)");
-
-                entity.Property(e => e.DeLiColor)
-                    .IsRequired()
-                    .HasMaxLength(20);
-
-                entity.Property(e => e.DeLiDue).HasColumnType("datetime");
-
-                entity.Property(e => e.DeLiHapp).HasColumnType("datetime");
-
-                entity.Property(e => e.DeLiIcon)
-                    .IsRequired()
-                    .HasMaxLength(255);
-
-                entity.Property(e => e.DeLiName)
-                    .IsRequired()
-                    .HasMaxLength(50);
-
-                entity.Property(e => e.DeLiType)
-                    .IsRequired()
-                    .HasMaxLength(50);
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.MDebitLiabs)
-                    .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_M_DebitLiab_UserId");
-            });
-
-            modelBuilder.Entity<MRole>(entity =>
-            {
-                entity.HasKey(e => e.RoleId);
-
-                entity.ToTable("M_ROLE");
-
-                entity.Property(e => e.RoleId).ValueGeneratedNever();
-
-                entity.Property(e => e.RoleName)
-                    .IsRequired()
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
-            });
-
             modelBuilder.Entity<MTransaction>(entity =>
             {
                 entity.HasKey(e => e.TransactionId)
-                    .HasName("PK__M_Transa__55433A6B99DD4BCE");
+                    .HasName("PK__M_Transa__55433A6B72A3A6D8");
 
                 entity.ToTable("M_Transaction");
 
                 entity.Property(e => e.Amount).HasColumnType("decimal(10, 2)");
 
-                entity.Property(e => e.Description).HasMaxLength(100);
-
                 entity.Property(e => e.Note).HasMaxLength(255);
 
                 entity.Property(e => e.TransactionDate).HasColumnType("date");
+
+                entity.Property(e => e.TransactionType)
+                    .IsRequired()
+                    .HasMaxLength(50);
 
                 entity.HasOne(d => d.Category)
                     .WithMany(p => p.MTransactions)
                     .HasForeignKey(d => d.CategoryId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__M_Transac__Categ__07C12930");
+                    .HasConstraintName("fk_category_id");
 
-                entity.HasOne(d => d.DeLi)
+                entity.HasOne(d => d.User)
                     .WithMany(p => p.MTransactions)
-                    .HasForeignKey(d => d.DeLiId)
+                    .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__M_Transac__DeLiI__08B54D69");
+                    .HasConstraintName("fk_user_id");
+
+                entity.HasOne(d => d.Wallet)
+                    .WithMany(p => p.MTransactions)
+                    .HasForeignKey(d => d.WalletId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("fk_deli_id");
             });
 
             modelBuilder.Entity<MUser>(entity =>
@@ -155,6 +112,8 @@ namespace ASI.Basecode.Data
                 entity.Property(e => e.InsDt)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.isVerified).HasColumnName("isVerified");
 
                 entity.Property(e => e.LastName).HasMaxLength(50);
 
@@ -191,6 +150,38 @@ namespace ASI.Basecode.Data
                     .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.VerificationToken).HasMaxLength(255);
+
+                entity.Property(e => e.VerificationTokenExpiration).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<MWallet>(entity =>
+            {
+                entity.HasKey(e => e.WalletId)
+                    .HasName("PK__M_Wallet__84D4F90EF1DA7894");
+
+                entity.ToTable("M_Wallet");
+
+                entity.Property(e => e.WalletBalance).HasColumnType("decimal(10, 2)");
+
+                entity.Property(e => e.WalletColor)
+                    .IsRequired()
+                    .HasMaxLength(20);
+
+                entity.Property(e => e.WalletIcon)
+                    .IsRequired()
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.WalletName)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.MWallets)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_M_Wallet_UserId");
             });
 
             OnModelCreatingPartial(modelBuilder);

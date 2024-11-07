@@ -30,13 +30,9 @@
                     </svg>
                 </div>
             </div>
-
-            <div class="flex justify-between items-center mb-4">
-                <img src="~/img/logo.svg" class="w-48 mx-auto" alt="logo">
-            </div>
-
             <!-- Heading -->
-            <h2 class="text-center text-2xl font-bold text-gray-900 dark:text-white mb-4">Register</h2>
+            <h2 class=" text-2xl font-semibold text-gray-900 dark:text-white ">Register an Account</h2>
+            <h2 class=" text-l text-gray-800 dark:text-white mb-4">Please register to log in</h2>
 
             <!-- Error message container -->
             <div id="error-message" class="hidden text-center text-red-500 dark:text-red-400 text-sm font-semibold"></div>
@@ -46,15 +42,15 @@
             <form id="registerForm" class="space-y-4">
                 <!-- User Code -->
                 <div>
-                    <label asp-for="UserCode" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
-                    <input type="text" asp-for="UserCode" placeholder="Enter User Code"
+                    <label asp-for="UserCode" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
+                    <input type="text" asp-for="UserCode" placeholder="Enter Username"
                            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
                     <span asp-validation-for="UserCode" class="text-danger"></span>
                 </div>
 
                 <!-- First Name -->
                 <div>
-                    <label asp-for="FirstName" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+                    <label asp-for="FirstName" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">First Name</label>
                     <input type="text" asp-for="FirstName" placeholder="Enter First Name"
                            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
                     <span asp-validation-for="FirstName" class="text-danger"></span>
@@ -62,7 +58,7 @@
 
                 <!-- Last Name -->
                 <div>
-                    <label asp-for="LastName" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+                    <label asp-for="LastName" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Last Name</label>
                     <input type="text" asp-for="LastName" placeholder="Enter Last Name"
                            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
                     <span asp-validation-for="LastName" class="text-danger"></span>
@@ -70,7 +66,7 @@
 
                 <!-- Email -->
                 <div>
-                    <label asp-for="Email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+                    <label asp-for="Email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
                     <input type="email" asp-for="Email" placeholder="Enter Email"
                            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
                     <span asp-validation-for="Email" class="text-danger"></span>
@@ -78,7 +74,7 @@
 
                 <!-- Password -->
                 <div>
-                    <label asp-for="Password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+                    <label asp-for="Password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
                     <input type="password" asp-for="Password" placeholder="Enter Password"
                            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
                     <span asp-validation-for="Password" class="text-danger"></span>
@@ -86,7 +82,7 @@
 
                 <!-- Confirm Password -->
                 <div>
-                    <label asp-for="ConfirmPassword" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+                    <label asp-for="ConfirmPassword" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Confirm Password</label>
                     <input type="password" asp-for="ConfirmPassword" placeholder="Confirm Password"
                            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
                     <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
@@ -96,8 +92,9 @@
                     Register
                 </button>
 
-                <div class="text-center">
-                    <a asp-controller="Account" asp-action="Login" class="btn btn-outline-danger">@BackToLogin</a>
+                <div class="text-center mt-4">
+                    <p class="mb-0 dark:text-white inline">Already have an account?</p>
+                    <a asp-controller="Account" asp-action="Login" class="btn inline text-blue-500 hover:text-blue-800">Login</a>
                 </div>
             </form>
 

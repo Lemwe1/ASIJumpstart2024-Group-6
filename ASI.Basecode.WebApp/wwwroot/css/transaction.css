@@ -1,0 +1,44 @@
+﻿#transaction-content {
+    background: #f8f8f8;
+}
+
+.modal {
+    z-index: 1050;
+    display: none; 
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+   
+    .modal.flex {
+        display: flex; 
+    }
+
+.modal-content {
+    max-width: 700px;
+    width: 100%;
+    height: 90%;
+    overflow-y: scroll;
+    padding: 20px 40px;
+    background-color: white;
+    border-radius: 8px;
+}
+@media (max-width: 768px) {
+    .modal-content {
+        max-width: 90%;
+        padding: 20px;
+    }
+}
+
+
+.empty-row {
+    width: 100%;
+}
+
+select option:disabled {
+    color: #9ca3af;
+}
+
+
+

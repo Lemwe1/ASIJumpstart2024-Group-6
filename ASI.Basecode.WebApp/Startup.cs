@@ -1,4 +1,6 @@
 ﻿using ASI.Basecode.Data;
+using ASI.Basecode.Data.Interfaces;
+using ASI.Basecode.Data.Repositories;
 using ASI.Basecode.Resources.Constants;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.Manager;
@@ -7,6 +9,7 @@ using ASI.Basecode.WebApp.Authentication;
 using ASI.Basecode.WebApp.Extensions.Configuration;
 using ASI.Basecode.WebApp.Models;
 using ASI.Basecode.WebApp.Services;
+using ASI.Basecode.WebApp.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Features;
@@ -105,7 +108,15 @@ namespace ASI.Basecode.WebApp
             // Registering the CategoryService
             services.AddScoped<CategoryService>();
 
-            services.AddScoped<DebitLiabilitiesService>();
+            services.AddScoped<IWalletRepository, WalletRepository>();
+            services.AddScoped<WalletService>();
+            services.AddScoped<IWalletService, WalletService>();
+
+            services.AddScoped<ITransactionRepository, TransactionRepository>();
+            services.AddScoped<TransactionService>();
+            services.AddScoped<ITransactionService, TransactionService>();
+
+            services.AddScoped<ICategoryService, CategoryService>();
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IEmailService, EmailService>();

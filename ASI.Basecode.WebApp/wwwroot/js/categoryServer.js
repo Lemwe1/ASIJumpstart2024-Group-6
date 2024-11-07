@@ -191,7 +191,6 @@ document.getElementById('deleteButton').addEventListener('click', async function
         }
     });
 });
-
 // Function to handle type selection and highlight the selected button
 function setTypeSelection(modalType, selectedType) {
     console.log('Setting type selection for:', modalType, 'Type:', selectedType);
@@ -211,24 +210,22 @@ function setTypeSelection(modalType, selectedType) {
     typeInput.value = selectedType;
     console.log(`Type input set to: ${selectedType}`);
 
+    // Reset both buttons to gray first
+    expenseButton.classList.remove('bg-red-400', 'text-white');
+    expenseButton.classList.add('bg-gray-200', 'text-gray-800');
+
+    incomeButton.classList.remove('bg-green-500', 'text-white');
+    incomeButton.classList.add('bg-gray-200', 'text-gray-800');
+
+    // Then apply selected styles
     if (selectedType === 'Expense') {
-        expenseButton.classList.add('bg-blue-500', 'text-white');
-        expenseButton.classList.remove('bg-gray-200', 'text-gray-800');
-        incomeButton.classList.remove('bg-blue-500', 'text-white');
-        incomeButton.classList.add('bg-gray-200', 'text-gray-800');
+        expenseButton.classList.add('bg-red-400', 'text-white');
     } else if (selectedType === 'Income') {
-        incomeButton.classList.add('bg-blue-500', 'text-white');
-        incomeButton.classList.remove('bg-gray-200', 'text-gray-800');
-        expenseButton.classList.remove('bg-blue-500', 'text-white');
-        expenseButton.classList.add('bg-gray-200', 'text-gray-800');
-    } else {
-        // Handle unexpected type values
-        expenseButton.classList.remove('bg-blue-500', 'text-white');
-        expenseButton.classList.add('bg-gray-200', 'text-gray-800');
-        incomeButton.classList.remove('bg-blue-500', 'text-white');
-        incomeButton.classList.add('bg-gray-200', 'text-gray-800');
+        incomeButton.classList.add('bg-green-500', 'text-white');
     }
 }
+
+
 
 // Event listeners for type buttons in the edit modal
 document.getElementById('editExpenseButton').addEventListener('click', function () {

@@ -1,0 +1,55 @@
+.accountCard {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    color: #fff;
+}
+
+/* Button styles */
+#addAccountButton {
+    padding: 0.5rem 1rem;
+    background-color: transparent; /* or none */
+    color: #fff;
+    border-radius: 0.5rem;
+}
+
+/* Style for modal body */
+#modalContent .modal-body {
+    max-height: 400px; 
+    overflow-y: auto; 
+}
+
+
+/* Balance Section */
+#balanceSection {
+    margin-top: 50px;
+    background-color: #3b82f6;
+    color: #fff;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+}
+
+.spacing {
+    margin-bottom: 4rem; 
+}
+
+.balanceSpacing {
+    margin-right: 10px; /* Adjust this value for more or less space */
+}
+
+.balance-icon {
+    margin-left: 5px; /* Adjust space between the balance value and the icon */
+}
+
+.balance-value {
+    margin-right: 5px; /* Space between the balance label and value */
+}
+
+.toggle-balance {
+    margin-left: 5px; /* Space between the balance value and eye icon */
+    cursor: pointer; /* Ensures the cursor indicates clickable item */
+}
+
+

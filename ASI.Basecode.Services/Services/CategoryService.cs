@@ -1,5 +1,6 @@
 ﻿using ASI.Basecode.Data;
 using ASI.Basecode.Data.Models;
+using ASI.Basecode.WebApp.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ASI.Basecode.WebApp.Services
 {
-    public class CategoryService
+    public class CategoryService : ICategoryService
     {
         private readonly AsiBasecodeDbContext _context;
 
@@ -17,17 +18,17 @@ namespace ASI.Basecode.WebApp.Services
             _context = context;
         }
 
-        // Get categories by UserId
-        public async Task<List<MCategory>> GetCategoriesAsync(string userId)
+
+        public async Task<List<MCategory>> GetCategoriesAsync(int userId)
         {
-            if (!int.TryParse(userId, out int userIdInt))
+            if (userId <= 0)
             {
-                throw new ArgumentException("Invalid user ID");
+                throw new ArgumentException("Invalid userId");
             }
 
             return await _context.MCategories
-                                 .Where(c => c.UserId == userIdInt)
-                                 .ToListAsync();
+                .Where(c => c.UserId == userId)
+                .ToListAsync();
         }
 
         // Add a new category for a specific user
@@ -100,6 +101,14 @@ namespace ASI.Basecode.WebApp.Services
             {
                 throw new KeyNotFoundException($"Category with ID {id} not found for user {userId}.");
             }
+        }
+
+        // Get category name by ID
+        public async Task<string> GetCategoryNameByIdAsync(int categoryId, int userId)
+        {
+            var category = await _context.MCategories
+                                         .FirstOrDefaultAsync(c => c.CategoryId == categoryId && c.UserId == userId);
+            return category?.Name; // Return the category name or null if not found
         }
     }
 }
