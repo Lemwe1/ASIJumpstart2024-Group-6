@@ -334,6 +334,8 @@ async function loadAccounts() {
     }
 }
 
+let oldBalance = 0;
+
 function openEditModal(account) {
     // Ensure account is defined
     if (!account) {
@@ -347,6 +349,8 @@ function openEditModal(account) {
     document.getElementById('editAccountBalance').value = account.WalletBalance || ''; // Default to empty string if undefined
     document.getElementById('editAccountColor').value = account.WalletColor || '#000000'; // Default color if undefined
     document.getElementById('editCreateIcon').value = account.WalletIcon || ''; // Default to empty string if undefined
+
+    oldBalance = account.WalletBalance;
 
     // Make sure the balance input accepts decimals
     const balanceInput = document.getElementById('editAccountBalance');
@@ -413,7 +417,7 @@ document.getElementById('editAccountForm').addEventListener('submit', async (e) 
         WalletIcon: icon,
         WalletColor: color,
         WalletName: name,
-        WalletBalance: 0 
+        WalletBalance: 0 // Placeholder for balance, to be updated
     };
 
     const balance = parseFloat(document.getElementById('editAccountBalance').value);
@@ -423,7 +427,7 @@ document.getElementById('editAccountForm').addEventListener('submit', async (e) 
 
     const { isConfirmed } = await Swal.fire({
         title: 'Are you sure?',
-        text: 'Do you really want to edit this walet?',
+        text: 'Do you really want to edit this wallet?',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
@@ -431,34 +435,73 @@ document.getElementById('editAccountForm').addEventListener('submit', async (e) 
         confirmButtonText: 'Yes, edit it!',
         cancelButtonText: 'No, cancel!'
     });
+
     if (isConfirmed) {
         try {
-            const response = await fetch(`/Wallet/Edit/${id}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'RequestVerificationToken': token
-                },
-                body: JSON.stringify(data)
-            });
 
-            const result = await response.json();
-            if (result.success) {
-                closeModal(editAccountModal);
-                Swal.fire({
-                    title: 'Success',
-                    text: 'Wallet Edited successfully!',
-                    icon: 'success',
-                    confirmButtonColor: '#3B82F6',
-                    customClass: { popup: 'swal2-front' }
-                }).then(() => {
-                    loadAccounts();
-                    window.location.reload();
+
+                // Logic for determining if the balance has changed
+                if (balance !== oldBalance) {
+                    const transactionData = {
+                        WalletId: id,
+                        Amount: Math.abs(balance - oldBalance),
+                        CategoryId: balance < oldBalance ? 1 : 2, // Category 1 for Expense, 2 for Income
+                        TransactionType: balance < oldBalance ? 'Expense' : 'Income',
+                        Note: balance < oldBalance ? 'Adjust Expense Wallet' : 'Adjust Income Wallet',
+                        TransactionDate: new Date().toISOString()
+                    };
+
+                    // Create the transaction if the balance has changed
+                    const transactionResponse = await fetch('/Transaction/Create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': token
+                        },
+                        body: JSON.stringify(transactionData)
+                    });
+
+                    const transactionResult = await transactionResponse.json();
+                    if (!transactionResult.success) {
+                        throw new Error(transactionResult.message || 'Transaction failed');
+                    }
+                
+
+                // Update wallet balance after the transaction is created
+                const updateResponse = await fetch(`/Wallet/Edit/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': token
+                    },
+                    body: JSON.stringify(data)
                 });
+
+                const updateResult = await updateResponse.json();
+                if (updateResult.success) {
+                    closeModal(editAccountModal);
+                    Swal.fire({
+                        title: 'Success',
+                        text: 'Wallet edited successfully!',
+                        icon: 'success',
+                        confirmButtonColor: '#3B82F6',
+                        customClass: { popup: 'swal2-front' }
+                    }).then(() => {
+                        loadAccounts();
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error',
+                        text: updateResult.message || 'An error occurred.',
+                        icon: 'error',
+                        customClass: { popup: 'swal2-front' }
+                    });
+                }
             } else {
                 Swal.fire({
                     title: 'Error',
-                    text: result.message || 'An error occurred.',
+                    text: 'Failed to retrieve wallet details.',
                     icon: 'error',
                     customClass: { popup: 'swal2-front' }
                 });
@@ -466,13 +509,14 @@ document.getElementById('editAccountForm').addEventListener('submit', async (e) 
         } catch (error) {
             Swal.fire({
                 title: 'Error',
-                text: result.message || 'An error occurred.',
+                text: error.message || 'An error occurred.',
                 icon: 'error',
                 customClass: { popup: 'swal2-front' }
             });
         }
     }
 });
+
 
 // Handle account deletion
 document.getElementById('deleteAccountButton').addEventListener('click', async () => {
