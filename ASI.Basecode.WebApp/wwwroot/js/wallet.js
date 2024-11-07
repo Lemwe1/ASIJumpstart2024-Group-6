@@ -13,15 +13,70 @@ const closeEditModal = document.getElementById('closeEditModal');
 // Arrays to store accounts (can be removed if stored in the DB)
 let debitAccounts = [];
 
+document.addEventListener('DOMContentLoaded', () => {
+    const totalBalanceElement = document.querySelector('#totalBalance .balance-value');
+    const toggleTotalBalanceButton = document.getElementById('toggleBalanceVisibility');
+
+    // Store the original total balance for toggling
+    const originalTotalBalance = totalBalanceElement.textContent.replace('₱', '');
+
+    // Toggle total balance visibility
+    toggleTotalBalanceButton.addEventListener('click', () => {
+        const isVisible = totalBalanceElement.dataset.visible === 'true';
+        if (isVisible) {
+            totalBalanceElement.textContent = '₱' + '*'.repeat(originalTotalBalance.length - 1); // Replace with asterisks
+            toggleTotalBalanceButton.classList.remove('fa-eye');
+            toggleTotalBalanceButton.classList.add('fa-eye-slash');
+            totalBalanceElement.dataset.visible = 'false'; // Update visibility state
+        } else {
+            totalBalanceElement.textContent = `₱${originalTotalBalance}`; // Show the original balance
+            toggleTotalBalanceButton.classList.remove('fa-eye-slash');
+            toggleTotalBalanceButton.classList.add('fa-eye');
+            totalBalanceElement.dataset.visible = 'true'; // Update visibility state
+        }
+    });
+
+    // Add event listeners to all eye icons for individual balances
+    const toggleButtons = document.querySelectorAll('.toggle-balance');
+
+    toggleButtons.forEach(button => {
+        const accountId = button.dataset.accountId;
+        const balanceElement = button.previousElementSibling; // The balance span
+
+        // Store the original balance for toggling
+        balanceElement.dataset.originalBalance = balanceElement.textContent.replace('₱', '');
+
+        button.addEventListener('click', () => {
+            const isVisible = balanceElement.dataset.visible === 'true';
+
+            if (isVisible) {
+                balanceElement.textContent = '₱' + '*'.repeat(balanceElement.dataset.originalBalance.length); // Replace balance with asterisks
+                button.classList.remove('fa-eye');
+                button.classList.add('fa-eye-slash');
+                balanceElement.dataset.visible = 'false'; // Update visibility state
+            } else {
+                balanceElement.textContent = `₱${balanceElement.dataset.originalBalance}`; // Show the original balance
+                button.classList.remove('fa-eye-slash');
+                button.classList.add('fa-eye');
+                balanceElement.dataset.visible = 'true'; // Update visibility state
+            }
+        });
+    });
+});
+
+
+
+// Function to update the total balance displayed
 function updateNetWorth() {
     // Calculate the total debit and total liabilities
     let totalDebit = debitAccounts.reduce((acc, account) => acc + account.WalletBalance, 0);
 
     // Update the net worth section in the HTML
     document.getElementById('balanceSection').innerHTML = `
-        <h2 class="text-2xl font-bold">Net Worth: ₱${totalDebit.toFixed(2)}</h2>
+        <h2 id="totalBalance" class="text-2xl font-bold" data-visible="true">Total Balance: ₱${totalDebit.toFixed(2)}</h2>
     `;
 }
+
 
 // Function to reset the Add Account form fields
 function resetAddFormFields() {
@@ -149,11 +204,11 @@ function loadDebitForm() {
             </div>
             <div class="mb-4">
                 <label class="block">Balance</label>
-                <input type="number" id="accountBalance" class="border p-2 w-full" required />
+                <input type="number" id="accountBalance" class="border p-2 w-full" required step="any" />
             </div>
             <div class="mb-6">
                 <label for="createIcon" class="block text-sm font-medium text-gray-700">Icon</label>
-                <select name="Icon" id="createIcon" class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500">
+                <select name="Icon" id="createIcon" class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500" required>
                     <option value="">Select Icon</option>
                     <option value="fas fa-apple-alt">Apple (Food)</option>
                     <option value="fas fa-shopping-bag">Shopping Bag</option>
@@ -172,6 +227,7 @@ function loadDebitForm() {
     }
 }
 
+
 // Handle form submission for adding an account
 document.getElementById('addAccountForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -183,19 +239,33 @@ document.getElementById('addAccountForm').addEventListener('submit', async (e) =
     const color = document.getElementById('accountColor').value;
     const icon = document.getElementById('createIcon').value;
 
-    let data = {
-        WalletIcon: icon,
-        WalletColor: color,
-        WalletBalance: 0,
-        WalletName: name
-    };
-
-    const balance = parseFloat(document.getElementById('accountBalance').value);
-    data.WalletBalance = balance;
-
-    console.log('Sending data:', JSON.stringify(data));
-
+    // Preliminary check for existing wallet
     try {
+        const existingWalletResponse = await fetch(`/Wallet/Exists?name=${encodeURIComponent(name)}`);
+        const existingWalletResult = await existingWalletResponse.json();
+
+        if (existingWalletResult.exists) {
+            Swal.fire({
+                title: 'Error',
+                text: 'A wallet with this name already exists. Please choose a different name.',
+                icon: 'error',
+                customClass: { popup: 'swal2-front' }
+            });
+            return; // Stop the process if wallet already exists
+        }
+
+        let data = {
+            WalletIcon: icon,
+            WalletColor: color,
+            WalletBalance: 0,
+            WalletName: name
+        };
+
+        const balance = parseFloat(document.getElementById('accountBalance').value);
+        data.WalletBalance = balance;
+
+        console.log('Sending data:', JSON.stringify(data));
+
         const response = await fetch('/Wallet/Create', {
             method: 'POST',
             headers: {
@@ -227,14 +297,16 @@ document.getElementById('addAccountForm').addEventListener('submit', async (e) =
             });
         }
     } catch (error) {
+        console.error('Error during wallet creation:', error);
         Swal.fire({
             title: 'Error',
-            text: result.message || 'An error occurred.',
+            text: 'An unexpected error occurred. Please try again later.',
             icon: 'error',
             customClass: { popup: 'swal2-front' }
         });
     }
 });
+
 
 // Function to load accounts from the server and render them
 async function loadAccounts() {
@@ -262,6 +334,8 @@ async function loadAccounts() {
     }
 }
 
+let oldBalance = 0;
+
 function openEditModal(account) {
     // Ensure account is defined
     if (!account) {
@@ -276,8 +350,19 @@ function openEditModal(account) {
     document.getElementById('editAccountColor').value = account.WalletColor || '#000000'; // Default color if undefined
     document.getElementById('editCreateIcon').value = account.WalletIcon || ''; // Default to empty string if undefined
 
+    oldBalance = account.WalletBalance;
+
+    // Make sure the balance input accepts decimals
+    const balanceInput = document.getElementById('editAccountBalance');
+    balanceInput.setAttribute('step', 'any'); // Allow decimal inputs
+
+    // Ensure the icon selection is required
+    const iconSelect = document.getElementById('editCreateIcon');
+    iconSelect.setAttribute('required', 'required'); // Make icon selection required
+
     openModal(editAccountModal);
 }
+
 
 // Close the edit modal if the background (not the modal content) is clicked
 if (editAccountModal) {
@@ -332,7 +417,7 @@ document.getElementById('editAccountForm').addEventListener('submit', async (e) 
         WalletIcon: icon,
         WalletColor: color,
         WalletName: name,
-        WalletBalance: 0 // Set this dynamically for debit or borrowed
+        WalletBalance: 0 // Placeholder for balance, to be updated
     };
 
     const balance = parseFloat(document.getElementById('editAccountBalance').value);
@@ -342,7 +427,7 @@ document.getElementById('editAccountForm').addEventListener('submit', async (e) 
 
     const { isConfirmed } = await Swal.fire({
         title: 'Are you sure?',
-        text: 'Do you really want to edit this walet?',
+        text: 'Do you really want to edit this wallet?',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
@@ -350,34 +435,73 @@ document.getElementById('editAccountForm').addEventListener('submit', async (e) 
         confirmButtonText: 'Yes, edit it!',
         cancelButtonText: 'No, cancel!'
     });
+
     if (isConfirmed) {
         try {
-            const response = await fetch(`/Wallet/Edit/${id}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'RequestVerificationToken': token
-                },
-                body: JSON.stringify(data)
-            });
 
-            const result = await response.json();
-            if (result.success) {
-                closeModal(editAccountModal);
-                Swal.fire({
-                    title: 'Success',
-                    text: 'Wallet Edited successfully!',
-                    icon: 'success',
-                    confirmButtonColor: '#3B82F6',
-                    customClass: { popup: 'swal2-front' }
-                }).then(() => {
-                    loadAccounts();
-                    window.location.reload();
+
+                // Logic for determining if the balance has changed
+                if (balance !== oldBalance) {
+                    const transactionData = {
+                        WalletId: id,
+                        Amount: Math.abs(balance - oldBalance),
+                        CategoryId: balance < oldBalance ? 5 : 6, // Category 1 for Expense, 2 for Income
+                        TransactionType: balance < oldBalance ? 'Expense' : 'Income',
+                        Note: balance < oldBalance ? 'Adjust Expense Wallet' : 'Adjust Income Wallet',
+                        TransactionDate: new Date().toISOString()
+                    };
+
+                    // Create the transaction if the balance has changed
+                    const transactionResponse = await fetch('/Transaction/Create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': token
+                        },
+                        body: JSON.stringify(transactionData)
+                    });
+
+                    const transactionResult = await transactionResponse.json();
+                    if (!transactionResult.success) {
+                        throw new Error(transactionResult.message || 'Transaction failed');
+                    }
+                
+
+                // Update wallet balance after the transaction is created
+                const updateResponse = await fetch(`/Wallet/Edit/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': token
+                    },
+                    body: JSON.stringify(data)
                 });
+
+                const updateResult = await updateResponse.json();
+                if (updateResult.success) {
+                    closeModal(editAccountModal);
+                    Swal.fire({
+                        title: 'Success',
+                        text: 'Wallet edited successfully!',
+                        icon: 'success',
+                        confirmButtonColor: '#3B82F6',
+                        customClass: { popup: 'swal2-front' }
+                    }).then(() => {
+                        loadAccounts();
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error',
+                        text: updateResult.message || 'An error occurred.',
+                        icon: 'error',
+                        customClass: { popup: 'swal2-front' }
+                    });
+                }
             } else {
                 Swal.fire({
                     title: 'Error',
-                    text: result.message || 'An error occurred.',
+                    text: 'Failed to retrieve wallet details.',
                     icon: 'error',
                     customClass: { popup: 'swal2-front' }
                 });
@@ -385,13 +509,14 @@ document.getElementById('editAccountForm').addEventListener('submit', async (e) 
         } catch (error) {
             Swal.fire({
                 title: 'Error',
-                text: result.message || 'An error occurred.',
+                text: error.message || 'An error occurred.',
                 icon: 'error',
                 customClass: { popup: 'swal2-front' }
             });
         }
     }
 });
+
 
 // Handle account deletion
 document.getElementById('deleteAccountButton').addEventListener('click', async () => {

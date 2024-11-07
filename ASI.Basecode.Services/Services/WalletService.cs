@@ -2,6 +2,7 @@
 using ASI.Basecode.Data.Models;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -81,6 +82,11 @@ namespace ASI.Basecode.Services.Services
         {
             var debitLiability = await _walletRepository.GetByIdAsync(walletId);
             return debitLiability?.WalletName; // Return the category name or null if not found
+        }
+        public async Task<bool> WalletExistsAsync(int userId, string walletName)
+        {
+            var debitLiability = await _walletRepository.RetrieveAllAsync();
+            return debitLiability.Any(x => x.UserId == userId && x.WalletName.Equals(walletName, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

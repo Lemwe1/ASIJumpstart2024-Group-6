@@ -127,6 +127,27 @@ namespace ASI.Basecode.WebApp.Controllers
             }
         }
 
+        // GET: /Wallet/Exists
+        [HttpGet]
+        [Route("Wallet/Exists")]
+        public async Task<IActionResult> Exists(string name)
+        {
+            // Get the currently logged-in user's ID
+            var userClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId");
+            if (userClaim == null)
+            {
+                return BadRequest(new { exists = false });
+            }
+
+            int userId = int.Parse(userClaim.Value);
+
+            // Check if the wallet exists for this user
+            var exists = await _walletService.WalletExistsAsync(userId, name);
+
+            return Json(new { exists });
+        }
+
+
         // POST: /Wallet/Delete/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
