@@ -39,13 +39,13 @@
             </div>
 
             <!-- Sidebar Navigation (Visible on larger screens) -->
-            <nav id="sidebar-nav" class="bg-white w-64 hidden lg:flex">
+            <nav id="sidebar-nav" class="bg-white w-72 hidden lg:flex">
                 @Html.Partial("_Navigation")
             </nav>
 
             <!-- Sidebar Menu (hidden on larger screens, shown on toggle for smaller screens) -->
             <div id="sidebar-menu" class="fixed inset-y-0 left-0 bg-gray-800 bg-opacity-75 z-50 hidden lg:hidden overflow-y-auto">
-                <div class="flex flex-col min-h-full bg-white w-80">
+                <div class="flex flex-col min-h-full bg-white w-72">
                     <!-- Adjusted width -->
                     <div class="flex justify-between items-center p-4">
                         <button id="close-menu" class="text-black">
@@ -73,6 +73,8 @@
     <script src="https://kit.fontawesome.com/832b27a645.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         // Configure Toastr options
         toastr.options = {
@@ -93,6 +95,23 @@
             const sidebarMenu = document.getElementById('sidebar-menu');
             sidebarMenu.classList.add('hidden'); // Hide sidebar when close button is clicked
         });
+        document.getElementById('logoutLink').addEventListener('click', function (event) {
+            event.preventDefault();
+
+            Swal.fire({
+                text: "Are you sure you want to log out?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Logout'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = this.getAttribute('href');
+                }
+            });
+        });
+
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

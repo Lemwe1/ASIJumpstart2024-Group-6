@@ -14,6 +14,8 @@
     const editIncomeButton = document.getElementById('editIncomeButton');
 
     const transactionCategorySelect = document.getElementById('transactionCategory');
+    const editTransactionCategorySelect = document.getElementById('editTransactionCategory');
+
     const transactionWalletSelect = document.getElementById('transactionWallet');
     const transactionType = document.getElementById('transactionType');
 
@@ -61,13 +63,11 @@
 
 
     // Reset form fields when the reset button is clicked
-    document.getElementById('resetTransactionForm').addEventListener('click', function () {
+    document.getElementById('resetTransactionFormButton').addEventListener('click', function () {
         // Reset the form fields
         document.getElementById('transactionForm').reset();
 
-        // Reset category and wallet selections
-        const transactionCategorySelect = document.getElementById('transactionCategory');
-        const transactionWalletSelect = document.getElementById('transactionWallet');
+
 
         // Resetting to default (assuming the first option is disabled)
         transactionCategorySelect.value = "";
@@ -114,7 +114,10 @@
             }
         });
     }
-
+    // Add event listener to the cancel button to close the edit modal
+    document.getElementById('cancelButton').addEventListener('click', function () {
+        closeEditTransactionModal();
+    });
 
     // Close the modal when clicking outside of it
     window.addEventListener('click', (event) => {
@@ -130,7 +133,7 @@
         modal.classList.add('hidden');
         modal.classList.remove('flex');
         editModal.classList.add('hidden');
-        editModal.classList.remove('flex'); // Ensure edit modal is also hidden
+        editModal.classList.remove('flex'); 
         resetTransactionForm();
     }
 
@@ -188,7 +191,7 @@
 
     // Update the type button selection
     function updateTypeSelection(type) {
-        // Ensure transactionType element is found
+       
         if (transactionType) {
             transactionType.value = type;
         } else {
@@ -223,13 +226,21 @@
 
 
 
-    // Filter categories based on transaction type
     function filterCategories(type) {
-        const options = transactionCategorySelect.querySelectorAll('option');
-        options.forEach(option => {
+        // Get all category options from both modals
+        const transactionCategoryOptions = transactionCategorySelect.querySelectorAll('option');
+        const editTransactionCategoryOptions = editTransactionCategorySelect.querySelectorAll('option');
+
+        // Filter options in the add modal
+        transactionCategoryOptions.forEach(option => {
             option.style.display = (option.dataset.type === type || option.value === "") ? 'block' : 'none';
         });
-        transactionCategorySelect.value = ""; // Reset selection
+        transactionCategorySelect.value = ""; // Reset selection in add modal
+
+        // Filter options in the edit modal
+        editTransactionCategoryOptions.forEach(option => {
+            option.style.display = (option.dataset.type === type || option.value === "") ? 'block' : 'none';
+        });
     }
 
 
@@ -266,8 +277,6 @@
             inputElement.value = currentValue; // Update input with cleaned value
         });
     };
-
-    // ... (rest of your code)
 
     const transactionAmountInput = document.getElementById('transactionAmount');
     const editTransactionAmountInput = document.getElementById('editTransactionAmount');
@@ -341,7 +350,7 @@
         data.walletId = parseInt(data.walletId, 10); 
         data.TransactionId = currentTransactionId;
         data.TransactionType = transactionType.value;
-        data.TransactionDate = new Date(data.TransactionDate).toISOString(); // Ensure date format
+        data.TransactionDate = new Date(data.TransactionDate).toISOString();
 
         console.log("Data to be sent:", JSON.stringify(data)); // Debugging line
 
@@ -483,7 +492,7 @@
             const id = button.getAttribute('data-id'); // Get the transaction ID from data-id attribute
 
             const { isConfirmed } = await Swal.fire({
-                title: 'Are you sure?',
+                title: 'Delete Transaction',
                 text: 'Do you really want to delete this transaction?',
                 icon: 'warning',
                 showCancelButton: true,

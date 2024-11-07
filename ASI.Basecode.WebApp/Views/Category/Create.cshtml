@@ -5,11 +5,13 @@
 }
 
 <!-- Create Category Modal -->
-<div id="createCategoryModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 items-center justify-center hidden">
-    <div class="modal-content bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-auto darken-modal-content">
+<!-- Create Category Modal -->
+<div id="createCategoryModal" class="modal fixed inset-0 bg-gray-800 bg-opacity-50 items-center justify-center hidden">
+    <!-- Matching width and padding with Add Transaction modal -->
+    <div class="modal-content bg-white p-6 rounded-lg shadow-lg w-full max-w-lg mx-auto darken-modal-content">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-2xl font-bold text-black">Add Category</h2>
-            <button id="closeCreateModal" class="text-gray-400 hover:text-gray-600" aria-label="Close Create Category Modal">
+            <button id="closeCreateModal" class="absolute top-2 right-2 text-gray-400 hover:bg-gray-200 p-2 w-10 rounded-full" aria-label="Close Create Category Modal">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -19,11 +21,13 @@
         <form id="categoryForm" asp-controller="Category" asp-action="Create" method="post">
             @Html.AntiForgeryToken()
             <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                <label class="block text-sm font-medium text-gray-700 inline">Type</label>
+                <span class="text-gray-500 text-xs inline-block mb-2">(Select A type)</span>
                 <div class="flex space-x-4">
-                    <button type="button" id="createExpenseButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300">Expense</button>
-                    <button type="button" id="createIncomeButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300">Income</button>
+                    <button type="button" id="createExpenseButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800">Expense</button>
+                    <button type="button" id="createIncomeButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800">Income</button>
                 </div>
+
                 <input type="hidden" name="Type" id="createTypeInput" value="Expense" />
             </div>
 
@@ -55,3 +59,4 @@
         </form>
     </div>
 </div>
+
