@@ -85,3 +85,15 @@ body {
 .w-1000px {
     width: 1000px;
 }
+
+
+/* Icon-only sidebar style */
+@media (max-width: 768px) {
+    #sidebar-nav ul li a span {
+        display: none; /* Hide text on smaller screens */
+    }
+
+    #sidebar-nav {
+        width: 4rem; /* Shrink sidebar to icon width */
+    }
+}
