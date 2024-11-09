@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
 
 <!-- Navigation Bar -->
@@ -24,17 +24,17 @@
             </li>
             <li class="my-2">
                 <a asp-controller="Wallet" asp-action="Index" class="flex items-center  py-3 px-4 rounded-l hover:bg-gray-100 @(ViewData["Title"].ToString() == "Wallet Page" ? "active bg-gray-100" : "")">
-                    <i class="fas fa-user mr-4"></i> Wallet
+                    <i class="fas fa-wallet mr-4"></i> Wallet
                 </a>
             </li>
             <li class="my-2">
                 <a asp-controller="Category" asp-action="Index" class="flex items-center py-3 px-4 rounded-l hover:bg-gray-100 no-underline hover:no-underline hover:scale-105 transition-transform duration-200 @(ViewData["Title"].ToString() == "Category Page" ? "active bg-gray-100" : "")">
-                    <i class="fas fa-icons mr-4"></i> Category
+                    <i class="fas fa-layer-group mr-4"></i> Category
                 </a>
             </li>
             <li class="my-2">
                 <a asp-controller="Transaction" asp-action="Index" class="flex items-center py-3 px-4 rounded-l hover:bg-gray-100 no-underline hover:no-underline hover:scale-105 transition-transform duration-200 @(ViewData["Title"].ToString() == "Transaction Page" ? "active bg-gray-100" : "")">
-                    <i class="fas fa-wallet mr-4"></i> Transactions
+                    <i class="fas fa-file-invoice-dollar mr-4"></i> Transactions
                 </a>
             </li>
             <li class="my-2">
@@ -43,8 +43,8 @@
                 </a>
             </li>
             <li class="mt-auto my-2">
-                <a id="logoutLink" asp-action="SignOutUser" asp-controller="Account" class="flex items-center py-3 px-4 rounded-l hover:bg-gray-100 no-underline hover:no-underline hover:scale-105 transition-transform duration-200">
-                    <i class="fas fa-sign-out-alt mr-4"></i> Log out
+                <a id="logoutLink" asp-action="SignOutUser" asp-controller="Account" class="text-red-500 flex items-center py-3 px-4 rounded-l  hover:bg-gray-100 no-underline hover:no-underline hover:scale-105 transition-transform duration-200">
+                    <i class="fas fa-sign-out-alt mr-4 text-red-500"></i> Log out
                 </a>
             </li>
         </ul>
@@ -61,8 +61,8 @@
             text: "Are you sure you want to log out?",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#a6a6a6',
             confirmButtonText: 'Logout'
         }).then((result) => {
             if (result.isConfirmed) {
