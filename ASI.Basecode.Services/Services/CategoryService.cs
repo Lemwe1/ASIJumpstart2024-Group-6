@@ -18,7 +18,7 @@ namespace ASI.Basecode.WebApp.Services
             _context = context;
         }
 
-
+        // Get both user-specific and global categories
         public async Task<List<MCategory>> GetCategoriesAsync(int userId)
         {
             if (userId <= 0)
@@ -26,9 +26,10 @@ namespace ASI.Basecode.WebApp.Services
                 throw new ArgumentException("Invalid userId");
             }
 
+            // Retrieve both user-specific and global categories
             return await _context.MCategories
-                .Where(c => c.UserId == userId)
-                .ToListAsync();
+                      .Where(c => c.UserId == userId || (c.IsGlobal ?? false))
+                      .ToListAsync();
         }
 
         // Add a new category for a specific user

@@ -445,7 +445,7 @@ document.getElementById('editAccountForm').addEventListener('submit', async (e) 
                     const transactionData = {
                         WalletId: id,
                         Amount: Math.abs(balance - oldBalance),
-                        CategoryId: balance < oldBalance ? 5 : 6, // Category 1 for Expense, 2 for Income
+                        CategoryId: balance < oldBalance ? 2: 1, // Category 1 for Expense, 2 for Income
                         TransactionType: balance < oldBalance ? 'Expense' : 'Income',
                         Note: balance < oldBalance ? 'Adjust Expense Wallet' : 'Adjust Income Wallet',
                         TransactionDate: new Date().toISOString()
