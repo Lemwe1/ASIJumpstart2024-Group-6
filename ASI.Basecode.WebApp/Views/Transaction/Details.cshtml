@@ -4,8 +4,8 @@
 @using ASI.Basecode.Services.ServiceModels
 
 <div class="overflow-x-auto shadow-md">
-    <table class="transaction-table bg-white rounded-lg w-full">
-        <thead class="bg-gray-200">
+    <table class="transaction-table bg-white dark:bg-gray-800 rounded-lg w-full text-gray-900 dark:text-gray-200">
+        <thead class="bg-gray-200 dark:bg-gray-800 dark:text-white">
             <tr>
                 <th class="p-4 text-left">Category</th>
                 <th class="p-4 text-left">Amount</th>
@@ -15,7 +15,7 @@
                 <th class="p-4 text-left">Action</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody class="dark:bg-gray-700 dark:text-white">
             @if (ViewData["Transactions"] is List<TransactionViewModel> transactions)
             {
                 if (transactions.Count > 0)
@@ -23,10 +23,10 @@
                     @Html.AntiForgeryToken()
                     foreach (var transaction in transactions)
                     {
-                        <tr data-category="@transaction.CategoryId" class="border-b odd:bg-white even:bg-gray-100">
+                        <tr data-category="@transaction.CategoryId" class="border-b border-gray-300 dark:border-gray-600 odd:bg-white even:bg-gray-100 dark:odd:bg-gray-800 dark:even:bg-gray-700">
                             <td class="px-4 py-4 w-1/6 whitespace-nowrap">
                                 <div class="flex items-center space-x-4">
-                                    <span class="flex items-center justify-center p-2 w-12 h-12 rounded-full border border-gray-300" style="background-color: @transaction.CategoryColor;">
+                                    <span class="flex items-center justify-center p-2 w-12 h-12 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: @transaction.CategoryColor;">
                                         <i class="@transaction.CategoryIcon text-white"></i>
                                     </span>
                                     <span>@transaction.CategoryName</span>
@@ -37,13 +37,13 @@
                                 <div class="flex items-center space-x-1">
                                     @if (transaction.TransactionType == "Expense")
                                     {
-                                        <div class="bg-red-400 text-white px-2 py-1 rounded">
+                                        <div class="bg-red-400 dark:bg-red-600 text-white px-2 py-1 rounded">
                                             <span>-₱@transaction.Amount</span>
                                         </div>
                                     }
                                     else
                                     {
-                                        <div class="bg-green-400 text-white px-2 py-1 rounded">
+                                        <div class="bg-green-400 dark:bg-green-600 text-white px-2 py-1 rounded">
                                             <span>₱@transaction.Amount</span>
                                         </div>
                                     }
@@ -52,7 +52,7 @@
 
                             <td class="px-4 py-4 w-1/6 whitespace-nowrap">
                                 <div class="flex items-center space-x-4">
-                                    <span class="flex items-center justify-center p-2 w-12 h-12 rounded-full border border-gray-300" style="background-color: @transaction.WalletColor;">
+                                    <span class="flex items-center justify-center p-2 w-12 h-12 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: @transaction.WalletColor;">
                                         <i class="@transaction.WalletIcon text-white"></i>
                                     </span>
                                     <span>@transaction.WalletName</span>
@@ -65,11 +65,11 @@
                             <td class="px-4 py-3">
                                 <div class="flex space-x-2">
                                     <button data-id="@transaction.TransactionId"
-                                            class="editTransaction border border-gray-600 text-gray-600 hover:bg-gray-600 hover:text-white px-3 py-1 rounded-lg transition duration-150 flex items-center">
+                                            class="editTransaction border border-gray-600 dark:border-gray-500 text-gray-600 dark:text-gray-300 hover:bg-gray-600 dark:hover:bg-gray-500 hover:text-white px-3 py-1 rounded-lg transition duration-150 flex items-center">
                                         <i class="fas fa-edit mr-1"></i> Edit
                                     </button>
                                     <button data-id="@transaction.TransactionId"
-                                            class="border border-red-500 text-red-500 hover:bg-red-500 hover:text-white px-3 py-1 rounded-lg transition duration-150 deleteTransaction flex items-center">
+                                            class="border border-red-500 dark:border-red-600 text-red-500 dark:text-red-400 hover:bg-red-500 dark:hover:bg-red-600 hover:text-white px-3 py-1 rounded-lg transition duration-150 deleteTransaction flex items-center">
                                         <i class="fas fa-trash-alt mr-1"></i> Delete
                                     </button>
                                 </div>
@@ -80,7 +80,7 @@
                 else
                 {
                     <tr>
-                        <td colspan="6" class="px-4 py-3 text-center">No entries yet.</td>
+                        <td colspan="6" class="px-4 py-3 text-center text-gray-500 dark:text-gray-400">No entries yet.</td>
                     </tr>
                 }
             }

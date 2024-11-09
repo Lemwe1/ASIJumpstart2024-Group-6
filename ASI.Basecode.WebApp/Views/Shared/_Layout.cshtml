@@ -30,18 +30,18 @@
         && action != "VerifyEmail" && action != "ResendVerificationLink"))
         {
                 <!-- Sidebar Navigation for larger screens (lg and above) -->
-                <nav id="sidebar-nav" class="hidden lg:flex bg-white w-72">
+                <nav id="sidebar-nav" class="hidden lg:flex  w-72">
                 @Html.Partial("_Navigation")
                 </nav>
 
                 <!-- Mini Sidebar Navigation for small screens (below lg) -->
-                <nav id="mini-sidebar-nav" class="flex lg:hidden bg-white w-20">
+                <nav id="mini-sidebar-nav" class="flex lg:hidden w-20">
                 @Html.Partial("_MiniNavigation")
                 </nav>
         }
 
         <!-- Main Content Area -->
-        <main role="main" class="flex-1">
+        <main role="main" class="flex-1 dark:bg-gray-900">
             @RenderBody()
         </main>
     </div>
