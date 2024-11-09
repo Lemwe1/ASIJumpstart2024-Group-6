@@ -27,7 +27,7 @@ namespace ASI.Basecode.Data
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=NI¥O\\SQLEXPRESS;Database=AsiBasecodeDb;Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer("Server=(localdb)\\MSSqlLocalDb;Database=AsiBasecodeDb;Integrated Security=True;Trusted_Connection=True");
             }
         }
 
@@ -36,7 +36,7 @@ namespace ASI.Basecode.Data
             modelBuilder.Entity<MCategory>(entity =>
             {
                 entity.HasKey(e => e.CategoryId)
-                    .HasName("PK__M_Catego__19093A0B120367F6");
+                    .HasName("PK__M_Catego__19093A0BC3D774D6");
 
                 entity.ToTable("M_Category");
 
@@ -60,7 +60,7 @@ namespace ASI.Basecode.Data
             modelBuilder.Entity<MTransaction>(entity =>
             {
                 entity.HasKey(e => e.TransactionId)
-                    .HasName("PK__M_Transa__55433A6B72A3A6D8");
+                    .HasName("PK__M_Transa__55433A6B2B61D004");
 
                 entity.ToTable("M_Transaction");
 
@@ -113,7 +113,7 @@ namespace ASI.Basecode.Data
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.isVerified).HasColumnName("isVerified");
+                entity.Property(e => e.IsVerified).HasColumnName("isVerified");
 
                 entity.Property(e => e.LastName).HasMaxLength(50);
 
@@ -159,7 +159,7 @@ namespace ASI.Basecode.Data
             modelBuilder.Entity<MWallet>(entity =>
             {
                 entity.HasKey(e => e.WalletId)
-                    .HasName("PK__M_Wallet__84D4F90EF1DA7894");
+                    .HasName("PK__M_Wallet__84D4F90E31963785");
 
                 entity.ToTable("M_Wallet");
 
