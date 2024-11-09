@@ -440,16 +440,16 @@ document.getElementById('editAccountForm').addEventListener('submit', async (e) 
         try {
 
 
-            // Logic for determining if the balance has changed
-            if (balance !== oldBalance) {
-                const transactionData = {
-                    WalletId: id,
-                    Amount: Math.abs(balance - oldBalance),
-                    CategoryId: balance < oldBalance ? 1 : 2, // Category 1 for Expense, 2 for Income
-                    TransactionType: balance < oldBalance ? 'Expense' : 'Income',
-                    Note: balance < oldBalance ? '  just Expense Wallet' : 'Adjust Income Wallet',
-                    TransactionDate: new Date().toISOString()
-                };
+                // Logic for determining if the balance has changed
+                if (balance !== oldBalance) {
+                    const transactionData = {
+                        WalletId: id,
+                        Amount: Math.abs(balance - oldBalance),
+                        CategoryId: balance < oldBalance ? 2: 1, // Category 1 for Expense, 2 for Income
+                        TransactionType: balance < oldBalance ? 'Expense' : 'Income',
+                        Note: balance < oldBalance ? 'Adjust Expense Wallet' : 'Adjust Income Wallet',
+                        TransactionDate: new Date().toISOString()
+                    };
 
                 // Create the transaction if the balance has changed
                 const transactionResponse = await fetch('/Transaction/Create', {

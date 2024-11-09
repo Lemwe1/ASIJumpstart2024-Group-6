@@ -36,7 +36,7 @@ namespace ASI.Basecode.WebApp.Controllers
                 return BadRequest("Invalid user ID");
             }
 
-            // Retrieve list of MCategory from the service for the specific user
+            // Retrieve list of MCategory for both user-specific and global categories
             var categories = await _categoryService.GetCategoriesAsync(userId);
 
             // Map MCategory to CategoryViewModel
@@ -51,7 +51,6 @@ namespace ASI.Basecode.WebApp.Controllers
 
             return View(categoryViewModels);
         }
-
 
         // GET: /Category/GetCategory/{id}
         [HttpGet]
