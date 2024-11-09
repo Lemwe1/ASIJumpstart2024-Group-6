@@ -1,6 +1,8 @@
 ﻿using ASI.Basecode.Data.Models;
+using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.WebApp.Models;
-using ASI.Basecode.WebApp.Services;
+using ASI.Basecode.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -10,33 +12,34 @@ using System.Threading.Tasks;
 
 namespace ASI.Basecode.WebApp.Controllers
 {
+    [Authorize] // Ensure that the user is authenticated for all actions
+    [Route("Category")]
     public class CategoryController : Controller
     {
-        private readonly CategoryService _categoryService;
+        private readonly ICategoryService _categoryService;
 
-        public CategoryController(CategoryService categoryService)
+        public CategoryController(ICategoryService categoryService)
         {
             _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
         }
 
+        // GET: /Category
+        [HttpGet("")]
         public async Task<IActionResult> Index()
         {
             ViewData["Title"] = "Category List";
 
-            // Get user ID
+            // Get user ID as string
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdString))
+
+            // Convert userIdString to int?
+            int? userId = null;
+            if (!string.IsNullOrEmpty(userIdString) && int.TryParse(userIdString, out int parsedUserId))
             {
-                return Unauthorized();
+                userId = parsedUserId;
             }
 
-            // Convert the string userId to an integer
-            if (!int.TryParse(userIdString, out int userId))
-            {
-                return BadRequest("Invalid user ID");
-            }
-
-            // Retrieve list of MCategory from the service for the specific user
+            // Retrieve list of MCategory for both user-specific and global categories
             var categories = await _categoryService.GetCategoriesAsync(userId);
 
             // Map MCategory to CategoryViewModel
@@ -52,16 +55,18 @@ namespace ASI.Basecode.WebApp.Controllers
             return View(categoryViewModels);
         }
 
-
         // GET: /Category/GetCategory/{id}
-        [HttpGet]
+        [HttpGet("GetCategory/{id}")]
         public async Task<IActionResult> GetCategory(int id)
         {
-            // Get user ID
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId))
+            // Get user ID as string
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Convert userIdString to int?
+            int? userId = null;
+            if (!string.IsNullOrEmpty(userIdString) && int.TryParse(userIdString, out int parsedUserId))
             {
-                return Unauthorized();
+                userId = parsedUserId;
             }
 
             var category = await _categoryService.GetCategoryByIdAsync(id, userId);
@@ -84,23 +89,26 @@ namespace ASI.Basecode.WebApp.Controllers
         }
 
         // POST: /Category/Create
-        [HttpPost]
+        [HttpPost("Create")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CategoryViewModel categoryViewModel)
         {
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
-                return BadRequest(new { success = false, message = "Please Fill Up Everything", errors });
+                return BadRequest(new { success = false, message = "Please fill up everything.", errors });
             }
 
             try
             {
-                // Get user ID
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (string.IsNullOrEmpty(userId))
+                // Get user ID as string
+                var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                // Convert userIdString to int?
+                int? userId = null;
+                if (!string.IsNullOrEmpty(userIdString) && int.TryParse(userIdString, out int parsedUserId))
                 {
-                    return Unauthorized();
+                    userId = parsedUserId;
                 }
 
                 // Map CategoryViewModel to MCategory
@@ -122,7 +130,7 @@ namespace ASI.Basecode.WebApp.Controllers
         }
 
         // POST: /Category/Edit/{id}
-        [HttpPost]
+        [HttpPost("Edit/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, CategoryViewModel categoryViewModel)
         {
@@ -134,16 +142,19 @@ namespace ASI.Basecode.WebApp.Controllers
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
-                return BadRequest(new { success = false, message = "Invalid data", errors });
+                return BadRequest(new { success = false, message = "Invalid data.", errors });
             }
 
             try
             {
-                // Get user ID
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (string.IsNullOrEmpty(userId))
+                // Get user ID as string
+                var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                // Convert userIdString to int?
+                int? userId = null;
+                if (!string.IsNullOrEmpty(userIdString) && int.TryParse(userIdString, out int parsedUserId))
                 {
-                    return Unauthorized();
+                    userId = parsedUserId;
                 }
 
                 // Map CategoryViewModel to MCategory
@@ -170,17 +181,20 @@ namespace ASI.Basecode.WebApp.Controllers
         }
 
         // POST: /Category/Delete/{id}
-        [HttpPost]
+        [HttpPost("Delete/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                // Get user ID
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (string.IsNullOrEmpty(userId))
+                // Get user ID as string
+                var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                // Convert userIdString to int?
+                int? userId = null;
+                if (!string.IsNullOrEmpty(userIdString) && int.TryParse(userIdString, out int parsedUserId))
                 {
-                    return Unauthorized();
+                    userId = parsedUserId;
                 }
 
                 await _categoryService.DeleteCategoryAsync(id, userId);

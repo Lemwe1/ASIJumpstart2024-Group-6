@@ -94,7 +94,7 @@ namespace ASI.Basecode.Services.Services
                 Deleted = false,
                 VerificationToken = newUser.VerificationToken,  // Use the token generated in the controller
                 VerificationTokenExpiration = newUser.VerificationTokenExpiration,  // Use the expiration generated in the controller
-                isVerified = false  // Account is initially unverified
+                IsVerified = false  // Account is initially unverified
             };
 
             _userRepository.AddUser(newModel);
@@ -132,7 +132,7 @@ namespace ASI.Basecode.Services.Services
                     existingData.VerificationTokenExpiration = model.VerificationTokenExpiration;
                 }
 
-                existingData.isVerified = model.isVerified;  // Update verification status
+                existingData.IsVerified = model.IsVerified;  // Update verification status
 
                 _userRepository.UpdateUser(existingData);  // Update user in the database
             }

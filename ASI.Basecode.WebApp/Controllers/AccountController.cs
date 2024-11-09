@@ -73,7 +73,7 @@ namespace ASI.Basecode.WebApp.Controllers
 
             if (loginResult == LoginResult.Success)
             {
-                if (!user.isVerified)
+                if (!user.IsVerified)
                 {
                     return Json(new
                     {
@@ -148,7 +148,7 @@ namespace ASI.Basecode.WebApp.Controllers
                     InsDt = DateTime.Now,
                     VerificationToken = Guid.NewGuid().ToString(),  // Generate token for email verification
                     VerificationTokenExpiration = DateTime.Now.AddHours(24),
-                    isVerified = false  // Set account to unverified initially
+                    IsVerified = false  // Set account to unverified initially
                 };
 
                 // Save the new user to the database
@@ -189,14 +189,14 @@ namespace ASI.Basecode.WebApp.Controllers
                 return View("VerificationError");
             }
 
-            if (user.isVerified)
+            if (user.IsVerified)
             {
                 ViewBag.ErrorMessage = "This account has already been verified.";
                 return View("VerificationError");
             }
 
             // Mark the account as verified
-            user.isVerified = true;
+            user.IsVerified = true;
             user.VerificationToken = null;  // Clear the verification token
             user.VerificationTokenExpiration = null;  // Clear the expiration
 
@@ -227,7 +227,7 @@ namespace ASI.Basecode.WebApp.Controllers
             }
 
             var user = _userService.GetByEmail(email);
-            if (user == null || user.isVerified)
+            if (user == null || user.IsVerified)
             {
                 TempData["ErrorMessage"] = "Invalid email address or account is already verified.";
                 return RedirectToAction("ResendVerificationLink");

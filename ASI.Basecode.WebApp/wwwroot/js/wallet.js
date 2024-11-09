@@ -102,7 +102,7 @@ async function showConfirmationDialog(modal, resetFunction) {
     if (isConfirmed) {
         closeModal(modal);
         if (resetFunction) {
-            resetFunction(); 
+            resetFunction();
         }
     }
 }
@@ -393,11 +393,11 @@ if (editAccountModal) {
         customClass: { popup: 'swal2-front' }
     });
     Swal.fire({
-    title: 'Error',
-    text: result.message || 'An error occurred.',
-    icon: 'error',
-    customClass: { popup: 'swal2-front' }
-});
+        title: 'Error',
+        text: result.message || 'An error occurred.',
+        icon: 'error',
+        customClass: { popup: 'swal2-front' }
+    });
 }
 
 // Handle form submission for editing an account
@@ -445,27 +445,27 @@ document.getElementById('editAccountForm').addEventListener('submit', async (e) 
                     const transactionData = {
                         WalletId: id,
                         Amount: Math.abs(balance - oldBalance),
-                        CategoryId: balance < oldBalance ? 5 : 6, // Category 1 for Expense, 2 for Income
+                        CategoryId: balance < oldBalance ? 2: 1, // Category 1 for Expense, 2 for Income
                         TransactionType: balance < oldBalance ? 'Expense' : 'Income',
                         Note: balance < oldBalance ? 'Adjust Expense Wallet' : 'Adjust Income Wallet',
                         TransactionDate: new Date().toISOString()
                     };
 
-                    // Create the transaction if the balance has changed
-                    const transactionResponse = await fetch('/Transaction/Create', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'RequestVerificationToken': token
-                        },
-                        body: JSON.stringify(transactionData)
-                    });
+                // Create the transaction if the balance has changed
+                const transactionResponse = await fetch('/Transaction/Create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': token
+                    },
+                    body: JSON.stringify(transactionData)
+                });
 
-                    const transactionResult = await transactionResponse.json();
-                    if (!transactionResult.success) {
-                        throw new Error(transactionResult.message || 'Transaction failed');
-                    }
-                
+                const transactionResult = await transactionResponse.json();
+                if (!transactionResult.success) {
+                    throw new Error(transactionResult.message || 'Transaction failed');
+                }
+
 
                 // Update wallet balance after the transaction is created
                 const updateResponse = await fetch(`/Wallet/Edit/${id}`, {
@@ -567,7 +567,7 @@ document.getElementById('deleteAccountButton').addEventListener('click', async (
             } else {
                 Swal.fire({
                     title: 'Error',
-                    text: result.message || 'An error occurred.',
+                    text: 'Sorry, this wallet is being used in transaction, so you cannot delete this right now.',
                     icon: 'error',
                     customClass: { popup: 'swal2-front' }
                 });
@@ -575,13 +575,13 @@ document.getElementById('deleteAccountButton').addEventListener('click', async (
         } catch (error) {
             Swal.fire({
                 title: 'Error',
-                text: result.message || 'An error occurred.',
+                text: 'Sorry, this wallet is being used in transaction, so you cannot delete this right now.',
                 icon: 'error',
                 customClass: { popup: 'swal2-front' }
             });
         }
     }
-    
+
 });
 
 // Load accounts on page load

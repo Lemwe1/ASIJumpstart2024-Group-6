@@ -30,7 +30,7 @@ namespace ASI.Basecode.Data.Models
         public string Remarks { get; set; }
         public string PasswordResetToken { get; set; }
         public DateTime? PasswordResetExpiration { get; set; }
-        public bool isVerified { get; set; }
+        public bool IsVerified { get; set; }
         public string VerificationToken { get; set; }
         public DateTime? VerificationTokenExpiration { get; set; }
 
