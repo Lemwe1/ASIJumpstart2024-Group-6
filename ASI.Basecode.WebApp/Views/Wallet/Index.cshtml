@@ -1,6 +1,5 @@
 ﻿@model List<ASI.Basecode.Services.ServiceModels.WalletViewModel>
 
-
 @{
     ViewData["Title"] = "Wallet Page";
 }
@@ -14,32 +13,48 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 }
 
-<!-- Content -->
-<div class="flex-1 p-6 bg-gray-50">
-    <!-- Search Bar -->
-    <div class="flex justify-between items-center mt-2">
-        <input type="text" placeholder="Search here..." class="w-1/3 p-2 border border-gray-300 rounded-lg">
+<div class="flex flex-col h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <!-- Toggle Button for Theme -->
+    <div class="absolute top-4 right-4 cursor-pointer">
+        <button id="theme-toggle" class="text-gray-500 dark:text-gray-300 focus:outline-none">
+            <svg id="sun-icon" class="w-6 h-6 hidden" fill="currentColor" viewBox="0 0 20 20">
+                <!-- Sun Icon -->
+                <path d="M10 2a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5A.75.75 0 0110 2zm0 16a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5a.75.75 0 01-.75-.75zm8.7-7.3a.75.75 0 010 1.5h-1.5a.75.75 0 010-1.5h1.5zM2 10a.75.75 0 01.75-.75H4.25a.75.75 0 010 1.5H2.75A.75.75 0 012 10zM16.07 4.93a.75.75 0 011.06-1.06l1.06 1.06a.75.75 0 01-1.06 1.06l-1.06-1.06zM4.93 4.93a.75.75 0 011.06-1.06L7.06 4.93a.75.75 0 01-1.06 1.06L4.93 5.99zM16.07 4.93a.75.75 0 011.06-1.06l1.06 1.06a.75.75 0 01-1.06 1.06L16.07 4.93zM4.93 16.07a.75.75 0 011.06 0l1.06-1.06a.75.75 0 00-1.06-1.06L4.93 15.01a.75.75 0 000 1.06zM10 5.75a4.25 4.25 0 110 8.5 4.25 4.25 0 010-8.5zm0 1.5a2.75 2.75 0 100 5.5 2.75 2.75 0 000-5.5z" />
+            </svg>
+            <svg id="moon-icon" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <!-- Moon Icon -->
+                <path d="M10 2a8 8 0 017.463 10.84c-.152.593-.608.91-1.2.91a1.19 1.19 0 01-.75-.255 7.9 7.9 0 00-5.513-2.127 7.91 7.91 0 00-2.126 5.514 1.188 1.188 0 01-.255.75 1.189 1.189 0 01-.91.451A8 8 0 0110 2zM2 10a8 8 0 0016 0A8 8 0 002 10z" />
+            </svg>
+        </button>
     </div>
 
-<!-- Total Balance Section -->
-<div id="balanceSection" class="mb-6">
-    <h2 id="totalBalance" class="text-2xl font-bold">
-        Total Balance: 
-        <span class="balanceSpacing balance-value" data-visible="true">₱@ViewBag.TotalDebit.ToString("0.00")</span>
-        <i id="toggleBalanceVisibility" class="fas fa-eye cursor-pointer balance-icon"></i>
-    </h2>
+    <!-- Content Wrapper -->
+    <div class="flex-1 p-6 bg-gray-50 dark:bg-gray-900">
+        <!-- Search Bar -->
+        <div class="flex justify-between items-center mt-2">
+            <input type="text" placeholder="Search here..." class="w-1/3 p-2 border border-gray-300 rounded-lg dark:bg-gray-700  dark:placeholder-gray-400 dark:text-white">
+        </div>
+
+        <!-- Page Title -->
+        <div class="flex justify-between items-center my-4">
+            <h2 id="accountPageTitle" class="font-bold text-2xl dark:text-gray-100">Wallets</h2>
+        </div>
+
+        <!-- Total Balance Section -->
+        <div id="balanceSection" class="mb-6">
+            <h2 id="totalBalance" class="text-2xl font-bold dark:text-gray-100">
+                Total Balance:
+                <span class="balanceSpacing balance-value" data-visible="true">₱@ViewBag.TotalDebit.ToString("0.00")</span>
+                <i id="toggleBalanceVisibility" class="fas fa-eye cursor-pointer balance-icon dark:text-gray-400"></i>
+            </h2>
+        </div>
+
+        @Html.Partial("Details")
+    </div>
+
+    @Html.Partial("Create")
+    @Html.Partial("Edit")
 </div>
 
 
 
-    <!-- Add New Account Button and Account Title -->
-    <div class="flex justify-between items-center my-4">
-        <h2 id="accountPageTitle" class="font-bold text-2xl">Wallets</h2>
-    </div>
-
-    @Html.Partial("Details")
-</div>
-
-@Html.Partial("Create")
-
-@Html.Partial("Edit")

@@ -194,22 +194,21 @@ if (addAccountModal) {
     });
 }
 
-// Function to load Debit form fields
 function loadDebitForm() {
     if (addFormFields) {
         addFormFields.innerHTML = `
             <div class="mb-4">
                 <label class="block">Name</label>
-                <input type="text" id="accountName" class="border p-2 w-full" required />
+                <input type="text" id="accountName" class="border p-2 w-full" placeholder="Enter account name" required />
             </div>
             <div class="mb-4">
                 <label class="block">Balance</label>
-                <input type="number" id="accountBalance" class="border p-2 w-full" required step="any" />
+                <input type="number" id="accountBalance" class="border p-2 w-full" placeholder="Enter balance amount" required step="any" />
             </div>
             <div class="mb-6">
                 <label for="createIcon" class="block text-sm font-medium text-gray-700">Icon</label>
                 <select name="Icon" id="createIcon" class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500" required>
-                    <option value="">Select Icon</option>
+                    <option value="" disabled selected>Select Icon</option>
                     <option value="fas fa-apple-alt">Apple (Food)</option>
                     <option value="fas fa-shopping-bag">Shopping Bag</option>
                     <option value="fas fa-bolt">Bolt (Electricity)</option>
@@ -219,13 +218,14 @@ function loadDebitForm() {
             </div>
             <div class="mb-4">
                 <label class="block">Color</label>
-                <input type="color" id="accountColor" class="border p-2 w-full" style="height: 50px;" required />
+                <input type="color" id="accountColor" class="border p-2 w-full" style="height: 50px;" title="Choose a color" required />
             </div>
         `;
     } else {
         console.error('Add Form Fields element not found.');
     }
 }
+
 
 
 // Handle form submission for adding an account
@@ -285,7 +285,6 @@ document.getElementById('addAccountForm').addEventListener('submit', async (e) =
                 confirmButtonColor: '#3B82F6',
                 customClass: { popup: 'swal2-front' }
             }).then(() => {
-                loadAccounts();
                 window.location.reload();
             });
         } else {
@@ -306,33 +305,6 @@ document.getElementById('addAccountForm').addEventListener('submit', async (e) =
         });
     }
 });
-
-
-// Function to load accounts from the server and render them
-async function loadAccounts() {
-    try {
-        const response = await fetch('/Wallet'); // Adjust URL if necessary
-        const accounts = await response.json();
-
-        debitAccounts = accounts.filter(account => account.DeLiType === 'debit');
-
-        // Render the updated accounts
-        renderAccounts();
-    } catch (error) {
-        Swal.fire({
-            title: 'Error',
-            text: result.message || 'An error occurred.',
-            icon: 'error',
-            customClass: { popup: 'swal2-front' }
-        });
-        Swal.fire({
-            title: 'Error',
-            text: result.message || 'An error occurred.',
-            icon: 'error',
-            customClass: { popup: 'swal2-front' }
-        });
-    }
-}
 
 let oldBalance = 0;
 
@@ -438,18 +410,16 @@ document.getElementById('editAccountForm').addEventListener('submit', async (e) 
 
     if (isConfirmed) {
         try {
-
-
-                // Logic for determining if the balance has changed
-                if (balance !== oldBalance) {
-                    const transactionData = {
-                        WalletId: id,
-                        Amount: Math.abs(balance - oldBalance),
-                        CategoryId: balance < oldBalance ? 2: 1, // Category 1 for Expense, 2 for Income
-                        TransactionType: balance < oldBalance ? 'Expense' : 'Income',
-                        Note: balance < oldBalance ? 'Adjust Expense Wallet' : 'Adjust Income Wallet',
-                        TransactionDate: new Date().toISOString()
-                    };
+            // Logic for determining if the balance has changed
+            if (balance != oldBalance) {
+                const transactionData = {
+                    WalletId: id,
+                    Amount: Math.abs(balance - oldBalance),
+                    CategoryId: balance < oldBalance ? 1 : 2, // Category 2 for Expense, 1 for Income
+                    TransactionType: balance < oldBalance ? 'Expense' : 'Income',
+                    Note: balance < oldBalance ? '  just Expense Wallet' : 'Adjust Income Wallet',
+                    TransactionDate: new Date().toISOString()
+                };
 
                 // Create the transaction if the balance has changed
                 const transactionResponse = await fetch('/Transaction/Create', {
@@ -487,7 +457,6 @@ document.getElementById('editAccountForm').addEventListener('submit', async (e) 
                         confirmButtonColor: '#3B82F6',
                         customClass: { popup: 'swal2-front' }
                     }).then(() => {
-                        loadAccounts();
                         window.location.reload();
                     });
                 } else {
@@ -499,17 +468,40 @@ document.getElementById('editAccountForm').addEventListener('submit', async (e) 
                     });
                 }
             } else {
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Failed to retrieve wallet details.',
-                    icon: 'error',
-                    customClass: { popup: 'swal2-front' }
+                // Update wallet balance after the transaction is created
+                const updateResponse = await fetch(`/Wallet/Edit/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': token
+                    },
+                    body: JSON.stringify(data)
                 });
+                const updateResult = await updateResponse.json();
+                if (updateResult.success) {
+                    closeModal(editAccountModal);
+                    Swal.fire({
+                        title: 'Success',
+                        text: 'Wallet edited successfully!',
+                        icon: 'success',
+                        confirmButtonColor: '#3B82F6',
+                        customClass: { popup: 'swal2-front' }
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error',
+                        text: updateResult.message || 'An error occurred.',
+                        icon: 'error',
+                        customClass: { popup: 'swal2-front' }
+                    });
+                }
             }
         } catch (error) {
             Swal.fire({
                 title: 'Error',
-                text: error.message || 'An error occurred.',
+                text: error.message || 'Catch',
                 icon: 'error',
                 customClass: { popup: 'swal2-front' }
             });
@@ -561,7 +553,6 @@ document.getElementById('deleteAccountButton').addEventListener('click', async (
                     confirmButtonColor: '#3B82F6',
                     customClass: { popup: 'swal2-front' }
                 }).then(() => {
-                    loadAccounts();
                     window.location.reload();
                 });
             } else {
@@ -586,6 +577,28 @@ document.getElementById('deleteAccountButton').addEventListener('click', async (
 
 // Load accounts on page load
 document.addEventListener('DOMContentLoaded', () => {
-    loadAccounts();
     loadDebitForm(); // Load the form fields initially
+});
+
+// Theme toggle script
+document.addEventListener('DOMContentLoaded', function () {
+    const toggle = document.getElementById('theme-toggle');
+    const sunIcon = document.getElementById('sun-icon');
+    const moonIcon = document.getElementById('moon-icon');
+
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark');
+        sunIcon.classList.remove('hidden');
+        moonIcon.classList.add('hidden');
+    }
+
+    toggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark');
+        sunIcon.classList.toggle('hidden');
+        moonIcon.classList.toggle('hidden');
+
+        const theme = document.body.classList.contains('dark') ? 'dark' : 'light';
+        localStorage.setItem('theme', theme);
+    });
 });
