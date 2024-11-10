@@ -1,4 +1,5 @@
 ﻿using ASI.Basecode.Data;
+using ASI.Basecode.Data.Interfaces;
 using ASI.Basecode.Data.Models;
 using ASI.Basecode.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -12,10 +13,12 @@ namespace ASI.Basecode.Services.Services
     public class CategoryService : ICategoryService
     {
         private readonly AsiBasecodeDbContext _context;
+        private readonly ITransactionRepository _transactionRepository;
 
-        public CategoryService(AsiBasecodeDbContext context)
+        public CategoryService(AsiBasecodeDbContext context, ITransactionRepository transactionRepository)
         {
             _context = context;
+            _transactionRepository = transactionRepository;
         }
 
         // Get both user-specific and global categories
@@ -68,21 +71,28 @@ namespace ASI.Basecode.Services.Services
         {
             var category = await _context.MCategories
                                          .FirstOrDefaultAsync(c => c.CategoryId == id && (c.UserId == userId || c.IsGlobal == true));
-            if (category != null)
-            {
-                // Prevent deletion of specific global categories: "Default Income" and "Default Expense"
-                if (category.IsGlobal && (category.Name == "Default Income" || category.Name == "Default Expense"))
-                {
-                    throw new InvalidOperationException("Default categories cannot be deleted.");
-                }
 
-                _context.MCategories.Remove(category);
-                await _context.SaveChangesAsync();
-            }
-            else
+            if (category == null)
             {
                 throw new KeyNotFoundException($"Category with ID {id} not found for user {userId}.");
             }
+
+            // Prevent deletion of specific global categories: "Default Income" and "Default Expense"
+            if (category.IsGlobal && (category.Name == "Default Income" || category.Name == "Default Expense"))
+            {
+                throw new InvalidOperationException("Default categories cannot be deleted.");
+            }
+
+            // Check if the category is in use in any transactions
+            bool isCategoryInUse = await _transactionRepository.IsCategoryInUseAsync(id);
+            if (isCategoryInUse)
+            {
+                throw new InvalidOperationException("Category is in use in Transactions and cannot be deleted.");
+            }
+
+            // If not in use, proceed with deletion
+            _context.MCategories.Remove(category);
+            await _context.SaveChangesAsync();
         }
 
         // Get category name by ID, accommodating both user-specific and global categories

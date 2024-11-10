@@ -1,7 +1,6 @@
 ﻿using ASI.Basecode.Data.Models;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.WebApp.Models;
-using ASI.Basecode.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -59,16 +58,7 @@ namespace ASI.Basecode.WebApp.Controllers
         [HttpGet("GetCategory/{id}")]
         public async Task<IActionResult> GetCategory(int id)
         {
-            // Get user ID as string
-            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            // Convert userIdString to int?
-            int? userId = null;
-            if (!string.IsNullOrEmpty(userIdString) && int.TryParse(userIdString, out int parsedUserId))
-            {
-                userId = parsedUserId;
-            }
-
+            var userId = GetUserId();
             var category = await _categoryService.GetCategoryByIdAsync(id, userId);
             if (category == null)
             {
@@ -101,15 +91,7 @@ namespace ASI.Basecode.WebApp.Controllers
 
             try
             {
-                // Get user ID as string
-                var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-                // Convert userIdString to int?
-                int? userId = null;
-                if (!string.IsNullOrEmpty(userIdString) && int.TryParse(userIdString, out int parsedUserId))
-                {
-                    userId = parsedUserId;
-                }
+                var userId = GetUserId();
 
                 // Map CategoryViewModel to MCategory
                 var category = new MCategory
@@ -147,15 +129,7 @@ namespace ASI.Basecode.WebApp.Controllers
 
             try
             {
-                // Get user ID as string
-                var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-                // Convert userIdString to int?
-                int? userId = null;
-                if (!string.IsNullOrEmpty(userIdString) && int.TryParse(userIdString, out int parsedUserId))
-                {
-                    userId = parsedUserId;
-                }
+                var userId = GetUserId();
 
                 // Map CategoryViewModel to MCategory
                 var category = new MCategory
@@ -187,18 +161,14 @@ namespace ASI.Basecode.WebApp.Controllers
         {
             try
             {
-                // Get user ID as string
-                var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-                // Convert userIdString to int?
-                int? userId = null;
-                if (!string.IsNullOrEmpty(userIdString) && int.TryParse(userIdString, out int parsedUserId))
-                {
-                    userId = parsedUserId;
-                }
+                var userId = GetUserId();
 
                 await _categoryService.DeleteCategoryAsync(id, userId);
                 return Json(new { success = true, message = "Category deleted successfully." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
             }
             catch (KeyNotFoundException knfEx)
             {
@@ -208,6 +178,17 @@ namespace ASI.Basecode.WebApp.Controllers
             {
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
+        }
+
+        // Helper method to retrieve the user ID from claims
+        private int? GetUserId()
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!string.IsNullOrEmpty(userIdString) && int.TryParse(userIdString, out int parsedUserId))
+            {
+                return parsedUserId;
+            }
+            return null;
         }
     }
 }
