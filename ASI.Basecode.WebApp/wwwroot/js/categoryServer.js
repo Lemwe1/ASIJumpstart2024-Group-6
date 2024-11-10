@@ -48,6 +48,14 @@ async function openEditModal(categoryId) {
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
                 console.log('Edit modal displayed.');
+
+                // Hide delete button if category is "Default Income" or "Default Expense"
+                const deleteButton = document.getElementById('deleteButton');
+                if (category.name === 'Default Income' || category.name === 'Default Expense') {
+                    deleteButton.classList.add('hidden');
+                } else {
+                    deleteButton.classList.remove('hidden');
+                }
             } else {
                 Swal.fire('Error', 'Failed to load category data.', 'error');
             }
@@ -191,6 +199,7 @@ document.getElementById('deleteButton').addEventListener('click', async function
         }
     });
 });
+
 // Function to handle type selection and highlight the selected button
 function setTypeSelection(modalType, selectedType) {
     console.log('Setting type selection for:', modalType, 'Type:', selectedType);
@@ -224,8 +233,6 @@ function setTypeSelection(modalType, selectedType) {
         incomeButton.classList.add('bg-green-500', 'text-white');
     }
 }
-
-
 
 // Event listeners for type buttons in the edit modal
 document.getElementById('editExpenseButton').addEventListener('click', function () {
