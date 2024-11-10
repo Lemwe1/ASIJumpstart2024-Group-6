@@ -1,7 +1,7 @@
 ﻿using ASI.Basecode.Data.Models;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
-using ASI.Basecode.WebApp.Services.Interfaces;
+using ASI.Basecode.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
@@ -106,7 +106,9 @@ namespace ASI.Basecode.WebApp.Controllers
                 CategoryId = transaction.CategoryId,
                 WalletId = transaction.WalletId,
                 CategoryName = categoryName, 
-                WalletName = walletName 
+                WalletName = walletName,
+                TransactionSort = transaction.TransactionSort
+
             };
 
             return Json(new { success = true, data = transactionViewModel });
@@ -170,7 +172,8 @@ namespace ASI.Basecode.WebApp.Controllers
                 TransactionDate = transaction.TransactionDate,
                 Note = transaction.Note,
                 CategoryId = transaction.CategoryId,
-                WalletId = transaction.WalletId 
+                WalletId = transaction.WalletId,
+                TransactionSort = transaction.TransactionSort
             };
 
             // Ensure categories and wallets liabilities are loaded
@@ -219,6 +222,8 @@ namespace ASI.Basecode.WebApp.Controllers
                 existingTransaction.Note = model.Note;
                 existingTransaction.CategoryId = model.CategoryId;
                 existingTransaction.WalletId = model.WalletId;
+                existingTransaction.TransactionSort = model.TransactionSort;
+
 
                 // Call the service to update the transaction
                 await _transactionService.UpdateTransactionAsync(existingTransaction);

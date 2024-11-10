@@ -19,6 +19,8 @@ namespace ASI.Basecode.WebApp.Controllers
     {
 
         private readonly IWalletService _walletService;
+        private readonly ITransactionService _transactionService;
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -31,9 +33,12 @@ namespace ASI.Basecode.WebApp.Controllers
                               ILoggerFactory loggerFactory,
                               IConfiguration configuration,
                               IWalletService walletService,
+                               ITransactionService transactionService,
                               IMapper mapper = null) : base(httpContextAccessor, loggerFactory, configuration, mapper)
         {
             _walletService = walletService ?? throw new ArgumentNullException(nameof(walletService));
+            _transactionService = transactionService;
+
         }
 
 
@@ -42,25 +47,36 @@ namespace ASI.Basecode.WebApp.Controllers
             // Get the logged-in user's ID
             int userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "UserId").Value);
 
-            // Fetch the debit liabilities belonging to the logged-in user
+            // Fetch the wallet data for the logged-in user
             var wallet = await _walletService.GetWalletAsync(userId);
-
-            // Filter the list after awaiting the async method and convert to a List
             var userWallet = wallet
                 .Where(x => x.UserId == userId)
                 .ToList(); // Convert to List<DebitLiabilityViewModel>
 
-            if (json)
-            {
-                return Json(userWallet); // Return JSON data if requested
-            }
+            // Get all transactions (Income and Expense) for the logged-in user
+            var transactions = await _transactionService.GetAllTransactionsAsync(userId);
 
-            // Calculate totals
+            // Calculate the totals for Income and Expense
+            var totalIncome = transactions.Where(t => t.TransactionType == "Income" && t.TransactionSort == "Transaction").Sum(t => t.Amount);
+            var totalExpense = transactions.Where(t => t.TransactionType == "Expense" && t.TransactionSort == "Transaction").Sum(t => t.Amount);
+
+            // Calculate total wallet balance (total debit)
             var totalDebit = userWallet.Sum(x => x.WalletBalance);
 
+            // Add totals to ViewBag to display them in the view
             ViewBag.TotalDebit = totalDebit;
+            ViewBag.TotalIncome = totalIncome;
+            ViewBag.TotalExpense = totalExpense;
 
-            return View(userWallet); // Return the view otherwise
+            if (json)
+            {
+                // Return the wallet and transactions in JSON format if requested
+                return Json(new { userWallet, totalIncome, totalExpense });
+            }
+
+            // Return the view with wallet data and transaction totals
+            return View(userWallet);
         }
+
     }
 }

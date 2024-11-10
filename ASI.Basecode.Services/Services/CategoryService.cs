@@ -1,13 +1,13 @@
 ﻿using ASI.Basecode.Data;
 using ASI.Basecode.Data.Models;
-using ASI.Basecode.WebApp.Services.Interfaces;
+using ASI.Basecode.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ASI.Basecode.WebApp.Services
+namespace ASI.Basecode.Services.Services
 {
     public class CategoryService : ICategoryService
     {
@@ -19,57 +19,37 @@ namespace ASI.Basecode.WebApp.Services
         }
 
         // Get both user-specific and global categories
-        public async Task<List<MCategory>> GetCategoriesAsync(int userId)
+        public async Task<List<MCategory>> GetCategoriesAsync(int? userId)
         {
-            if (userId <= 0)
-            {
-                throw new ArgumentException("Invalid userId");
-            }
-
-            // Retrieve both user-specific and global categories
             return await _context.MCategories
-                      .Where(c => c.UserId == userId || (c.IsGlobal ?? false))
-                      .ToListAsync();
+                       .Where(c => c.UserId == userId || c.IsGlobal == true)
+                       .ToListAsync();
         }
 
         // Add a new category for a specific user
-        public async Task AddCategoryAsync(MCategory category, string userId)
+        public async Task AddCategoryAsync(MCategory category, int? userId)
         {
-            if (!int.TryParse(userId, out int userIdInt))
-            {
-                throw new ArgumentException("Invalid user ID");
-            }
-
-            category.UserId = userIdInt; // Assign the category to the user
+            category.UserId = userId; // Assign the category to the user
             _context.MCategories.Add(category);
             await _context.SaveChangesAsync();
         }
 
-        // Get category by Id and UserId
-        public async Task<MCategory> GetCategoryByIdAsync(int id, string userId)
+        // Get category by Id, accommodating both user-specific and global categories
+        public async Task<MCategory> GetCategoryByIdAsync(int id, int? userId)
         {
-            if (!int.TryParse(userId, out int userIdInt))
-            {
-                throw new ArgumentException("Invalid user ID");
-            }
-
             return await _context.MCategories
                                  .AsNoTracking()
-                                 .FirstOrDefaultAsync(c => c.CategoryId == id && c.UserId == userIdInt);
+                                 .FirstOrDefaultAsync(c => c.CategoryId == id && (c.UserId == userId || c.IsGlobal == true));
         }
 
-        // Update a category for a specific user
-        public async Task UpdateCategoryAsync(MCategory category, string userId)
+        // Update a category for a specific user, accommodating global categories if needed
+        public async Task UpdateCategoryAsync(MCategory category, int? userId)
         {
-            if (!int.TryParse(userId, out int userIdInt))
-            {
-                throw new ArgumentException("Invalid user ID");
-            }
-
             var existingCategory = await _context.MCategories
-                                                 .FirstOrDefaultAsync(c => c.CategoryId == category.CategoryId && c.UserId == userIdInt);
+                                                 .FirstOrDefaultAsync(c => c.CategoryId == category.CategoryId && (c.UserId == userId || c.IsGlobal == true));
             if (existingCategory != null)
             {
+                // Update fields for both user-specific and global categories
                 existingCategory.Name = category.Name;
                 existingCategory.Type = category.Type;
                 existingCategory.Icon = category.Icon;
@@ -83,18 +63,19 @@ namespace ASI.Basecode.WebApp.Services
             }
         }
 
-        // Delete a category by Id and UserId
-        public async Task DeleteCategoryAsync(int id, string userId)
+        // Delete a category by Id, with restrictions on specific global categories
+        public async Task DeleteCategoryAsync(int id, int? userId)
         {
-            if (!int.TryParse(userId, out int userIdInt))
-            {
-                throw new ArgumentException("Invalid user ID");
-            }
-
             var category = await _context.MCategories
-                                         .FirstOrDefaultAsync(c => c.CategoryId == id && c.UserId == userIdInt);
+                                         .FirstOrDefaultAsync(c => c.CategoryId == id && (c.UserId == userId || c.IsGlobal == true));
             if (category != null)
             {
+                // Prevent deletion of specific global categories: "Default Income" and "Default Expense"
+                if (category.IsGlobal && (category.Name == "Default Income" || category.Name == "Default Expense"))
+                {
+                    throw new InvalidOperationException("Default categories cannot be deleted.");
+                }
+
                 _context.MCategories.Remove(category);
                 await _context.SaveChangesAsync();
             }
@@ -104,11 +85,11 @@ namespace ASI.Basecode.WebApp.Services
             }
         }
 
-        // Get category name by ID
-        public async Task<string> GetCategoryNameByIdAsync(int categoryId, int userId)
+        // Get category name by ID, accommodating both user-specific and global categories
+        public async Task<string> GetCategoryNameByIdAsync(int categoryId, int? userId)
         {
             var category = await _context.MCategories
-                                         .FirstOrDefaultAsync(c => c.CategoryId == categoryId && c.UserId == userId);
+                                         .FirstOrDefaultAsync(c => c.CategoryId == categoryId && (c.UserId == userId || c.IsGlobal == true));
             return category?.Name; // Return the category name or null if not found
         }
     }

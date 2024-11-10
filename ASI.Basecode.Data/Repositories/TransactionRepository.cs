@@ -53,6 +53,7 @@ namespace ASI.Basecode.Data.Repositories
                 existingTransaction.Note = transaction.Note;
                 existingTransaction.CategoryId = transaction.CategoryId;
                 existingTransaction.WalletId = transaction.WalletId;
+                existingTransaction.TransactionSort = transaction.TransactionSort;
 
                 // Mark the entity as modified
                 _context.Entry(existingTransaction).State = EntityState.Modified;

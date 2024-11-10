@@ -40,7 +40,8 @@ public class TransactionService : ITransactionService
                 CategoryIcon = transaction.Category?.Icon ?? string.Empty,
                 WalletIcon = transaction.Wallet?.WalletIcon ?? string.Empty,
                 CategoryColor = transaction.Category?.Color ?? string.Empty,
-                WalletColor = transaction.Wallet?.WalletColor ?? string.Empty
+                WalletColor = transaction.Wallet?.WalletColor ?? string.Empty,
+                TransactionSort = transaction.TransactionSort
             });
 
         return transactionViewModels;
@@ -97,6 +98,8 @@ public class TransactionService : ITransactionService
         existingTransaction.Note = transaction.Note;
         existingTransaction.CategoryId = transaction.CategoryId;
         existingTransaction.WalletId = transaction.WalletId;
+        existingTransaction.TransactionSort = transaction.TransactionSort;
+
 
         // Step 3: Handle wallet change
         if (transaction.WalletId != previousWalletId)
@@ -178,7 +181,8 @@ public class TransactionService : ITransactionService
             TransactionType = model.TransactionType,
             Amount = model.Amount,
             TransactionDate = model.TransactionDate,
-            Note = model.Note
+            Note = model.Note,
+            TransactionSort = model.TransactionSort
         };
     }
 
@@ -194,7 +198,9 @@ public class TransactionService : ITransactionService
             TransactionType = viewModel.TransactionType,
             Amount = viewModel.Amount,
             TransactionDate = viewModel.TransactionDate,
-            Note = viewModel.Note
+            Note = viewModel.Note,
+            TransactionSort = viewModel.TransactionSort
+
         };
     }
 }

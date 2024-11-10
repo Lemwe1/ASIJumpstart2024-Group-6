@@ -417,8 +417,10 @@ document.getElementById('editAccountForm').addEventListener('submit', async (e) 
                     Amount: Math.abs(balance - oldBalance),
                     CategoryId: balance < oldBalance ? 1 : 2, // Category 2 for Expense, 1 for Income
                     TransactionType: balance < oldBalance ? 'Expense' : 'Income',
-                    Note: balance < oldBalance ? '  just Expense Wallet' : 'Adjust Income Wallet',
-                    TransactionDate: new Date().toISOString()
+                    Note: balance < oldBalance ? 'Adjust Expense Wallet' : 'Adjust Income Wallet',
+                    TransactionDate: new Date().toISOString(),
+                    TransactionSort: 'Edit'
+
                 };
 
                 // Create the transaction if the balance has changed

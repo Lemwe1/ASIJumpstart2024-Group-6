@@ -69,6 +69,10 @@ namespace ASI.Basecode.Data
 
                 entity.Property(e => e.TransactionDate).HasColumnType("date");
 
+                entity.Property(e => e.TransactionSort)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
                 entity.Property(e => e.TransactionType)
                     .IsRequired()
                     .HasMaxLength(50);
