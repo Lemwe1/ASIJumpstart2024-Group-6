@@ -18,6 +18,8 @@
         <tbody class="dark:bg-gray-700 dark:text-white">
             @if (ViewData["Transactions"] is List<TransactionViewModel> transactions)
             {
+                if (transactions.Count > 0)
+                {
                     @Html.AntiForgeryToken()
                     foreach (var transaction in transactions)
                     {
@@ -74,6 +76,13 @@
                             </td>
                         </tr>
                     }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="px-4 py-3 text-center text-gray-500 dark:text-white">No entries yet.</td>
+                    </tr>
+                }
             }
         </tbody>
     </table>
