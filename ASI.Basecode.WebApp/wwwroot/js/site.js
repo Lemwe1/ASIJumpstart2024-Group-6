@@ -1,19 +1,28 @@
-﻿document.addEventListener('DOMContentLoaded', () => {
-    const toggleButton = document.getElementById('theme-toggle');
+﻿document.addEventListener("DOMContentLoaded", () => {
 
-    if (toggleButton) {
-        toggleButton.addEventListener('click', () => {
-            // Toggle the dark mode class and save the preference in localStorage
-            if (document.documentElement.classList.contains('dark')) {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-            } else {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
-            }
+    // Theme toggle logic
+    const toggle = document.getElementById('theme-toggle');
+    const sunIcon = document.getElementById('sun-icon');
+    const moonIcon = document.getElementById('moon-icon');
 
-            // Reload the page to apply the theme change immediately
-            location.reload();
-        });
+    // Check if user has a previously saved theme preference
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark');
+        sunIcon.classList.remove('hidden');
+        moonIcon.classList.add('hidden');
     }
+
+    // Toggle between dark and light mode
+    toggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark');
+
+        // Toggle icon visibility
+        sunIcon.classList.toggle('hidden');
+        moonIcon.classList.toggle('hidden');
+
+        // Save the theme preference in local storage
+        const theme = document.body.classList.contains('dark') ? 'dark' : 'light';
+        localStorage.setItem('theme', theme);
+    });
 });
