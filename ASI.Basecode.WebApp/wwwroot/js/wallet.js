@@ -203,7 +203,7 @@ function loadDebitForm() {
             </div>
             <div class="mb-4">
                 <label class="block">Balance</label>
-                <input type="number" id="accountBalance" class="border p-2 w-full" placeholder="Enter balance amount" required step="any" />
+                <input type="number" id="accountBalance" class="border p-2 w-full" placeholder="0.00" required step="any" />
             </div>
             <div class="mb-6">
                 <label for="createIcon" class="block text-sm font-medium text-gray-700">Icon</label>
@@ -415,10 +415,12 @@ document.getElementById('editAccountForm').addEventListener('submit', async (e) 
                 const transactionData = {
                     WalletId: id,
                     Amount: Math.abs(balance - oldBalance),
-                    CategoryId: balance < oldBalance ? 1 : 2, // Category 2 for Expense, 1 for Income
+                    CategoryId: balance < oldBalance ? 2 : 1, // Category 2 for Expense, 1 for Income
                     TransactionType: balance < oldBalance ? 'Expense' : 'Income',
-                    Note: balance < oldBalance ? '  just Expense Wallet' : 'Adjust Income Wallet',
-                    TransactionDate: new Date().toISOString()
+                    Note: balance < oldBalance ? 'Adjust Expense Wallet' : 'Adjust Income Wallet',
+                    TransactionDate: new Date().toISOString(),
+                    TransactionSort: 'Edit'
+
                 };
 
                 // Create the transaction if the balance has changed
@@ -580,25 +582,3 @@ document.addEventListener('DOMContentLoaded', () => {
     loadDebitForm(); // Load the form fields initially
 });
 
-// Theme toggle script
-document.addEventListener('DOMContentLoaded', function () {
-    const toggle = document.getElementById('theme-toggle');
-    const sunIcon = document.getElementById('sun-icon');
-    const moonIcon = document.getElementById('moon-icon');
-
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark');
-        sunIcon.classList.remove('hidden');
-        moonIcon.classList.add('hidden');
-    }
-
-    toggle.addEventListener('click', () => {
-        document.body.classList.toggle('dark');
-        sunIcon.classList.toggle('hidden');
-        moonIcon.classList.toggle('hidden');
-
-        const theme = document.body.classList.contains('dark') ? 'dark' : 'light';
-        localStorage.setItem('theme', theme);
-    });
-});

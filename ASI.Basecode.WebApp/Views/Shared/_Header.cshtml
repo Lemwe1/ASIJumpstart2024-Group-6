@@ -1,28 +1,63 @@
 ﻿@using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
-<header class="@((ViewBag.LoginView == true) ? "hide-navbar" : "") shadow-sm">
-    <div class="logosec hover-pointer">
-        <img src="~/img/asi-logo-invert.svg"
-             style="width: 185px;" alt="logo"
-             onclick="window.location.href = '@Url.Action("Index", "Home")';">
-    </div>
-    <a asp-action="Index" asp-controller="User">Sample Crud Screen</a>
-    <div class="logosec ">
-        @HttpContextAccessor.HttpContext.Session.GetString("UserName")
-        <div class="mr-20 hover-pointer " style="position: relative">
-            <div class="dp">
-                <img src="~/img/profile-logo.png"
-                     class="dpicn hover-pointer"
-                     alt="dp">
-            </div>
-            <div class="dropdown">
-                <ul>
-                    <li>
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                        <a asp-action="SignOutUser" asp-controller="Account">Logout</a>
-                    </li>
-                </ul>
-            </div>
+<!-- Header -->
+<header class="bg-gray-100 dark:bg-gray-900 p-4 w-full z-40">
+    <div class="flex justify-between items-center w-full">
+        <div class="flex items-center space-x-4">
+            <button class="text-black dark:text-white focus:outline-none">
+                <i class="fas fa-search text-xl"></i>
+            </button>
+            <input type="text" class="p-2 rounded-lg bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200" placeholder="Search..." />
         </div>
+        <label id="theme-toggle" class="inline-flex items-center cursor-pointer absolute top-6 right-5">
+            <input type="checkbox" class="sr-only peer" id="theme-checkbox">
+            <span class="dark:text-white mr-3">Dark Mode</span>
+            <div class="relative w-12 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:bg-blue-600">
+                <svg id="sun-icon" class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 text-yellow-500 transition-transform transform peer-checked:translate-x-full" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 2a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5A.75.75 0 0110 2zm0 16a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5a.75.75 0 01-.75-.75zm8.7-7.3a.75.75 0 010 1.5h-1.5a.75.75 0 010-1.5h1.5zM2 10a.75.75 0 01.75-.75H4.25a.75.75 0 010 1.5H2.75A.75.75 0 012 10zm12.07 7.07a.75.75 0 011.06-1.06l1.06 1.06a.75.75 0 01-1.06 1.06l-1.06-1.06zM4.93 4.93a.75.75 0 011.06-1.06L7.06 4.93a.75.75 0 01-1.06 1.06L4.93 5.99zM16.07 4.93a.75.75 0 011.06-1.06l1.06 1.06a.75.75 0 01-1.06 1.06L16.07 4.93zM4.93 16.07a.75.75 0 011.06 0l1.06-1.06a.75.75 0 00-1.06-1.06L4.93 15.01a.75.75 0 000 1.06zM10 5.75a4.25 4.25 0 110 8.5 4.25 4.25 0 010-8.5zm0 1.5a2.75 2.75 0 100 5.5 2.75 2.75 0 000-5.5z" />
+                </svg>
+                <svg id="moon-icon" class="w-5 h-5 bg-white rounded-full absolute top-0.5 right-0.5 text-black dark:text-gray-300 transition-transform transform peer-checked:-translate-x-full" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 2a8 8 0 017.463 10.84c-.152.593-.608.91-1.2.91a1.19 1.19 0 01-.75-.255 7.9 7.9 0 00-5.513-2.127 7.91 7.91 0 00-2.126 5.514 1.188 1.188 0 01-.255.75 1.189 1.189 0 01-.91.451A8 8 0 0110 2zM2 10a8 8 0 0016 0A8 8 0 002 10z" />
+                </svg>
+            </div>
+        </label>
     </div>
 </header>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const themeCheckbox = document.getElementById('theme-checkbox');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+
+        // Get the saved theme, default to 'light' if not set
+        const savedTheme = localStorage.getItem('theme') || 'light';
+
+        // Apply the theme on page load
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark');
+            themeCheckbox.checked = true;
+            sunIcon.classList.add('hidden');  // Hide sun icon
+            moonIcon.classList.remove('hidden');  // Show moon icon
+        } else {
+            sunIcon.classList.remove('hidden');  // Show sun icon
+            moonIcon.classList.add('hidden');  // Hide moon icon
+        }
+
+        // Handle theme toggle when the checkbox changes
+        themeCheckbox.addEventListener('change', () => {
+            // Toggle the dark mode class on the body
+            document.body.classList.toggle('dark');
+
+            // Toggle the visibility of the icons
+            sunIcon.classList.toggle('hidden');
+            moonIcon.classList.toggle('hidden');
+
+            // Save the current theme to localStorage
+            const theme = document.body.classList.contains('dark') ? 'dark' : 'light';
+            localStorage.setItem('theme', theme);
+        });
+    });
+
+</script>
+

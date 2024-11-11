@@ -53,6 +53,7 @@ namespace ASI.Basecode.Data.Repositories
                 existingTransaction.Note = transaction.Note;
                 existingTransaction.CategoryId = transaction.CategoryId;
                 existingTransaction.WalletId = transaction.WalletId;
+                existingTransaction.TransactionSort = transaction.TransactionSort;
 
                 // Mark the entity as modified
                 _context.Entry(existingTransaction).State = EntityState.Modified;
@@ -79,5 +80,12 @@ namespace ASI.Basecode.Data.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<bool> IsCategoryInUseAsync(int categoryId)
+        {
+            // Check if any transaction uses the given category ID
+            return await _context.MTransactions.AnyAsync(t => t.CategoryId == categoryId);
+        }
+
     }
 }

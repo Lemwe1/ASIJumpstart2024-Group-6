@@ -13,6 +13,7 @@ namespace ASI.Basecode.Data.Models
         public decimal Amount { get; set; }
         public DateTime TransactionDate { get; set; }
         public string Note { get; set; }
+        public string TransactionSort { get; set; }
 
         public virtual MCategory Category { get; set; }
         public virtual MUser User { get; set; }

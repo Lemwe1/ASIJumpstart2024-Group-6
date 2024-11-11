@@ -1,3 +1,4 @@
-#settings-content {
-    background: #f8f8f8;
+
+#theme-toggle {
+    transition: color 0.3s;
 }

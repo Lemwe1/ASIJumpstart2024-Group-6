@@ -1,6 +1,7 @@
 ﻿using ASI.Basecode.Data.Models;
+using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.WebApp.Models;
-using ASI.Basecode.WebApp.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -10,30 +11,31 @@ using System.Threading.Tasks;
 
 namespace ASI.Basecode.WebApp.Controllers
 {
+    [Authorize] // Ensure that the user is authenticated for all actions
+    [Route("Category")]
     public class CategoryController : Controller
     {
-        private readonly CategoryService _categoryService;
+        private readonly ICategoryService _categoryService;
 
-        public CategoryController(CategoryService categoryService)
+        public CategoryController(ICategoryService categoryService)
         {
             _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
         }
 
+        // GET: /Category
+        [HttpGet("")]
         public async Task<IActionResult> Index()
         {
             ViewData["Title"] = "Category List";
 
-            // Get user ID
+            // Get user ID as string
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdString))
-            {
-                return Unauthorized();
-            }
 
-            // Convert the string userId to an integer
-            if (!int.TryParse(userIdString, out int userId))
+            // Convert userIdString to int?
+            int? userId = null;
+            if (!string.IsNullOrEmpty(userIdString) && int.TryParse(userIdString, out int parsedUserId))
             {
-                return BadRequest("Invalid user ID");
+                userId = parsedUserId;
             }
 
             // Retrieve list of MCategory for both user-specific and global categories
@@ -53,16 +55,10 @@ namespace ASI.Basecode.WebApp.Controllers
         }
 
         // GET: /Category/GetCategory/{id}
-        [HttpGet]
+        [HttpGet("GetCategory/{id}")]
         public async Task<IActionResult> GetCategory(int id)
         {
-            // Get user ID
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized();
-            }
-
+            var userId = GetUserId();
             var category = await _categoryService.GetCategoryByIdAsync(id, userId);
             if (category == null)
             {
@@ -83,24 +79,19 @@ namespace ASI.Basecode.WebApp.Controllers
         }
 
         // POST: /Category/Create
-        [HttpPost]
+        [HttpPost("Create")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CategoryViewModel categoryViewModel)
         {
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
-                return BadRequest(new { success = false, message = "Please Fill Up Everything", errors });
+                return BadRequest(new { success = false, message = "Please fill up everything.", errors });
             }
 
             try
             {
-                // Get user ID
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (string.IsNullOrEmpty(userId))
-                {
-                    return Unauthorized();
-                }
+                var userId = GetUserId();
 
                 // Map CategoryViewModel to MCategory
                 var category = new MCategory
@@ -121,7 +112,7 @@ namespace ASI.Basecode.WebApp.Controllers
         }
 
         // POST: /Category/Edit/{id}
-        [HttpPost]
+        [HttpPost("Edit/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, CategoryViewModel categoryViewModel)
         {
@@ -133,17 +124,12 @@ namespace ASI.Basecode.WebApp.Controllers
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
-                return BadRequest(new { success = false, message = "Invalid data", errors });
+                return BadRequest(new { success = false, message = "Invalid data.", errors });
             }
 
             try
             {
-                // Get user ID
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (string.IsNullOrEmpty(userId))
-                {
-                    return Unauthorized();
-                }
+                var userId = GetUserId();
 
                 // Map CategoryViewModel to MCategory
                 var category = new MCategory
@@ -169,21 +155,20 @@ namespace ASI.Basecode.WebApp.Controllers
         }
 
         // POST: /Category/Delete/{id}
-        [HttpPost]
+        [HttpPost("Delete/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                // Get user ID
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (string.IsNullOrEmpty(userId))
-                {
-                    return Unauthorized();
-                }
+                var userId = GetUserId();
 
                 await _categoryService.DeleteCategoryAsync(id, userId);
                 return Json(new { success = true, message = "Category deleted successfully." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
             }
             catch (KeyNotFoundException knfEx)
             {
@@ -193,6 +178,17 @@ namespace ASI.Basecode.WebApp.Controllers
             {
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
+        }
+
+        // Helper method to retrieve the user ID from claims
+        private int? GetUserId()
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!string.IsNullOrEmpty(userIdString) && int.TryParse(userIdString, out int parsedUserId))
+            {
+                return parsedUserId;
+            }
+            return null;
         }
     }
 }

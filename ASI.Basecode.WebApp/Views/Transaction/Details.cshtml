@@ -5,7 +5,7 @@
 
 <div class="overflow-x-auto shadow-md">
     <table class="transaction-table bg-white dark:bg-gray-800 rounded-lg w-full text-gray-900 dark:text-gray-200">
-        <thead class="bg-gray-200 dark:bg-gray-800 dark:text-white">
+        <thead class="bg-gray-200 dark:bg-gray-900 dark:text-white">
             <tr>
                 <th class="p-4 text-left">Category</th>
                 <th class="p-4 text-left">Amount</th>
@@ -26,7 +26,7 @@
                         <tr data-category="@transaction.CategoryId" class="border-b border-gray-300 dark:border-gray-600 odd:bg-white even:bg-gray-100 dark:odd:bg-gray-800 dark:even:bg-gray-700">
                             <td class="px-4 py-4 w-1/6 whitespace-nowrap">
                                 <div class="flex items-center space-x-4">
-                                    <span class="flex items-center justify-center p-2 w-12 h-12 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: @transaction.CategoryColor;">
+                                    <span class="flex items-center justify-center p-2 w-12 h-12 rounded-full" style="background-color: @transaction.CategoryColor;">
                                         <i class="@transaction.CategoryIcon text-white"></i>
                                     </span>
                                     <span>@transaction.CategoryName</span>
@@ -52,7 +52,7 @@
 
                             <td class="px-4 py-4 w-1/6 whitespace-nowrap">
                                 <div class="flex items-center space-x-4">
-                                    <span class="flex items-center justify-center p-2 w-12 h-12 rounded-full border border-gray-300 dark:border-gray-600" style="background-color: @transaction.WalletColor;">
+                                    <span class="flex items-center justify-center p-2 w-12 h-12 rounded-full" style="background-color: @transaction.WalletColor;">
                                         <i class="@transaction.WalletIcon text-white"></i>
                                     </span>
                                     <span>@transaction.WalletName</span>
@@ -80,7 +80,7 @@
                 else
                 {
                     <tr>
-                        <td colspan="6" class="px-4 py-3 text-center text-gray-500 dark:text-gray-400">No entries yet.</td>
+                        <td colspan="6" class="px-4 py-3 text-center text-gray-500 dark:text-white">No entries yet.</td>
                     </tr>
                 }
             }

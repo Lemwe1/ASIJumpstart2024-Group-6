@@ -4,8 +4,11 @@
     color: #fff;
 }
 
-/* Button styles */
 #addAccountButton {
+    border-radius: 0.5rem;
+}
+/* Button styles */
+    #addAccountButton {
     padding: 0.5rem 1rem;
     background-color: transparent; /* or none */
     color: #fff;
