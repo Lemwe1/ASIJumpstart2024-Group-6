@@ -32,6 +32,19 @@ namespace ASI.Basecode.Services.Services
         // Add a new category for a specific user
         public async Task AddCategoryAsync(MCategory category, int? userId)
         {
+            // **Modification Starts Here**
+
+            // Check if category with the same name already exists for the user or globally
+            bool categoryExists = await _context.MCategories
+                .AnyAsync(c => c.Name == category.Name && (c.UserId == userId || c.IsGlobal));
+
+            if (categoryExists)
+            {
+                throw new InvalidOperationException("A category with the same name already exists.");
+            }
+
+            // **Modification Ends Here**
+
             category.UserId = userId; // Assign the category to the user
             _context.MCategories.Add(category);
             await _context.SaveChangesAsync();
@@ -52,6 +65,19 @@ namespace ASI.Basecode.Services.Services
                                                  .FirstOrDefaultAsync(c => c.CategoryId == category.CategoryId && (c.UserId == userId || c.IsGlobal == true));
             if (existingCategory != null)
             {
+                // **Modification Starts Here**
+
+                // Check if another category with the same name exists (excluding the current category)
+                bool categoryExists = await _context.MCategories
+                    .AnyAsync(c => c.Name == category.Name && c.CategoryId != category.CategoryId && (c.UserId == userId || c.IsGlobal));
+
+                if (categoryExists)
+                {
+                    throw new InvalidOperationException("A category with the same name already exists.");
+                }
+
+                // **Modification Ends Here**
+
                 // Update fields for both user-specific and global categories
                 existingCategory.Name = category.Name;
                 existingCategory.Type = category.Type;

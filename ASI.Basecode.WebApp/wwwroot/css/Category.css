@@ -5,13 +5,6 @@
     z-index: 10;
 }
 
-/* Dark Mode Overrides for Modal Content */
-.dark .darken-modal-content {
-    background-color: #f7fafc; /* Tailwind's gray-100 */
-    color: #2d3748; /* Tailwind's gray-800 */
-}
-
-
 .category-card {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -43,33 +36,6 @@
     .category-card a:hover {
         opacity: 1;
     }
-
-/* Modal Content Styles */
-.modal-content {
-    z-index: 10;
-    background-color: white; /* Default background color */
-    color: black; /* Default text color */
-    padding: 20px; /* Add some padding */
-    border-radius: 8px; /* Rounded corners */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Add shadow */
-}
-
-/* Dark Mode Overrides for Modal Content */
-.dark .darken-modal-content {
-    background-color: #2d3748; /* Tailwind's gray-800 */
-    color: #f7fafc; /* Tailwind's gray-100 */
-}
-
-    /* Dark Mode Overrides for Input Fields */
-    .dark .darken-modal-content input,
-    .dark .darken-modal-content select,
-    .dark .darken-modal-content textarea {
-        background-color: #4a5568; /* Tailwind's gray-700 */
-        color: #f7fafc; /* Tailwind's gray-100 */
-        border: 1px solid #718096; /* Tailwind's gray-600 */
-    }
-
-
 
 /* Responsive Grid Adjustments */
 @media (max-width: 768px) {

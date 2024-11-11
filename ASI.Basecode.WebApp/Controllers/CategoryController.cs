@@ -105,6 +105,15 @@ namespace ASI.Basecode.WebApp.Controllers
                 await _categoryService.AddCategoryAsync(category, userId);
                 return Json(new { success = true, message = "Category created successfully." });
             }
+            catch (InvalidOperationException ex)
+            {
+                // **Modification Starts Here**
+
+                // Return a bad request with the error message
+                return BadRequest(new { success = false, message = ex.Message });
+
+                // **Modification Ends Here**
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, new { success = false, message = ex.Message });
@@ -143,6 +152,15 @@ namespace ASI.Basecode.WebApp.Controllers
 
                 await _categoryService.UpdateCategoryAsync(category, userId);
                 return Json(new { success = true, message = "Category updated successfully." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                // **Modification Starts Here**
+
+                // Return a bad request with the error message
+                return BadRequest(new { success = false, message = ex.Message });
+
+                // **Modification Ends Here**
             }
             catch (KeyNotFoundException knfEx)
             {
