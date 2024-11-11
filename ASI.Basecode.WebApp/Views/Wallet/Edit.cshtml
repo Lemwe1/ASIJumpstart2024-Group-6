@@ -16,15 +16,15 @@
             @Html.AntiForgeryToken()
             <input type="hidden" id="editAccountId" />
             <div class="mb-4">
-                <label class="block">&#128226;Name</label>
+                <label class="block">Name</label>
                 <input type="text" id="editAccountName" class="border p-2 w-full" required />
             </div>
             <div class="mb-4">
-                <label class="block">&#128181;Balance</label>
+                <label class="block">Balance</label>
                 <input type="number" id="editAccountBalance" class="border p-2 w-full" required step="any" />
             </div>
             <div class="mb-6">
-                <label for="createIcon" class="block text-sm font-medium text-gray-700">&#128295;Icon</label>
+                <label for="createIcon" class="block text-sm font-medium text-gray-700">Icon</label>
                 <select name="Icon" id="editCreateIcon" class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500" required>
                     <option value="">Select Icon</option>
                     <option value="🏦">🏦 Bank</option>
@@ -34,7 +34,7 @@
                 </select>
             </div>
             <div class="mb-4">
-                <label class="block">&#127912; Color</label>
+                <label class="block">Color</label>
                 <input type="color" id="editAccountColor" class="border p-2 w-full" style="height: 50px;" required />
             </div>
             <div class="text-right mt-4">
