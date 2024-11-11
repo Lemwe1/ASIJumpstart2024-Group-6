@@ -16,8 +16,16 @@
                 <input type="checkbox" class="sr-only peer" id="theme-checkbox">
                 <span class="dark:text-white mr-3">Dark Mode</span>
                 <div class="relative w-12 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:bg-blue-600">
-                    <svg id="sun-icon" class="w-6 h-6 bg-white border-1 shadow-sm border-gray-300 rounded-full absolute mb-20 text-yellow-500 transition-transform transform peer-checked:translate-x-full" fill="currentColor" viewBox="0 0 20 20"></svg>
-                    <svg id="moon-icon" class="w-6 h-6 bg-gray-100 border-2 dark:border-white rounded-full absolute mb-20 right-0.5 text-gray-100 dark:text-gray-300 transition-transform transform peer-checked:-translate-x-full" fill="currentColor" viewBox="0 0 20 20"></svg>
+                    <!-- Sun Icon with Border and Circle -->
+                    <div id="sun-icon" class="w-6 h-6 bg-white border-2 border-gray-300 rounded-full flex items-center justify-center  text-yellow-500 transition-transform transform peer-checked:translate-x-full">
+                        <span class="text-sm">☀️</span> <!-- Emoji for Sun -->
+                    </div>
+
+                    <!-- Moon Icon with Border and Circle -->
+                    <div id="moon-icon" class="w-6 h-6 p-2 bg-gray-100 border-2 dark:border-white rounded-full flex items-center justify-center absolute right-1 dark:text-gray-300 transition-transform transform peer-checked:-translate-x-full">
+                        <span class="text-sm">🌑</span> <!-- Emoji for Moon -->
+                    </div>
+
                 </div>
             </label>
         </div>

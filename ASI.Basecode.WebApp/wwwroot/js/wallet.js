@@ -199,15 +199,15 @@ function loadDebitForm() {
     if (addFormFields) {
         addFormFields.innerHTML = `
             <div class="mb-4">
-                <label class="block">&#128226;Name</label>
+                <label class="block">Name</label>
                 <input type="text" id="accountName" class="border p-2 w-full" placeholder="Enter account name" required />
             </div>
             <div class="mb-4">
-                <label class="block">💰 Balance</label>
+                <label class="block">Balance</label>
                 <input type="number" id="accountBalance" class="border p-2 w-full" placeholder="0.00" required step="any" />
             </div>
             <div class="mb-6">
-                <label for="createIcon" class="block text-sm font-medium text-gray-700">&#128295;Icon</label>
+                <label for="createIcon" class="block text-sm font-medium text-gray-700">Icon</label>
                 <select name="Icon" id="createIcon" class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500" required>
                     <option value="">Select Icon</option>
                     <option value="🏦">🏦 Bank</option>
@@ -217,7 +217,7 @@ function loadDebitForm() {
                 </select>
             </div>
             <div class="mb-4">
-                <label class="block">&#127912;Color</label>
+                <label class="block">Color</label>
                 <input type="color" id="accountColor" class="border p-2 w-full" style="height: 50px;" title="Choose a color" required />
             </div>
         `;
