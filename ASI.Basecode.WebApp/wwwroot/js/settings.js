@@ -20,4 +20,28 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+
+    // Function to toggle password visibility
+    function togglePasswordVisibility(inputId, iconId) {
+        const passwordField = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+
+        icon.addEventListener('click', function () {
+            // Toggle the type between password and text
+            if (passwordField.type === "password") {
+                passwordField.type = "text"; // Show the password
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash'); // Change the icon to eye-slash
+            } else {
+                passwordField.type = "password"; // Hide the password
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye'); // Change the icon to eye
+            }
+        });
+    }
+
+    // Call the function for each password input field
+    togglePasswordVisibility('current-password', 'toggle-current-password');
+    togglePasswordVisibility('new-password', 'toggle-new-password');
+    togglePasswordVisibility('confirm-password', 'toggle-confirm-password');
 });
