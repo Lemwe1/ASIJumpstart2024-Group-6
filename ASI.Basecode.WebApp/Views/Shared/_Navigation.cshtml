@@ -2,7 +2,7 @@
 @inject IHttpContextAccessor HttpContextAccessor
 
 <!-- Navigation Bar -->
-<div class="flex flex-col min-h-screen w-72 border-r border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-900">
+<div class="flex flex-col min-h-screen w-72 border-r border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-900  ">
     <!-- SpendWise Title -->
     <div class="p-4 text-center">
         <h2 class="mt-2 font-medium text-3xl">
@@ -15,7 +15,7 @@
         <img class="w-20 h-20 rounded-full mx-auto" src="~/img/profile-logo.png" alt="Profile Picture" />
     </div>
     <!-- Navigation -->
-    <nav class="flex-1 pl-5 lg:pl-4 mt-5 overflow-y-auto bg-gray-100 dark:bg-gray-900 ">
+    <nav class="flex-1 pl-4 lg:pl-4 mt-5 overflow-y-auto bg-gray-100 dark:bg-gray-900">
         <ul class="w-full flex flex-col">
             <li class="my-2">
                 <a asp-controller="Home" asp-action="Index" class="flex items-center py-3 px-4 rounded-l
@@ -34,7 +34,7 @@
                 </a>
             </li>
             <li class="my-2">
-                <a asp-controller="Category" asp-action="Index" class="flex items-center py-3 px-4 rounded-l 
+                <a asp-controller="Category" asp-action="Index" class="flex items-center py-3 pl-4 rounded-l 
                     @(ViewData["Title"].ToString() == "Category Page" ?
                    "active bg-blue-500 text-white border-r-4 border-blue-200  hover:no-underline hover:text-blue-500" :
                     "text-gray-500 dark:text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-500 hover:no-underline")">

@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    
+
     // Function to toggle password visibility
     function togglePasswordVisibility(inputId, iconId) {
         const passwordField = document.getElementById(inputId);
@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Call the togglePasswordVisibility function for each password input
+    // Call the function for each password input field
     togglePasswordVisibility('current-password', 'toggle-current-password');
     togglePasswordVisibility('new-password', 'toggle-new-password');
     togglePasswordVisibility('confirm-password', 'toggle-confirm-password');
@@ -28,11 +28,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const changePictureButton = document.getElementById('change-picture-btn');
     const fileInput = document.getElementById('file-input');
     const profilePicture = document.getElementById('profile-picture');
-
     changePictureButton.addEventListener('click', () => {
         fileInput.click();  // Trigger the file input dialog
     });
-
     // Update profile picture preview when a new image is selected
     fileInput.addEventListener('change', (event) => {
         const file = event.target.files[0];

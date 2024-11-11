@@ -32,7 +32,7 @@
             const rowCategory = row.dataset.category; // Get the category from the row
             if (categoryFilter === 'All' || rowCategory === categoryFilter) {
                 row.style.display = ''; // Show matching row
-                hasVisibleTransactions = true; // Set flag if at least one row is visible
+                hasVisibleTransactions = true;
             } else {
                 row.style.display = 'none'; // Hide non-matching row
             }
@@ -47,13 +47,14 @@
             noTransactionsRow.innerHTML = `<td colspan="6" class="px-4 py-3 text-center text-gray-500 dark:text-white">&#x1F937; No transactions found.</td>`;
             document.querySelector('.transaction-table tbody').appendChild(noTransactionsRow);
         }
-
         // Show "No transactions found" message only if no rows are visible
         noTransactionsRow.style.display = hasVisibleTransactions ? 'none' : '';
     };
 
     // Initial filter on page load
     filterTableByCategory();
+
+
     // Event listener for category filter
     document.querySelector('select[name="filterByCategory"]').addEventListener('change', filterTableByCategory);
 
@@ -598,6 +599,4 @@
     // Handle form submission
     transactionForm.addEventListener('submit', handleAddTransaction);
     editTransactionForm.addEventListener('submit', handleEditTransaction);
-
-  
 });

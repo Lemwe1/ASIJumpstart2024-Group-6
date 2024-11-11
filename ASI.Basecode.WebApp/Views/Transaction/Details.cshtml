@@ -18,6 +18,7 @@
         <tbody class="dark:bg-gray-700 dark:text-white">
             @if (ViewData["Transactions"] is List<TransactionViewModel> transactions)
             {
+
                     @Html.AntiForgeryToken()
                     foreach (var transaction in transactions)
                     {
@@ -74,6 +75,7 @@
                             </td>
                         </tr>
                     }
+                
             }
         </tbody>
     </table>
