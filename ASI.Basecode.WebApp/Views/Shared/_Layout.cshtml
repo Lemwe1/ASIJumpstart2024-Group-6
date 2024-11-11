@@ -18,6 +18,7 @@
     @RenderSection("Styles", required: false)
 </head>
 <body>
+
     <div class="flex min-h-screen">
         <!-- Conditionally render navigation based on the controller/action -->
         @{
@@ -29,25 +30,28 @@
         (action != "Login" && action != "Register" && action != "ForgotPassword" && action != "ResetPassword"
         && action != "VerifyEmail" && action != "ResendVerificationLink"))
         {
-                <!-- Sidebar Navigation for larger screens (lg and above) -->
-                <nav id="sidebar-nav" class="hidden lg:flex  w-72">
+            <!-- Sidebar Navigation for larger screens (lg and above) -->
+            <nav id="sidebar-nav" class="hidden lg:flex w-72">
                 @Html.Partial("_Navigation")
-                </nav>
+            </nav>
 
-                <!-- Mini Sidebar Navigation for small screens (below lg) -->
-                <nav id="mini-sidebar-nav" class="flex lg:hidden w-20">
+            <!-- Mini Sidebar Navigation for small screens (below lg) -->
+            <nav id="mini-sidebar-nav" class="flex lg:hidden w-20">
                 @Html.Partial("_MiniNavigation")
-                </nav>
+            </nav>
         }
 
         <!-- Main Content Area -->
-        <main role="main" class="flex-1 dark:bg-gray-900">
+        <main role="main" class="w-full dark:bg-gray-800 overflow-x-auto">
+            @if (controller != "Account" || (action != "Login" && action != "Register" && action != "ForgotPassword" && action != "ResetPassword"))
+            {
+                @Html.Partial("_Header")
+            }
             @RenderBody()
         </main>
     </div>
 
     <!-- Scripts -->
-    <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.js"></script>

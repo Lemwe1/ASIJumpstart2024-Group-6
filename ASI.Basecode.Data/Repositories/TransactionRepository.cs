@@ -80,5 +80,12 @@ namespace ASI.Basecode.Data.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<bool> IsCategoryInUseAsync(int categoryId)
+        {
+            // Check if any transaction uses the given category ID
+            return await _context.MTransactions.AnyAsync(t => t.CategoryId == categoryId);
+        }
+
     }
 }

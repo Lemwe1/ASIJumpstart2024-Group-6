@@ -9,7 +9,7 @@
 <!-- Sidebar and Content -->
 <div class="flex min-h-screen">
     <!-- Main Content Area -->
-    <div class="flex-1 p-6 bg-gray-50 dark:bg-gray-900 text-gray-900 ">
+    <div class="flex-1 p-6 bg-gray-50 dark:bg-gray-800 text-gray-900 ">
 
         <!-- Dashboard Header -->
         <div class="my-4">
@@ -18,17 +18,17 @@
 
         <!-- Dashboard Cards -->
         <div class="grid grid-cols-3 gap-6 mb-8">
-            <div class="bg-green-500 shadow-md text-white p-6 rounded-lg">
+            <div class="bg-green-500 border-2 border-black shadow-md text-white p-6 rounded-lg">
                 <h3 class="text-s">Current Balance</h3>
                 <p class="mt-10 text-3xl font-bold">₱&nbsp;@ViewBag.TotalDebit.ToString("0.00")</p>
             </div>
-            <div class="bg-red-500 shadow-md text-white p-6 rounded-lg">
+            <div class="bg-red-500 border-2 border-black shadow-md text-white p-6 rounded-lg">
                 <h3 class="text-s ">Total Expenses</h3>
                 <p class="mt-10 text-3xl font-bold">
                     <i class="fas fa-angles-up text-3xl font-bold mr-4"></i>₱&nbsp;@ViewBag.TotalExpense.ToString("0.00")
                 </p>
             </div>
-            <div class="bg-blue-500 text-white p-6 rounded-lg">
+            <div class="bg-blue-500 border-2 border-black text-white p-6 rounded-lg">
                 <h3 class="text-s ">Total Income</h3>
                 <p class="mt-10 text-3xl font-bold">
                     <i class="fas fa-angles-down text-3xl font-bold mr-4"></i>₱&nbsp;@ViewBag.TotalIncome.ToString("0.00")
@@ -39,7 +39,7 @@
 
         <!-- Trends and Monthly Charts -->
         <div class="grid grid-cols-3 gap-6 mb-8">
-            <div class="bg-white  p-6 shadow-md rounded-lg">
+            <div class="bg-white p-6 shadow-md rounded-lg">
                 <h4 class="font-bold">Trends</h4>
                 <!-- Chart Placeholder -->
             </div>
@@ -62,8 +62,8 @@
             </a>
 
             <a asp-controller="Transaction" asp-action="Index">
-                <div id="dialog-message" class="fixed bottom-8 right-24 bg-white border-2 border-blue-200 text-gray-700 text-sm rounded-lg p-3 shadow-l transition-opacity duration-300 opacity-0 mr-2">
-                    Click to add transaction!
+                <div id="dialog-message" class="fixed bottom-8 right-24 bg-gray-100 dark:bg-gray-700 dark:text-white border-2 border-blue-200 text-gray-700 text-sm rounded-lg p-3 shadow-l transition-opacity duration-300 opacity-0 mr-2">
+                    Click me to add transaction!
                 </div>
             </a>
 

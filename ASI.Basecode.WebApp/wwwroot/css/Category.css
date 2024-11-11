@@ -32,18 +32,6 @@
     transition: border-color 0.3s ease;
 }
 
-    #newCategoryCard:hover {
-        border-color: #a0aec0; /* Tailwind's gray-400 */
-    }
-
-/* Icon Styles within Category Cards */
-.category-card i {
-    transition: color 0.3s ease;
-}
-
-.category-card:hover i {
-    color: #cbd5e0; /* Tailwind's gray-400 */
-}
 
 /* Edit Icon Styles */
 .category-card a {
