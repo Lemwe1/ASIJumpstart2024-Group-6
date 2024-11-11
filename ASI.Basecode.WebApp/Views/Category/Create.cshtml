@@ -5,58 +5,119 @@
 }
 
 <!-- Create Category Modal -->
-<!-- Create Category Modal -->
 <div id="createCategoryModal" class="modal fixed inset-0 bg-gray-800 bg-opacity-50 items-center justify-center hidden">
-    <!-- Matching width and padding with Add Transaction modal -->
-    <div class="modal-content bg-white p-6 rounded-lg shadow-lg w-full max-w-lg mx-auto darken-modal-content">
+    <div class="modal-content dark:bg-gray-700 p-6 rounded-lg shadow-lg w-full max-w-lg mx-auto">
         <div class="flex justify-between items-center mb-4">
-            <h2 class="text-2xl font-bold text-black">Add Category</h2>
-            <button id="closeCreateModal" class="absolute top-2 right-2 text-gray-400 hover:bg-gray-200 p-2 w-10 rounded-full" aria-label="Close Create Category Modal">
-                <i class="fas fa-times"></i>
+            <h2 class="text-2xl font-bold text-black dark:text-white">Add Category</h2>
+            <button id="closeCreateModal" class="absolute top-2 right-2 text-gray-400 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 p-2 w-10 rounded-full" aria-label="Close Create Category Modal">
+                <i class="fas fa-times dark:text-white"></i>
             </button>
         </div>
-        <p class="mb-4 text-sm text-gray-500">Fill out all the fields below to add a category.</p>
+        <p class="mb-4 text-sm text-gray-500 dark:text-gray-400 dark:text-gray-300">Fill out all the fields below to add a category.</p>
 
         <!-- Form -->
         <form id="categoryForm" asp-controller="Category" asp-action="Create" method="post">
             @Html.AntiForgeryToken()
-            <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 inline">Type</label>
-                <span class="text-gray-500 text-xs inline-block mb-2">(Select A type)</span>
-                <div class="flex space-x-4">
-                    <button type="button" id="createExpenseButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800">Expense</button>
-                    <button type="button" id="createIncomeButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800">Income</button>
-                </div>
 
+            <!-- Type Field -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 inline">Type</label>
+                <span class="text-gray-500 dark:text-gray-400 text-xs inline-block mb-2 dark:text-gray-300">(Select A type)</span>
+                <div class="flex space-x-4">
+                    <button type="button" id="createExpenseButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800"> Expense</button>
+                    <button type="button" id="createIncomeButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800"> Income</button>
+                </div>
                 <input type="hidden" name="Type" id="createTypeInput" value="Expense" />
             </div>
 
+            <!-- Name Field -->
             <div class="mb-6">
-                <label for="createName" class="block text-sm font-medium text-gray-700">Name</label>
-                <input type="text" name="Name" id="createName" placeholder="Enter Name" class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500" required />
+                <label for="createName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">&#128226; Name</label>
+                <input type="text" name="Name" id="createName" placeholder="Enter Name" class="mt-1 block w-full px-4 py-2 border rounded-md dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
             </div>
 
+            <!-- Icon Field -->
             <div class="mb-6">
-                <label for="createIcon" class="block text-sm font-medium text-gray-700">Icon</label>
-                <select name="Icon" id="createIcon" class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500">
+                <label for="createIcon" class="block text-sm font-medium text-gray-700 dark:text-gray-300">&#128295; Icon</label>
+                <select name="Icon" id="createIcon" class="mt-1 block w-full px-4 py-2 border rounded-md dark:bg-gray-700 text-gray-900 dark:text-white">
                     <option value="">Select Icon</option>
-                    <option value="fas fa-apple-alt">Apple (Food)</option>
-                    <option value="fas fa-shopping-bag">Shopping Bag</option>
-                    <option value="fas fa-bolt">Bolt (Electricity)</option>
-                    <option value="fas fa-wallet">Wallet (Income)</option>
-                    <option value="fas fa-money-bill-wave">Money (Expense)</option>
+                    <option value="🍎" class="dark:text-white">🍎 Apple (Food)</option>
+                    <option value="👜" class="dark:text-gray-400 dark:text-white">👜 Shopping Bag</option>
+                    <option value="⚡" class="dark:text-gray-400 dark:text-white">⚡ Bolt (Electricity)</option>
+                    <option value="💰" class="dark:text-gray-400 dark:text-white">💰 Wallet (Income)</option>
+                    <option value="💵" class="dark:text-gray-400 dark:text-white">💵 Money (Expense)</option>
                 </select>
             </div>
 
+            <!-- Color Picker Field -->
             <div class="mb-6">
-                <label for="createColorPicker" class="block text-sm font-medium text-gray-700">Select Color</label>
-                <input type="color" name="Color" id="createColorPicker" class="mt-1 block w-full h-12 border rounded-md bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500" required />
+                <label for="createColorPicker" class="block text-sm font-medium text-gray-700 dark:text-gray-300">&#127912; Select Color</label>
+                <input type="color" name="Color" id="createColorPicker" class="mt-1 block w-full h-12 border rounded-md dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
             </div>
 
+            <!-- Error Message Display -->
+            <div id="errorMessage" class="mb-4 text-red-500"></div>
+
+            <!-- Submit Button -->
             <div class="mt-6">
-                <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 rounded-md">Confirm</button>
+                <button type="submit" class="w-full bg-blue-500 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 text-white font-bold py-3 rounded-md"> Confirm</button>
             </div>
         </form>
+
     </div>
 </div>
 
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#categoryForm').submit(function (event) {
+                event.preventDefault();
+
+                var formData = $(this).serialize();
+
+                $.ajax({
+                    url: '@Url.Action("Create", "Category")',
+                    type: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        if (response.success) {
+                            alert(response.message);
+                            // Close the modal, refresh the category list, etc.
+                            $('#createCategoryModal').hide();
+                            location.reload();
+                        } else {
+                            $('#errorMessage').text(response.message);
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 400) {
+                            var response = xhr.responseJSON;
+                            $('#errorMessage').text(response.message);
+                        } else {
+                            alert('An error occurred while creating the category.');
+                        }
+                    }
+                });
+            });
+
+            // Additional JavaScript for handling the modal and type buttons...
+
+            // Close modal
+            $('#closeCreateModal').click(function () {
+                $('#createCategoryModal').hide();
+            });
+
+            // Open modal (assuming you have a button to open it)
+            $('#openCreateModal').click(function () {
+                $('#createCategoryModal').show();
+            });
+
+            // Type button handling
+            $('.type-button').click(function () {
+                $('.type-button').removeClass('bg-blue-500 text-white').addClass('bg-gray-200 text-gray-800');
+                $(this).addClass('bg-blue-500 text-white').removeClass('bg-gray-200 text-gray-800');
+                $('#createTypeInput').val($(this).text());
+            });
+        });
+    </script>
+}

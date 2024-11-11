@@ -12,23 +12,27 @@
     <script src="~/js/wallet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 }
-<div class="flex min-h-screen mt-5">
+<div class="flex min-h-screen mt-5 ml-10">
     <!-- Content Wrapper -->
-    <div class="flex-1 p-6 bg-gray-50 dark:bg-gray-900">
+    <div class="flex-1 container p-6 bg-gray-50 dark:bg-gray-800">
 
         <!-- Page Title -->
-        <div class="flex justify-between items-center my-4">
+        <div class="flex justify-between items-center mt-4">
             <h2 id="accountPageTitle" class="font-semibold text-2xl dark:text-white">Wallets</h2>
         </div>
 
         <!-- Total Balance Section -->
-        <div id="balanceSection" class="mb-6">
-            <h2 id="totalBalance" class="text-2xl font-bold dark:text-gray-100">
-                Total Balance:
-                <span class="balanceSpacing balance-value" data-visible="true">₱@ViewBag.TotalDebit.ToString("0.00")</span>
-                <i id="toggleBalanceVisibility" class="fas fa-eye cursor-pointer balance-icon dark:text-gray-400"></i>
+        <div id="balanceSection" class="mb-6 py-5 flex flex-col items-center">
+            <h2 class="text-xl font-regular dark:text-gray-100 flex items-center">
+                Total Balance
             </h2>
+            <div class="flex items-center mt-2">
+                <span id="totalBalance" class="balanceSpacing balance-value text-5xl font-bold" data-visible="true">₱&nbsp;@ViewBag.TotalDebit.ToString("0.00")</span>
+                <i id="toggleBalanceVisibility" class="fas fa-eye cursor-pointer balance-icon ml-2 dark:text-gray-400"></i>
+            </div>
         </div>
+
+
 
         @Html.Partial("Details")
     </div>

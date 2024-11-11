@@ -10,7 +10,10 @@
 
 <body class="bg-gray-50 text-gray-900 transition-colors duration-300">
     <!-- Dark Mode Toggle Button -->
-    @Html.Partial("_CategoryList")
+    
+    <div class="ml-10">
+        @Html.Partial("_CategoryList")
+    </div>
     @Html.Partial("Create")
     @Html.Partial("_EditCategory")
     <!-- Include SweetAlert2 JavaScript -->

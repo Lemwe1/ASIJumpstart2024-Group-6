@@ -14,52 +14,53 @@ const closeEditModal = document.getElementById('closeEditModal');
 let debitAccounts = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-    const totalBalanceElement = document.querySelector('#totalBalance .balance-value');
+    const totalBalanceElement = document.getElementById('totalBalance');
     const toggleTotalBalanceButton = document.getElementById('toggleBalanceVisibility');
+    const totalBalanceKey = 'totalBalanceVisibility';
 
-    // Store the original total balance for toggling
-    const originalTotalBalance = totalBalanceElement.textContent.replace('₱', '');
+    // Retrieve saved visibility state for total balance
+    const isTotalBalanceVisible = localStorage.getItem(totalBalanceKey) === 'true';
+    updateBalanceVisibility(totalBalanceElement, toggleTotalBalanceButton, isTotalBalanceVisible);
 
-    // Toggle total balance visibility
     toggleTotalBalanceButton.addEventListener('click', () => {
         const isVisible = totalBalanceElement.dataset.visible === 'true';
-        if (isVisible) {
-            totalBalanceElement.textContent = '₱' + '*'.repeat(originalTotalBalance.length - 1); // Replace with asterisks
-            toggleTotalBalanceButton.classList.remove('fa-eye');
-            toggleTotalBalanceButton.classList.add('fa-eye-slash');
-            totalBalanceElement.dataset.visible = 'false'; // Update visibility state
-        } else {
-            totalBalanceElement.textContent = `₱${originalTotalBalance}`; // Show the original balance
-            toggleTotalBalanceButton.classList.remove('fa-eye-slash');
-            toggleTotalBalanceButton.classList.add('fa-eye');
-            totalBalanceElement.dataset.visible = 'true'; // Update visibility state
-        }
+        updateBalanceVisibility(totalBalanceElement, toggleTotalBalanceButton, !isVisible);
+        localStorage.setItem(totalBalanceKey, !isVisible); // Save new visibility state
     });
 
-    // Add event listeners to all eye icons for individual balances
+    // Function to update visibility and icon for a balance element
+    function updateBalanceVisibility(balanceElement, toggleButton, isVisible) {
+        const originalBalance = balanceElement.dataset.originalBalance || balanceElement.textContent.replace('₱', '').trim();
+        if (isVisible) {
+            balanceElement.textContent = `₱${originalBalance}`; // Show original balance
+            toggleButton.classList.remove('fa-eye-slash');
+            toggleButton.classList.add('fa-eye');
+            balanceElement.dataset.visible = 'true';
+        } else {
+            balanceElement.textContent = '₱' + '*'.repeat(originalBalance.length); // Replace with asterisks
+            toggleButton.classList.remove('fa-eye');
+            toggleButton.classList.add('fa-eye-slash');
+            balanceElement.dataset.visible = 'false';
+        }
+        balanceElement.dataset.originalBalance = originalBalance; // Store for future toggling
+    }
+
+    // Individual wallet balances
     const toggleButtons = document.querySelectorAll('.toggle-balance');
 
     toggleButtons.forEach(button => {
         const accountId = button.dataset.accountId;
-        const balanceElement = button.previousElementSibling; // The balance span
+        const balanceElement = button.previousElementSibling;
+        const balanceKey = `walletBalanceVisibility_${accountId}`;
+        const isBalanceVisible = localStorage.getItem(balanceKey) === 'true';
 
-        // Store the original balance for toggling
-        balanceElement.dataset.originalBalance = balanceElement.textContent.replace('₱', '');
+        // Set initial visibility based on localStorage
+        updateBalanceVisibility(balanceElement, button, isBalanceVisible);
 
         button.addEventListener('click', () => {
             const isVisible = balanceElement.dataset.visible === 'true';
-
-            if (isVisible) {
-                balanceElement.textContent = '₱' + '*'.repeat(balanceElement.dataset.originalBalance.length); // Replace balance with asterisks
-                button.classList.remove('fa-eye');
-                button.classList.add('fa-eye-slash');
-                balanceElement.dataset.visible = 'false'; // Update visibility state
-            } else {
-                balanceElement.textContent = `₱${balanceElement.dataset.originalBalance}`; // Show the original balance
-                button.classList.remove('fa-eye-slash');
-                button.classList.add('fa-eye');
-                balanceElement.dataset.visible = 'true'; // Update visibility state
-            }
+            updateBalanceVisibility(balanceElement, button, !isVisible);
+            localStorage.setItem(balanceKey, !isVisible); // Save new visibility state
         });
     });
 });
@@ -198,26 +199,25 @@ function loadDebitForm() {
     if (addFormFields) {
         addFormFields.innerHTML = `
             <div class="mb-4">
-                <label class="block">Name</label>
+                <label class="block">&#128226;Name</label>
                 <input type="text" id="accountName" class="border p-2 w-full" placeholder="Enter account name" required />
             </div>
             <div class="mb-4">
-                <label class="block">Balance</label>
+                <label class="block">💰 Balance</label>
                 <input type="number" id="accountBalance" class="border p-2 w-full" placeholder="0.00" required step="any" />
             </div>
             <div class="mb-6">
-                <label for="createIcon" class="block text-sm font-medium text-gray-700">Icon</label>
+                <label for="createIcon" class="block text-sm font-medium text-gray-700">&#128295;Icon</label>
                 <select name="Icon" id="createIcon" class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500" required>
-                    <option value="" disabled selected>Select Icon</option>
-                    <option value="fas fa-apple-alt">Apple (Food)</option>
-                    <option value="fas fa-shopping-bag">Shopping Bag</option>
-                    <option value="fas fa-bolt">Bolt (Electricity)</option>
-                    <option value="fas fa-wallet">Wallet (Income)</option>
-                    <option value="fas fa-money-bill-wave">Money (Expense)</option>
+                    <option value="">Select Icon</option>
+                    <option value="🏦">🏦 Bank</option>
+                    <option value="🏧">🏧 ATM </option>
+                    <option value="💳">💳 Wallet</option>
+                    <option value="💰">💰 Money</option>
                 </select>
             </div>
             <div class="mb-4">
-                <label class="block">Color</label>
+                <label class="block">&#127912;Color</label>
                 <input type="color" id="accountColor" class="border p-2 w-full" style="height: 50px;" title="Choose a color" required />
             </div>
         `;

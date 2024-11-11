@@ -16,26 +16,25 @@
             @Html.AntiForgeryToken()
             <input type="hidden" id="editAccountId" />
             <div class="mb-4">
-                <label class="block">Name</label>
+                <label class="block">&#128226;Name</label>
                 <input type="text" id="editAccountName" class="border p-2 w-full" required />
             </div>
             <div class="mb-4">
-                <label class="block">Balance</label>
+                <label class="block">&#128181;Balance</label>
                 <input type="number" id="editAccountBalance" class="border p-2 w-full" required step="any" />
             </div>
             <div class="mb-6">
-                <label for="createIcon" class="block text-sm font-medium text-gray-700">Icon</label>
+                <label for="createIcon" class="block text-sm font-medium text-gray-700">&#128295;Icon</label>
                 <select name="Icon" id="editCreateIcon" class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500" required>
                     <option value="">Select Icon</option>
-                    <option value="fas fa-apple-alt">Apple (Food)</option>
-                    <option value="fas fa-shopping-bag">Shopping Bag</option>
-                    <option value="fas fa-bolt">Bolt (Electricity)</option>
-                    <option value="fas fa-wallet">Wallet (Income)</option>
-                    <option value="fas fa-money-bill-wave">Money (Expense)</option>
+                    <option value="🏦">🏦 Bank</option>
+                    <option value="🏧">🏧 ATM </option>
+                    <option value="💳">💳 Wallet</option>
+                    <option value="💰">💰 Money</option>
                 </select>
             </div>
             <div class="mb-4">
-                <label class="block">Color</label>
+                <label class="block">&#127912; Color</label>
                 <input type="color" id="editAccountColor" class="border p-2 w-full" style="height: 50px;" required />
             </div>
             <div class="text-right mt-4">
