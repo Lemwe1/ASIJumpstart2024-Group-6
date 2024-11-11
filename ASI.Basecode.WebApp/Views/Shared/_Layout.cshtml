@@ -16,6 +16,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     @RenderSection("Styles", required: false)
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 </head>
 <body>
 
@@ -31,12 +37,12 @@
         && action != "VerifyEmail" && action != "ResendVerificationLink"))
         {
             <!-- Sidebar Navigation for larger screens (lg and above) -->
-            <nav id="sidebar-nav" class="hidden lg:flex w-72">
+            <nav id="sidebar-nav position-fixed" class="hidden lg:flex w-72">
                 @Html.Partial("_Navigation")
             </nav>
 
             <!-- Mini Sidebar Navigation for small screens (below lg) -->
-            <nav id="mini-sidebar-nav" class="flex lg:hidden w-20">
+            <nav id="mini-sidebar-nav position-fixed" class="flex lg:hidden w-20">
                 @Html.Partial("_MiniNavigation")
             </nav>
         }
@@ -52,6 +58,7 @@
     </div>
 
     <!-- Scripts -->
+    <script src="~/js/site.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.js"></script>
