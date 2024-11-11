@@ -1,47 +1,58 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // Check if 'dark' theme is saved in localStorage or applied on body
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-    } else {
-        document.documentElement.classList.remove('dark');
-    }
 
-    // Listen for theme toggle (if you have a button or mechanism to change themes)
-    const toggleButton = document.getElementById('theme-toggle');
-    if (toggleButton) {
-        toggleButton.addEventListener('click', () => {
-            if (document.documentElement.classList.contains('dark')) {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-            } else {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
-            }
-        });
-    }
-
-    // Function to toggle password visibility
+    // Function to toggle password visibility and persist state
     function togglePasswordVisibility(inputId, iconId) {
         const passwordField = document.getElementById(inputId);
         const icon = document.getElementById(iconId);
+        const visibilityKey = `${inputId}_visibility`;
+
+        // Set initial visibility based on localStorage
+        const isPasswordVisible = localStorage.getItem(visibilityKey) === 'true';
+        updatePasswordVisibility(passwordField, icon, isPasswordVisible);
 
         icon.addEventListener('click', function () {
-            // Toggle the type between password and text
-            if (passwordField.type === "password") {
-                passwordField.type = "text"; // Show the password
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash'); // Change the icon to eye-slash
-            } else {
-                passwordField.type = "password"; // Hide the password
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye'); // Change the icon to eye
-            }
+            // Toggle between password and text type
+            const isVisible = passwordField.type === "text";
+            updatePasswordVisibility(passwordField, icon, !isVisible);
+            localStorage.setItem(visibilityKey, !isVisible); // Save the new visibility state
         });
+    }
+
+    // Helper function to update password field type and icon
+    function updatePasswordVisibility(passwordField, icon, isVisible) {
+        if (isVisible) {
+            passwordField.type = "text";
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        } else {
+            passwordField.type = "password";
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        }
     }
 
     // Call the function for each password input field
     togglePasswordVisibility('current-password', 'toggle-current-password');
     togglePasswordVisibility('new-password', 'toggle-new-password');
     togglePasswordVisibility('confirm-password', 'toggle-confirm-password');
+
+
+    // Profile picture change functionality
+    const changePictureButton = document.getElementById('change-picture-btn');
+    const fileInput = document.getElementById('file-input');
+    const profilePicture = document.getElementById('profile-picture');
+    changePictureButton.addEventListener('click', () => {
+        fileInput.click();  // Trigger the file input dialog
+    });
+    // Update profile picture preview when a new image is selected
+    fileInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                profilePicture.src = e.target.result;  // Set new image source
+            };
+            reader.readAsDataURL(file);
+        }
+    });
 });

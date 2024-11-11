@@ -31,12 +31,12 @@
         && action != "VerifyEmail" && action != "ResendVerificationLink"))
         {
             <!-- Sidebar Navigation for larger screens (lg and above) -->
-            <nav id="sidebar-nav" class="hidden lg:flex w-72">
+            <nav id="sidebar-nav position-fixed" class="hidden lg:flex w-72">
                 @Html.Partial("_Navigation")
             </nav>
 
             <!-- Mini Sidebar Navigation for small screens (below lg) -->
-            <nav id="mini-sidebar-nav" class="flex lg:hidden w-20">
+            <nav id="mini-sidebar-nav position-fixed" class="flex lg:hidden w-20">
                 @Html.Partial("_MiniNavigation")
             </nav>
         }
@@ -47,7 +47,7 @@
             {
                 @Html.Partial("_Header")
             }
-            @RenderBody()
+                @RenderBody()
         </main>
     </div>
 

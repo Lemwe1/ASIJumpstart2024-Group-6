@@ -1,16 +1,31 @@
-﻿/* index.css */
+﻿
+.modal {
+    z-index: 1050;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
 
-/* Modal Content Styles */
+.modal.flex {
+    display: flex;
+}
+
 .modal-content {
-    z-index: 10;
+    max-width: 700px;
+    width: 100%;
+    height: 90%;
+    padding: 20px 40px;
+    background-color: white;
+    border-radius: 8px;
 }
 
-/* Dark Mode Overrides for Modal Content */
-.dark .darken-modal-content {
-    background-color: #f7fafc; /* Tailwind's gray-100 */
-    color: #2d3748; /* Tailwind's gray-800 */
+@media (max-width: 768px) {
+    .modal-content {
+        max-width: 90%;
+        padding: 20px;
+    }
 }
-
 
 .category-card {
     transition: transform 0.3s ease, box-shadow 0.3s ease;

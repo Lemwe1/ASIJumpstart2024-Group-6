@@ -1,6 +1,10 @@
 ﻿// Flag to track if changes were made
 let isModalDirty = false;
 
+function toggleDarkMode() {
+    document.documentElement.classList.toggle('dark');
+}
+
 // Function to open the Create modal
 function openCreateModal() {
     const modal = document.getElementById('createCategoryModal');

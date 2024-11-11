@@ -18,8 +18,7 @@
         <tbody class="dark:bg-gray-700 dark:text-white">
             @if (ViewData["Transactions"] is List<TransactionViewModel> transactions)
             {
-                if (transactions.Count > 0)
-                {
+
                     @Html.AntiForgeryToken()
                     foreach (var transaction in transactions)
                     {
@@ -27,7 +26,7 @@
                             <td class="px-4 py-4 w-1/6 whitespace-nowrap">
                                 <div class="flex items-center space-x-4">
                                     <span class="flex items-center justify-center p-2 w-12 h-12 rounded-full" style="background-color: @transaction.CategoryColor;">
-                                        <i class="@transaction.CategoryIcon text-white"></i>
+                                    <p>@transaction.CategoryIcon</p>
                                     </span>
                                     <span>@transaction.CategoryName</span>
                                 </div>
@@ -53,7 +52,7 @@
                             <td class="px-4 py-4 w-1/6 whitespace-nowrap">
                                 <div class="flex items-center space-x-4">
                                     <span class="flex items-center justify-center p-2 w-12 h-12 rounded-full" style="background-color: @transaction.WalletColor;">
-                                        <i class="@transaction.WalletIcon text-white"></i>
+                                    <p class="">@transaction.WalletIcon</p>
                                     </span>
                                     <span>@transaction.WalletName</span>
                                 </div>
@@ -76,13 +75,7 @@
                             </td>
                         </tr>
                     }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="6" class="px-4 py-3 text-center text-gray-500 dark:text-white">No entries yet.</td>
-                    </tr>
-                }
+                
             }
         </tbody>
     </table>

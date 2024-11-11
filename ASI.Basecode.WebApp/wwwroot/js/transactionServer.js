@@ -24,18 +24,36 @@
     // Function to filter table based on category
     const filterTableByCategory = () => {
         const categoryFilter = document.querySelector('select[name="filterByCategory"]').value; // Get the selected category
-        const rows = Array.from(document.querySelectorAll('.transaction-table tbody tr')); // Get all rows
+        const rows = Array.from(document.querySelectorAll('.transaction-table tbody tr[data-category]')); // Get all rows with category data
+        let hasVisibleTransactions = false;
 
         // Show or hide rows based on selected category
         rows.forEach(row => {
             const rowCategory = row.dataset.category; // Get the category from the row
             if (categoryFilter === 'All' || rowCategory === categoryFilter) {
                 row.style.display = ''; // Show matching row
+                hasVisibleTransactions = true;
             } else {
                 row.style.display = 'none'; // Hide non-matching row
             }
         });
+
+        // Check if "No transactions found" row already exists
+        let noTransactionsRow = document.querySelector('.transaction-table tbody .no-transactions-row');
+        if (!noTransactionsRow) {
+            // Create "No transactions found" row if it doesn't exist
+            noTransactionsRow = document.createElement('tr');
+            noTransactionsRow.classList.add('no-transactions-row');
+            noTransactionsRow.innerHTML = `<td colspan="6" class="px-4 py-3 text-center text-gray-500 dark:text-white">&#x1F937; No transactions found.</td>`;
+            document.querySelector('.transaction-table tbody').appendChild(noTransactionsRow);
+        }
+        // Show "No transactions found" message only if no rows are visible
+        noTransactionsRow.style.display = hasVisibleTransactions ? 'none' : '';
     };
+
+    // Initial filter on page load
+    filterTableByCategory();
+
 
     // Event listener for category filter
     document.querySelector('select[name="filterByCategory"]').addEventListener('change', filterTableByCategory);
@@ -581,26 +599,4 @@
     // Handle form submission
     transactionForm.addEventListener('submit', handleAddTransaction);
     editTransactionForm.addEventListener('submit', handleEditTransaction);
-
-    // Check if 'dark' theme is saved in localStorage or applied on body
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-    } else {
-        document.documentElement.classList.remove('dark');
-    }
-
-    // Listen for theme toggle (if you have a button or mechanism to change themes)
-    const toggleButton = document.getElementById('theme-toggle');
-    if (toggleButton) {
-        toggleButton.addEventListener('click', () => {
-            if (document.documentElement.classList.contains('dark')) {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-            } else {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
-            }
-        });
-    }
 });
