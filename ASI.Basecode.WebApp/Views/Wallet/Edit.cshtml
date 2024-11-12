@@ -5,7 +5,7 @@
 }
 
 <!-- Edit Account Modal -->
-<div id="editAccountModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden">
+<div id="editAccountModal" class="fixed inset-0 flex items-center py-10 justify-center bg-black bg-opacity-50 z-50 hidden">
     <div class="modal-content bg-gray-300 dark:bg-gray-700 p-6 rounded-lg w-full max-w-lg mx-auto relative" id="modalContent">
         <button id="closeEditModal" class="absolute top-2 right-2 text-gray-400 hover:bg-gray-200 p-2 w-10 rounded-full">
             <i class="fas fa-times"></i>
@@ -39,7 +39,7 @@
                     Icon
                 </label>
                 <select name="Icon" id="editCreateIcon" class="mt-1 block w-full px-4 py-2 border rounded-md text-gray-900 dark:bg-gray-700 dark:text-white" required>
-                    <option value="">Select Icon</option>
+                    <option value=""disabled>Select Icon</option>
                     <option value="🏦">🏦 Bank</option>
                     <option value="🏧">🏧 ATM</option>
                     <option value="💳">💳 Wallet</option>
@@ -56,7 +56,7 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex mt-6 justify-between w-full space-x-4">
+            <div class="flex mt-10 justify-between w-full space-x-4">
                 <button type="button" id="deleteAccountButton" class="bg-red-500 text-white hover:bg-red-600 p-3 rounded-md w-full">
                     Delete
                 </button>
