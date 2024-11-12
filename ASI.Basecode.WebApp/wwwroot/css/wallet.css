@@ -2,6 +2,7 @@
     padding: 1rem;
     border-radius: 0.5rem;
     color: #fff;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 #addAccountButton {
@@ -10,13 +11,30 @@
 /* Button styles */
     #addAccountButton {
     padding: 0.5rem 1rem;
-    background-color: transparent; /* or none */
+    background-color: transparent; 
     color: #fff;
     border-radius: 0.5rem;
 }
 
 
+/* Hover effect: scale up and add shadow */
+.accountCard:hover {
+    transform: scale(1.05);
 }
+
+
+/* Edit Icon Styles */
+.accountCard a {
+    /* Transition for opacity */
+    transition: opacity 0.3s ease;
+    opacity: 0.8;
+}
+
+    .accountCard a:hover {
+        opacity: 1;
+    }
+
+
 
 .modal {
     z-index: 1050;
@@ -80,4 +98,5 @@
     margin-left: 5px; /* Space between the balance value and eye icon */
     cursor: pointer; /* Ensures the cursor indicates clickable item */
 }
+
 

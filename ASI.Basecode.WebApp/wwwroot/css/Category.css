@@ -37,7 +37,6 @@
     /* Hover effect: scale up and add shadow */
     .category-card:hover {
         transform: scale(1.05);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
 
 /* Dark Mode Overrides */

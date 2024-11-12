@@ -8,14 +8,14 @@
 <!-- Debit Sections -->
 <div id="debitSection" class="mb-6">
     <div id="debitAccounts" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div id="addAccountButton" class="category-card py-5 rounded-lg flex flex-col items-center justify-center cursor-pointer relative border-4 border-dashed border-gray-400 dark:border-gray-600" onclick="openModal(addAccountModal)">
+        <div id="addAccountButton" class="accountCard py-3 rounded-lg flex flex-col items-center justify-center cursor-pointer relative border-4 border-dashed border-gray-400 dark:border-gray-600" onclick="openModal(addAccountModal)">
             <i class="fas fa-plus text-6xl text-gray-400 dark:text-gray-600 mb-2"></i>
             <span class="text-gray-500 dark:text-gray-300">Add a Wallet</span>
         </div>
 
         @foreach (var debit in Model)
         {
-            <div class="accountCard border-2 border-gray-900 dark:border-gray-600 relative rounded-lg p-4" style="background-color: @debit.WalletColor;">
+            <div class="accountCard border-2 border-gray-900 dark:border-gray-600 relative rounded-lg p-4"  style="background-color: @debit.WalletColor;">
                 <!-- Edit Button -->
                 <button class="absolute top-2 right-2 bg-gray-200 text-black h-8 w-8 hover:bg-gray-300 rounded-full p-1"
                         onclick="openEditModal({
