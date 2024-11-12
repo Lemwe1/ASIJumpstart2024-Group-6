@@ -369,6 +369,7 @@
         data.TransactionId = currentTransactionId;
         data.TransactionType = transactionType.value;
         data.TransactionDate = new Date(data.TransactionDate).toISOString();
+        data.Amount = parseFloat(data.Amount);
 
         console.log("Data to be sent:", JSON.stringify(data)); // Debugging line
 
