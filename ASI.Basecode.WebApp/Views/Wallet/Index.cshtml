@@ -22,15 +22,16 @@
         </div>
 
         <!-- Total Balance Section -->
-        <div id="balanceSection" class="mb-6 py-5 flex flex-col items-center">
+        <div id="balanceSection" class="mb-6 mt-4 py-5 flex flex-col items-center border-2 border-gray-900 dark:border-gray-600">
             <h2 class="text-xl font-regular dark:text-gray-100 flex items-center">
                 Total Balance
             </h2>
             <div class="flex items-center mt-2">
-                <span id="totalBalance" class="balanceSpacing balance-value text-5xl font-bold" data-visible="true">₱&nbsp;@ViewBag.TotalDebit.ToString("0.00")</span>
+                <span id="totalBalance" class="balanceSpacing balance-value text-5xl font-bold" data-visible="true">₱ @ViewBag.TotalDebit.ToString("0.00")</span>
                 <i id="toggleBalanceVisibility" class="fas fa-eye cursor-pointer balance-icon ml-2 dark:text-gray-400"></i>
             </div>
         </div>
+
 
 
 

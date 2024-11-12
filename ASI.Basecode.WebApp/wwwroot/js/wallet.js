@@ -79,13 +79,15 @@ function updateNetWorth() {
 }
 
 
-// Function to reset the Add Account form fields
 function resetAddFormFields() {
     document.getElementById('accountName').value = '';
     document.getElementById('accountBalance').value = '';
-    document.getElementById('createIcon').value = '';
-    document.getElementById('accountColor').value = '#000000'; // Default color
+    document.getElementById('createIcon').value = "";
+    document.getElementById('accountColor').value = '#000000';
 }
+
+document.getElementById('resetWalletButton').addEventListener('click', resetAddFormFields);
+
 
 // Function to show confirmation dialog
 async function showConfirmationDialog(modal, resetFunction) {
@@ -127,6 +129,7 @@ function openModal(modal) {
     if (modal) {
         modal.classList.remove('hidden');
         document.body.classList.add('overflow-hidden'); 
+        document.getElementById('createIcon').value = "";
     } else {
         Swal.fire({
             title: 'Error',
@@ -183,6 +186,7 @@ if (addAccountModal) {
             }).then((result) => {
                 if (result.isConfirmed) {
                     closeModal(addAccountModal);
+
                     resetAddFormFields();
                 }
             });
@@ -201,17 +205,17 @@ function loadDebitForm() {
     if (addFormFields) {
         addFormFields.innerHTML = `
             <div class="mb-4">
-                <label class="block">Name</label>
-                <input type="text" id="accountName" class="border p-2 w-full" placeholder="Enter account name" required />
+                <label class="block dark:text-gray-300">Name</label>
+                <input type="text" id="accountName" class="border p-2 w-full dark:bg-gray-700 dark:text-white" placeholder="Enter wallet name" required />
             </div>
             <div class="mb-4">
-                <label class="block">Balance</label>
-                <input type="number" id="accountBalance" class="border p-2 w-full" placeholder="0.00" required step="any" />
+                <label class="block dark:text-gray-300">Balance</label>
+                <input type="number" id="accountBalance" class="border p-2 w-full dark:bg-gray-700 dark:text-white" placeholder="0.00" required step="any" />
             </div>
             <div class="mb-6">
-                <label for="createIcon" class="block text-sm font-medium text-gray-700">Icon</label>
-                <select name="Icon" id="createIcon" class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500" required>
-                    <option value="">Select Icon</option>
+                <label for="createIcon" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Icon</label>
+                <select name="Icon" id="createIcon" class="mt-1 block w-full px-4 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 " required>
+                    <option value="" disabled>Select Icon</option>
                     <option value="🏦">🏦 Bank</option>
                     <option value="🏧">🏧 ATM </option>
                     <option value="💳">💳 Wallet</option>
@@ -219,8 +223,8 @@ function loadDebitForm() {
                 </select>
             </div>
             <div class="mb-4">
-                <label class="block">Color</label>
-                <input type="color" id="accountColor" class="border p-2 w-full" style="height: 50px;" title="Choose a color" required />
+                <label class="block dark:text-gray-300">Color</label>
+                <input type="color" id="accountColor" class="border mt-2 p-2 w-full dark:bg-gray-700" style="height: 50px;" title="Choose a color" required />
             </div>
         `;
     } else {

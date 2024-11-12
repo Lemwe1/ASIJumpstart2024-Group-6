@@ -1,46 +1,70 @@
 ﻿@model List<ASI.Basecode.Services.ServiceModels.WalletViewModel>
 
-
 @{
     ViewData["Title"] = "Edit";
 }
 
 <!-- Edit Account Modal -->
-<div id="editAccountModal" class="fixed z-50 inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-    <div class="bg-white p-6 rounded-lg max-w-md w-full relative" id="modalContent">
+<div id="editAccountModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden">
+    <div class="modal-content bg-gray-300 dark:bg-gray-700 p-6 rounded-lg w-full max-w-lg mx-auto relative" id="modalContent">
         <button id="closeEditModal" class="absolute top-2 right-2 text-gray-400 hover:bg-gray-200 p-2 w-10 rounded-full">
             <i class="fas fa-times"></i>
         </button>
-        <h2 class="text-xl font-bold mb-4">Edit Account</h2>
+        <h2 class="text-2xl font-bold dark:text-white my-2">Edit Wallet</h2>
+        <p class="text-gray-600 mb-4 dark:text-gray-300">Fill out all the fields below to edit this wallet</p>
+
         <form id="editAccountForm">
             @Html.AntiForgeryToken()
             <input type="hidden" id="editAccountId" />
-            <div class="mb-4">
-                <label class="block">Name</label>
-                <input type="text" id="editAccountName" class="border p-2 w-full" required />
-            </div>
-            <div class="mb-4">
-                <label class="block">Balance</label>
-                <input type="number" id="editAccountBalance" class="border p-2 w-full" required step="any" />
-            </div>
+
+            <!-- Name Field -->
             <div class="mb-6">
-                <label for="createIcon" class="block text-sm font-medium text-gray-700">Icon</label>
-                <select name="Icon" id="editCreateIcon" class="mt-1 block w-full px-4 py-2 border rounded-md bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500" required>
+                <label for="editAccountName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Name
+                </label>
+                <input type="text" id="editAccountName" name="AccountName" required class="dark:bg-gray-700 mt-1 block w-full px-4 py-2 border rounded-md text-gray-900 dark:text-white" />
+            </div>
+
+            <!-- Balance Field -->
+            <div class="mb-6">
+                <label for="editAccountBalance" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Balance
+                </label>
+                <input type="number" id="editAccountBalance" name="Balance" step="any" required class="dark:bg-gray-700 mt-1 block w-full px-4 py-2 border rounded-md text-gray-900 dark:text-white" />
+            </div>
+
+            <!-- Icon Selection -->
+            <div class="mb-6">
+                <label for="editCreateIcon" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Icon
+                </label>
+                <select name="Icon" id="editCreateIcon" class="mt-1 block w-full px-4 py-2 border rounded-md text-gray-900 dark:bg-gray-700 dark:text-white" required>
                     <option value="">Select Icon</option>
                     <option value="🏦">🏦 Bank</option>
-                    <option value="🏧">🏧 ATM </option>
+                    <option value="🏧">🏧 ATM</option>
                     <option value="💳">💳 Wallet</option>
                     <option value="💰">💰 Money</option>
                 </select>
             </div>
-            <div class="mb-4">
-                <label class="block">Color</label>
-                <input type="color" id="editAccountColor" class="border p-2 w-full" style="height: 50px;" required />
+
+            <!-- Color Picker -->
+            <div class="mb-6">
+                <label for="editAccountColor" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Color
+                </label>
+                <input type="color" id="editAccountColor" name="Color" required class="mt-2 block w-full px-2 py-2 border rounded-md dark:bg-gray-700" style="height: 50px;" />
             </div>
-            <div class="text-right mt-4">
-                <button type="button" class="px-4 py-2 bg-red-500 text-white" id="deleteAccountButton">Delete</button>
-                <button type="submit" class="px-4 py-2 bg-blue-500 text-white">Save</button>
+
+            <!-- Action Buttons -->
+            <div class="flex mt-6 justify-between w-full space-x-4">
+                <button type="button" id="deleteAccountButton" class="bg-red-500 text-white hover:bg-red-600 p-3 rounded-md w-full">
+                    Delete
+                </button>
+                <button type="submit" class="bg-blue-500 text-white hover:bg-blue-700 p-3 rounded-md w-full">
+                    Save
+                </button>
             </div>
+
         </form>
     </div>
 </div>
