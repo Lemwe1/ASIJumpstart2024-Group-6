@@ -173,7 +173,7 @@
 
 
 
-        const { transactionId, amount, transactionDate, note, categoryId, walletId, transactionType } = transaction;
+        const { transactionId, amount, transactionDate, note, categoryId, walletId, transactionType, transactionSort } = transaction;
 
         currentTransactionId = transaction.transactionId;
 
@@ -184,6 +184,7 @@
         document.getElementById('editTransactionCategory').value = categoryId || '';
         document.getElementById('editTransactionWallet').value = walletId || '';
         document.getElementById('editTransactionType').value = transactionType || 'Expense';
+        document.getElementById('editTransactionSort').value = transactionSort;
 
 
         console.log("Transaction Data:", transaction);

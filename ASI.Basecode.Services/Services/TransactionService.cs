@@ -95,6 +95,7 @@ public class TransactionService : ITransactionService
         // Step 2: Update the transaction properties
         existingTransaction.TransactionType = transaction.TransactionType;
         existingTransaction.TransactionDate = transaction.TransactionDate;
+        existingTransaction.Amount = transaction.Amount;
         existingTransaction.Note = transaction.Note;
         existingTransaction.CategoryId = transaction.CategoryId;
         existingTransaction.WalletId = transaction.WalletId;
