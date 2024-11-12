@@ -5,9 +5,9 @@
 }
 
 <!-- Container with padding -->
-<div class=" container mx-auto p-6 mt-20 mb-4">
+<div class=" container mx-auto p-6 my-16 mb-2">
 
-    <h2 class="text-2xl font-semibold mb-6 dark:text-white">@ViewData["Title"]</h2>
+    <h2 class="text-2xl font-semibold mt-1 mb-6 dark:text-white">@ViewData["Title"]</h2>
 
     <!-- Add Category Button -->
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
@@ -25,7 +25,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
             @foreach (var item in Model.Where(c => c.Type == "Income"))
             {
-                <div class="category-card border-2 border-black p-6 rounded-lg shadow-lg text-white relative flex flex-col items-center justify-center" style="background-color:@item.Color;">
+                <div class="category-card border-2 border-gray-900 dark:border-gray-600 p-6 rounded-lg shadow-lg text-white relative flex flex-col items-center justify-center" style="background-color:@item.Color;">
                     <!-- Icon -->
                     <p class="text-6xl mb-4">@item.Icon</p>
                     <!-- Category Name -->
@@ -46,7 +46,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             @foreach (var item in Model.Where(c => c.Type == "Expense"))
             {
-                <div class="category-card border-2 border-black p-6 rounded-lg shadow-lg text-white relative flex flex-col items-center justify-center" style="background-color:@item.Color;">
+                <div class="category-card border-2 border-gray-900 dark:border-gray-600 p-6 rounded-lg shadow-lg text-white relative flex flex-col items-center justify-center" style="background-color:@item.Color;">
                     <!-- Icon -->
                     <p class=" text-6xl mb-4">@item.Icon</p>
                     <!-- Category Name -->
