@@ -183,26 +183,22 @@ namespace ASI.Basecode.WebApp.Controllers
             return View(transactionViewModel);
         }
 
-        // POST: EDIT a transaction
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [FromBody] TransactionViewModel model)
         {
             try
             {
-                // Validate the incoming model
                 if (model == null)
                 {
                     return BadRequest(new { success = false, message = "Model is null." });
                 }
 
-                // Check for ID mismatch
                 if (id != model.TransactionId)
                 {
                     return BadRequest(new { success = false, message = "Transaction ID mismatch." });
                 }
 
-                // Check model state
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(new { success = false, message = "Invalid model state.", errors = ModelState });
@@ -214,30 +210,17 @@ namespace ASI.Basecode.WebApp.Controllers
                     return NotFound(new { success = false, message = "Transaction not found." });
                 }
 
-
-                // Update properties of the existing transaction
-                existingTransaction.TransactionType = model.TransactionType;
-                existingTransaction.Amount = model.Amount;
-                existingTransaction.TransactionDate = model.TransactionDate;
-                existingTransaction.Note = model.Note;
-                existingTransaction.CategoryId = model.CategoryId;
-                existingTransaction.WalletId = model.WalletId;
-                existingTransaction.TransactionSort = model.TransactionSort;
-
-
-                // Call the service to update the transaction
-                await _transactionService.UpdateTransactionAsync(existingTransaction);
+                // Pass model directly to UpdateTransactionAsync without manually setting properties
+                await _transactionService.UpdateTransactionAsync(model);
 
                 return Json(new { success = true });
             }
             catch (Exception ex)
             {
-                // Log the exception
                 Console.Error.WriteLine($"Error in Edit method: {ex.Message}");
                 return StatusCode(500, new { success = false, message = "Internal server error", details = ex.Message });
             }
         }
-
 
 
         // POST: Delete a transaction

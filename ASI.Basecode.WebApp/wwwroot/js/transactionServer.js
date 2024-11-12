@@ -63,6 +63,7 @@
     function openAddTransactionModal() {
         modal.classList.remove('hidden');
         modal.classList.add('flex');
+        document.body.classList.add('overflow-hidden'); //remove scroll for body when modal is open
         resetTransactionForm();
         updateTypeSelection('Expense');
         filterCategories('Expense');
@@ -74,6 +75,7 @@
     function openEditTransactionModal(transaction) {
         editModal.classList.remove('hidden');
         editModal.classList.add('flex');
+        document.body.classList.add('overflow-hidden');//remove scroll for body when modal is open
         populateEditModalFields(transaction);
         updateTypeSelection(transaction.transactionType);
         filterCategories(transaction.transactionType);
@@ -152,6 +154,7 @@
         modal.classList.remove('flex');
         editModal.classList.add('hidden');
         editModal.classList.remove('flex'); 
+        document.body.classList.remove('overflow-hidden');
         resetTransactionForm();
     }
 
@@ -173,7 +176,7 @@
 
 
 
-        const { transactionId, amount, transactionDate, note, categoryId, walletId, transactionType } = transaction;
+        const { transactionId, amount, transactionDate, note, categoryId, walletId, transactionType, transactionSort } = transaction;
 
         currentTransactionId = transaction.transactionId;
 
@@ -184,6 +187,7 @@
         document.getElementById('editTransactionCategory').value = categoryId || '';
         document.getElementById('editTransactionWallet').value = walletId || '';
         document.getElementById('editTransactionType').value = transactionType || 'Expense';
+        document.getElementById('editTransactionSort').value = transactionSort;
 
 
         console.log("Transaction Data:", transaction);
@@ -369,6 +373,7 @@
         data.TransactionId = currentTransactionId;
         data.TransactionType = transactionType.value;
         data.TransactionDate = new Date(data.TransactionDate).toISOString();
+        data.Amount = parseFloat(data.Amount);
 
         console.log("Data to be sent:", JSON.stringify(data)); // Debugging line
 
