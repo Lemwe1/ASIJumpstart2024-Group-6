@@ -126,6 +126,7 @@ if (closeEditModal) {
 function openModal(modal) {
     if (modal) {
         modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden'); 
     } else {
         Swal.fire({
             title: 'Error',
@@ -140,6 +141,7 @@ function openModal(modal) {
 function closeModal(modal) {
     if (modal) {
         modal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden'); 
     } else {
         Swal.fire({
             title: 'Error',
