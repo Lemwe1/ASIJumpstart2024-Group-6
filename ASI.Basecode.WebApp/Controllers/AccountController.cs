@@ -125,7 +125,7 @@ namespace ASI.Basecode.WebApp.Controllers
             var existingUserByCode = _userService.GetByUserCode(model.UserCode);
             if (existingUserByCode != null)
             {
-                return Json(new { success = false, message = "UserCode is already taken." });
+                return Json(new { success = false, message = "Username is already taken." });
             }
 
             // Check if the Email already exists in the database
