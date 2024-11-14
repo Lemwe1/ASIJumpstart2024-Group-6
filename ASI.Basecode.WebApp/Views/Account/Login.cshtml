@@ -6,15 +6,16 @@
     ViewBag.LoginView = true;
     ViewData["Title"] = "Login Page";
 }
+@section styles {
+    <link rel="stylesheet" href="~/css/main.css" />
+}
 
 <div class="flex h-screen bg-gray-50 dark:bg-gray-900 relative">
     <div class="hidden lg:flex lg:w-1/2">
         <img src="~/img/spendwise-banner.svg" alt="Banner" class="w-full h-full object-cover" />
     </div>
-    <div class="flex items-center justify-center w-full lg:w-1/2 p-6">
-        <div class="relative rounded-lg shadow dark:bg-gray-800 w-full max-w-md lg:max-w-lg mx-auto min-h-[400px] sm:min-h-[450px] md:min-h-[500px] lg:min-h-[600px] flex flex-col p-8 space-y-4">
-
-            
+    <div class="flex flex-col items-center justify-center w-full lg:w-1/2 p-6 py-8 min-h-screen">
+        <div class="relative rounded-lg shadow dark:bg-gray-800 w-full max-w-md lg:max-w-lg mx-auto min-h-[400px] sm:min-h-[450px] md:min-h-[500px] lg:min-h-[600px] flex flex-col p-8 space-y-4 overflow-y-auto">
 
             <!-- Moved overlay inside the card container -->
             <div id="form-overlay" class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
@@ -32,8 +33,6 @@
                 </div>
             </div>
 
-       
-
             <!-- Heading -->
             <h2 class=" text-2xl font-semibold text-gray-900 dark:text-white ">Login to your Account</h2>
             <h2 class=" text-l text-gray-800 dark:text-white mb-4">Please login to continue</h2>
@@ -50,13 +49,14 @@
                         class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
                     <span asp-validation-for="UserCode" class="text-danger"></span>
                 </div>
-                <div>
-                    <label asp-for="Password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+                <div class="relative">
+                    <label asp-for="Password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
                     <input type="password" id="form2Example22" asp-for="Password" placeholder="Enter password"
-                        class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
+                           class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
+                    <i id="toggle-password" class="fas fa-eye-slash absolute bottom-1.5 right-3 transform -translate-y-1/2 cursor-pointer text-gray-500"></i>
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between mt">
                     <div class="flex items-center">
                         <input id="remember" aria-describedby="remember" type="checkbox" class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600" />
                         <label for="remember" class="ml-2 text-sm text-gray-500 dark:text-gray-300">@RememberMe</label>
@@ -88,141 +88,6 @@
 </div>
 
 @section scripts {
-   <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const loginForm = document.getElementById('loginForm');
-            if (loginForm) {
-                loginForm.addEventListener('submit', function (event) {
-                    event.preventDefault(); // Prevent form from submitting the usual way
-
-                    const overlay = document.getElementById('form-overlay');
-                    const spinner = document.getElementById('loading-spinner');
-                    const successIcon = document.getElementById('success-icon');
-                    const failureIcon = document.getElementById('failure-icon');
-                    const successMessageDiv = document.getElementById('success-message');
-                    const errorMessageDiv = document.getElementById('error-message');
-
-                    // Reset all icons, spinner, and messages to initial hidden state
-                    spinner.classList.add('hidden');
-                    successIcon.classList.add('hidden');
-                    failureIcon.classList.add('hidden');
-                    successMessageDiv.classList.add('hidden');
-                    errorMessageDiv.classList.add('hidden'); // Hide the error message
-                    overlay.classList.remove('hidden'); // Show the overlay
-
-                    // Show loading spinner
-                    spinner.classList.remove('hidden');
-
-                    // Prepare the form data
-                    const formData = new FormData(loginForm);
-
-                    // Send an AJAX request to the login endpoint
-                    fetch('/Account/Login', {
-                        method: 'POST',
-                        body: formData,
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            // Hide loading spinner
-                            spinner.classList.add('hidden');
-
-                            if (data.success) {
-                                successIcon.classList.remove('hidden');
-                                successMessageDiv.textContent = data.message; // Show success message from the response
-                                successMessageDiv.classList.remove('hidden'); // Display the success message
-
-                                // Redirect after showing success message for 2 seconds
-                                setTimeout(function () {
-                                    window.location.href = "/Home/Index"; // Redirect to home page
-                                }, 2000);
-                            } else {
-                                failureIcon.classList.remove('hidden');
-
-                                // Show error message from the response
-                                if (data.resendVerification) {
-                                    errorMessageDiv.innerHTML = `${data.message} <a href='/Account/ResendVerificationLink' class='text-blue-600 hover:underline'>Resend Verification Email</a>`;
-                                } else {
-                                    errorMessageDiv.textContent = data.message;
-                                }
-
-                                errorMessageDiv.classList.remove('hidden'); // Display the error message
-                                setTimeout(function () {
-                                    overlay.classList.add('hidden');
-                                    failureIcon.classList.add('hidden');
-                                }, 2000);
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            spinner.classList.add('hidden');
-                            failureIcon.classList.remove('hidden');
-                            setTimeout(function () {
-                                overlay.classList.add('hidden');
-                                failureIcon.classList.add('hidden');
-                            }, 2000);
-                        });
-                });
-            }
-        });
-
-// Check for success message and display Toastr notification
-var successMessage = '@TempData["SuccessMessage"]';
-if (successMessage) {
-    toastr.success(successMessage);
-}
-
-// Check for error message and display Toastr notification
-var errorMessage = '@TempData["ErrorMessage"]';
-if (errorMessage) {
-    toastr.error(errorMessage);
-}
-
-
-// Theme toggle logic
-const toggle = document.getElementById('theme-toggle');
-const sunIcon = document.getElementById('sun-icon');
-const moonIcon = document.getElementById('moon-icon');
-
-// Check if user has a previously saved theme preference
-const savedTheme = localStorage.getItem('theme') || 'light';
-if (savedTheme === 'dark') {
-    document.body.classList.add('dark');
-    sunIcon.classList.remove('hidden');
-    moonIcon.classList.add('hidden');
-}
-
-// Toggle between dark and light mode
-toggle.addEventListener('click', () => {
-    document.body.classList.toggle('dark');
-
-    // Toggle icon visibility
-    sunIcon.classList.toggle('hidden');
-    moonIcon.classList.toggle('hidden');
-
-    // Save the theme preference in local storage
-    const theme = document.body.classList.contains('dark') ? 'dark' : 'light';
-    localStorage.setItem('theme', theme);
-});
-</script>
-
-   <style>
-    #theme-toggle {
-        transition: color 0.3s;
-    }
-
-    #form-overlay {
-        transition: opacity 0.3s ease-in-out;
-    }
-
-    #loading-spinner,
-    #success-icon,
-    #failure-icon {
-        transition: visibility 0.3s, opacity 0.3s ease-in-out;
-    }
-
-    #error-message {
-        margin-top: -1rem; /* Center the error message */
-    }
-</style>
-
+    <script src="~/js/accountLogin.js"></script>
+    <script src="~/js/accountDarkmode.js"></script>
 }

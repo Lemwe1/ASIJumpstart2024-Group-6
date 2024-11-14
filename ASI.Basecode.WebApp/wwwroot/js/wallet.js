@@ -65,8 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-
-
 // Function to update the total balance displayed
 function updateNetWorth() {
     // Calculate the total debit and total liabilities

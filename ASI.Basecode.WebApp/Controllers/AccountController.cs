@@ -86,7 +86,7 @@ namespace ASI.Basecode.WebApp.Controllers
 
                 // Sign in the user
                 await _signInManager.SignInAsync(user);
-                _session.SetString("UserName", string.Join(" ", user.FirstName, user.LastName));
+                _session.SetString("UserName", user.UserCode);
 
                 // Return success response to the front-end
                 return Json(new { success = true, message = "Login successful! Redirecting..." });
@@ -125,7 +125,7 @@ namespace ASI.Basecode.WebApp.Controllers
             var existingUserByCode = _userService.GetByUserCode(model.UserCode);
             if (existingUserByCode != null)
             {
-                return Json(new { success = false, message = "UserCode is already taken." });
+                return Json(new { success = false, message = "Username is already taken." });
             }
 
             // Check if the Email already exists in the database
@@ -142,8 +142,6 @@ namespace ASI.Basecode.WebApp.Controllers
                 {
                     UserCode = model.UserCode,
                     Password = PasswordManager.EncryptPassword(model.Password),  // Use hashed password here
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
                     Mail = model.Email,
                     InsDt = DateTime.Now,
                     VerificationToken = Guid.NewGuid().ToString(),  // Generate token for email verification

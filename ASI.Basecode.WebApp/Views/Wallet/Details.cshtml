@@ -1,54 +1,65 @@
 ﻿@model List<ASI.Basecode.Services.ServiceModels.WalletViewModel>
 
-
 @{
     ViewData["Title"] = "Details";
 }
 
 <!-- Debit Sections -->
 <div id="debitSection" class="mb-6">
+    <!-- Wallet Cards Grid -->
     <div id="debitAccounts" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div id="addAccountButton" class="accountCard py-3 rounded-lg flex flex-col items-center justify-center cursor-pointer relative border-4 border-dashed border-gray-400 dark:border-gray-600" onclick="openModal(addAccountModal)">
+        <!-- Add Wallet Button, styled as a grid item -->
+        <div id="addAccountButton" class="accountCard  p-4 rounded-lg flex flex-col items-center justify-center cursor-pointer relative border-4 border-dashed border-gray-400 dark:border-gray-600" onclick="openModal(addAccountModal)">
             <i class="fas fa-plus text-6xl text-gray-400 dark:text-gray-600 mb-2"></i>
             <span class="text-gray-500 dark:text-gray-300">Add a Wallet</span>
         </div>
 
-        @foreach (var debit in Model)
+        @if (Model != null && Model.Any())
         {
-            <div class="accountCard border-2 border-gray-900 dark:border-gray-600 relative rounded-lg p-4"  style="background-color: @debit.WalletColor;">
-                <!-- Edit Button -->
-                <button class="absolute top-2 right-2 bg-gray-200 text-black h-8 w-8 hover:bg-gray-300 rounded-full p-1"
-                        onclick="openEditModal({
-                WalletId: '@debit.WalletId',
-                WalletName: '@debit.WalletName',
-                WalletBalance: '@debit.WalletBalance',
-                WalletColor: '@debit.WalletColor',
-                WalletIcon: '@debit.WalletIcon'
-            })">
-                    <i class="fas fa-edit"></i>
-                </button>
+            <!-- Display wallet cards if there are wallets -->
+            @foreach (var debit in Model)
+            {
+                <div class="accountCard border-2 border-gray-900 dark:border-gray-600 relative rounded-lg p-4" style="background-color: @debit.WalletColor;">
+                    <!-- Edit Button -->
+                    <button class="absolute top-2 right-2 bg-gray-200 text-black h-8 w-8 hover:bg-gray-300 rounded-full p-1"
+                            onclick="openEditModal({
+                        WalletId: '@debit.WalletId',
+                        WalletName: '@debit.WalletName',
+                        WalletBalance: '@debit.WalletBalance',
+                        WalletColor: '@debit.WalletColor',
+                        WalletIcon: '@debit.WalletIcon'
+                    })">
+                        <i class="fas fa-edit"></i>
+                    </button>
 
-                <!-- Balance Section -->
-                <div class="flex justify-between items-center mb-4 mr-4">
-                    <p class="text-white font-semibold">Balance</p>
-                    <span class="text-white text-lg font-semibold">*****</span>
+                    <!-- Balance Section -->
+                    <div class="flex justify-between items-center mb-4 mr-4">
+                        <p class="text-white font-semibold">Balance</p>
+                        <span class="text-white text-lg font-semibold">*****</span>
+                    </div>
+
+                    <!-- Balance Amount and Toggle Visibility Icon -->
+                    <div class="flex items-center text-white mb-2">
+                        <span class="text-2xl font-bold">₱&nbsp;@debit.WalletBalance</span>
+                        <i class="fas fa-eye ml-2 cursor-pointer toggle-balance" data-account-id="@debit.WalletId"></i>
+                    </div>
+
+                    <!-- Wallet Name and Type -->
+                    <div class="mt-4">
+                        <h3 class="text-white font-semibold">@debit.WalletName</h3>
+                    </div>
+
+                    <!-- Wallet Icon -->
+                    <p class="text-white text-3xl absolute bottom-5 right-4">@debit.WalletIcon</p>
                 </div>
-
-                <!-- Balance Amount and Toggle Visibility Icon -->
-                <div class="flex items-center text-white mb-2">
-                    <span class="text-2xl font-bold">₱&nbsp;@debit.WalletBalance</span>
-                    <i class="fas fa-eye ml-2 cursor-pointer toggle-balance" data-account-id="@debit.WalletId"></i>
-                </div>
-
-                <!-- Wallet Name and Type -->
-                <div class="mt-4">
-                    <h3 class="text-white font-semibold">@debit.WalletName</h3>
-                </div>
-
-                <!-- Wallet Icon -->
-                <p class="text-white text-3xl absolute bottom-5 right-4">@debit.WalletIcon</p>
+            }
+        }
+        else
+        {
+            <!-- Display message if no wallets are found -->
+            <div class=" py-10 text-2xl col-span-1 mt-20 md:col-span-3 text-center text-gray-500 dark:text-gray-300">
+                &#x1F937; No wallets found. Please add a wallet first!
             </div>
-
         }
     </div>
 </div>

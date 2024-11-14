@@ -12,10 +12,8 @@ namespace ASI.Basecode.Services.ServiceModels
         [Required(ErrorMessage = "UserCode is required")]
         public string UserCode { get; set; }
 
-        [Required(ErrorMessage = "FirstName is required")]
         public string FirstName { get; set; }
 
-        [Required(ErrorMessage = "LastName is required")]
         public string LastName { get; set; }
 
         [Required(ErrorMessage = "Password is required")]

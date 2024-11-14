@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="en " class="@ViewData["DarkModeClass"]">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -40,15 +40,15 @@
                 @Html.Partial("_MiniNavigation")
             </nav>
         }
-
         <!-- Main Content Area -->
         <main role="main" class="w-full dark:bg-gray-800 overflow-x-auto">
-            @if (controller != "Account" || (action != "Login" && action != "Register" && action != "ForgotPassword" && action != "ResetPassword"))
+            @if (controller != "Account" || (action != "Login" && action != "Register" && action != "ForgotPassword" && action != "ResetPassword" && action != "VerifyEmail" && action != "ResendVerificationLink"))
             {
                 @Html.Partial("_Header")
             }
-                @RenderBody()
+            @RenderBody()
         </main>
+
     </div>
 
     <!-- Scripts -->
