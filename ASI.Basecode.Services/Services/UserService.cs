@@ -84,8 +84,6 @@ namespace ASI.Basecode.Services.Services
             var newModel = new MUser
             {
                 UserCode = newUser.UserCode,
-                FirstName = newUser.FirstName,
-                LastName = newUser.LastName,
                 Mail = newUser.Mail,
                 Password = PasswordManager.EncryptPassword(newUser.Password),  // Password is already encrypted
                 UserRole = 1,  // Assuming 1 is for regular users
@@ -107,36 +105,44 @@ namespace ASI.Basecode.Services.Services
         public void Update(MUser model, bool isPasswordUpdate = false)
         {
             var existingData = _userRepository.GetUsers().FirstOrDefault(s => !s.Deleted && s.UserId == model.UserId);
+
             if (existingData != null)
             {
+                // Update UserCode, but avoid overwriting verification tokens unless explicitly provided
                 existingData.UserCode = model.UserCode;
-                existingData.FirstName = model.FirstName;
-                existingData.LastName = model.LastName;
 
-                // Only encrypt and update the password if it's a password reset operation
+                // Allow updating First Name and Last Name
+                existingData.FirstName = model.FirstName ?? existingData.FirstName;  // Only update if provided
+                existingData.LastName = model.LastName ?? existingData.LastName;     // Only update if provided
+
+                // Update password only if it is part of the operation
                 if (isPasswordUpdate && !string.IsNullOrEmpty(model.Password))
                 {
                     existingData.Password = PasswordManager.EncryptPassword(model.Password);
                 }
 
-                // Update reset and verification tokens only if they are provided
+                // Update the password reset token and expiration if provided
                 if (!string.IsNullOrEmpty(model.PasswordResetToken))
                 {
                     existingData.PasswordResetToken = model.PasswordResetToken;
                     existingData.PasswordResetExpiration = model.PasswordResetExpiration;
                 }
 
+                // Update the verification token and expiration only if provided
                 if (!string.IsNullOrEmpty(model.VerificationToken))
                 {
                     existingData.VerificationToken = model.VerificationToken;
                     existingData.VerificationTokenExpiration = model.VerificationTokenExpiration;
                 }
 
-                existingData.IsVerified = model.IsVerified;  // Update verification status
+                // Optionally, allow updating verification status (if needed)
+                existingData.IsVerified = model.IsVerified;
 
-                _userRepository.UpdateUser(existingData);  // Update user in the database
+                // Persist changes to the database
+                _userRepository.UpdateUser(existingData);
             }
         }
+
 
         /// <summary>
         /// Deletes the specified identifier.
