@@ -1,65 +1,65 @@
 ﻿<!DOCTYPE html>
 <html lang="en " class="@ViewData["DarkModeClass"]">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>@ViewData["Title"]</title>
 
-    <!-- Add Favicon and Stylesheets -->
-    <link rel="icon" type="image/x-icon" href="~/img/peso.ico" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/main.css" />
-    <link rel="stylesheet" href="~/css/style.css" />
-    <link rel="stylesheet" href="~/css/output.css">
-    <link rel="stylesheet" href="~/css/navigation.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    @RenderSection("Styles", required: false)
-</head>
-<body>
+        <!-- Add Favicon and Stylesheets -->
+        <link rel="icon" type="image/x-icon" href="~/img/peso.ico" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/main.css" />
+        <link rel="stylesheet" href="~/css/style.css" />
+        <link rel="stylesheet" href="~/css/output.css">
+        <link rel="stylesheet" href="~/css/navigation.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+        @RenderSection("Styles", required: false)
+    </head>
+    <body>
 
-    <div class="flex min-h-screen">
-        <!-- Conditionally render navigation based on the controller/action -->
-        @{
-            var controller = ViewContext.RouteData.Values["controller"].ToString();
-            var action = ViewContext.RouteData.Values["action"].ToString();
-        }
-
-        @if (controller != "Account" ||
-        (action != "Login" && action != "Register" && action != "ForgotPassword" && action != "ResetPassword"
-        && action != "VerifyEmail" && action != "ResendVerificationLink"))
-        {
-            <!-- Sidebar Navigation for larger screens (lg and above) -->
-            <nav id="sidebar-nav position-fixed" class="hidden lg:flex w-72">
-                @Html.Partial("_Navigation")
-            </nav>
-
-            <!-- Mini Sidebar Navigation for small screens (below lg) -->
-            <nav id="mini-sidebar-nav position-fixed" class="flex lg:hidden w-20">
-                @Html.Partial("_MiniNavigation")
-            </nav>
-        }
-        <!-- Main Content Area -->
-        <main role="main" class="w-full dark:bg-gray-800 overflow-x-auto">
-            @if (controller != "Account" || (action != "Login" && action != "Register" && action != "ForgotPassword" && action != "ResetPassword" && action != "VerifyEmail" && action != "ResendVerificationLink"))
-            {
-                @Html.Partial("_Header")
+        <div class="flex min-h-screen">
+            <!-- Conditionally render navigation based on the controller/action -->
+            @{
+                var controller = ViewContext.RouteData.Values["controller"].ToString();
+                var action = ViewContext.RouteData.Values["action"].ToString();
             }
-            @RenderBody()
-        </main>
 
-    </div>
+            @if (controller != "Account" ||
+            (action != "Login" && action != "Register" && action != "ForgotPassword" && action != "ResetPassword"
+            && action != "VerifyEmail" && action != "ResendVerificationLink"))
+            {
+                <!-- Sidebar Navigation for larger screens (lg and above) -->
+                <nav id="sidebar-nav position-fixed" class="hidden lg:flex w-72">
+                    @Html.Partial("_Navigation")
+                </nav>
 
-    <!-- Scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.js"></script>
-    <script src="https://kit.fontawesome.com/832b27a645.js" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                <!-- Mini Sidebar Navigation for small screens (below lg) -->
+                <nav id="mini-sidebar-nav position-fixed" class="flex lg:hidden w-20">
+                    @Html.Partial("_MiniNavigation")
+                </nav>
+            }
+            <!-- Main Content Area -->
+            <main role="main" class="w-full dark:bg-gray-800 overflow-x-auto">
+                @if (controller != "Account" || (action != "Login" && action != "Register" && action != "ForgotPassword" && action != "ResetPassword" && action != "VerifyEmail" && action != "ResendVerificationLink"))
+                {
+                    @Html.Partial("_Header")
+                }
+                @RenderBody()
+            </main>
 
-    @await RenderSectionAsync("Scripts", required: false)
-</body>
+        </div>
+
+        <!-- Scripts -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.js"></script>
+        <script src="https://kit.fontawesome.com/832b27a645.js" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        @await RenderSectionAsync("Scripts", required: false)
+    </body>
 </html>

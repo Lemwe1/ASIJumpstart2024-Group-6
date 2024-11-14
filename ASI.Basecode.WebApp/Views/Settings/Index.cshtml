@@ -7,94 +7,92 @@
     <link rel="stylesheet" href="~/css/settings.css" />
 }
 
+@using ASI.Basecode.Data.Models
+@using ASI.Basecode.Services.ServiceModels
+
 <!-- Sidebar and Content -->
 <div class="flex min-h-screen mt-5 ml-10">
     <!-- Main Content Area -->
-    <div class="flex-1 container p-6 bg-gray-50 dark:bg-gray-800 ">
-     
+    <div class="flex-1 container p-6 bg-gray-100 dark:bg-gray-800">
+
         <!-- Settings Header -->
         <div class="my-4">
             <h2 class="font-semibold text-2xl dark:text-white">Settings</h2>
         </div>
 
         <!-- Profile Section -->
-        <div class="p-6 shadow-md rounded-lg mb-6 bg-gray-50 dark:bg-gray-700">
-            <h3 class="text-lg font-semibold mb-4 dark:text-white">Profile</h3>
-            <!-- Edit Button -->
-            <button class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 focus:outline-none">
-                <i class="fas fa-edit"></i> 
+        <div class="relative p-6 shadow-sm rounded-lg mb-6 bg-gray-50 dark:bg-gray-700 flex flex-col md:flex-row">
+            <!-- Profile Details Section -->
+            <div class="md:w-1/2 pr-6 mb-4 sm:mb-0">
+                <h3 class="text-lg font-semibold mb-4 dark:text-white">Profile</h3>
+
+                <!-- Username Field -->
+                <div class="mb-4">
+                    <label for="usercode" class="block text-gray-700 dark:text-gray-300">Username</label>
+                    <input type="text" id="usercode" name="usercode"
+                           class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white"
+                           placeholder="Username"
+                           value="@ViewData["UserCode"]" readonly disabled>
+                </div>
+
+                <!-- Name Fields -->
+                <div class="flex flex-col sm:flex-row space-y-4 md:space-y-0 md:space-x-4 w-full my-4">
+                    <div class="w-full md:w-1/2">
+                        <label for="first-name" class="block text-gray-700 dark:text-gray-300">First Name</label>
+                        <input type="text" id="first-name" name="first-name"
+                               class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white"
+                               placeholder="First Name"
+                               value="@ViewData["FirstName"]" readonly disabled>
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <label for="last-name" class="block text-gray-700 dark:text-gray-300">Last Name</label>
+                        <input type="text" id="last-name" name="last-name"
+                               class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white"
+                               placeholder="Last Name"
+                               value="@ViewData["LastName"]" readonly disabled>
+                    </div>
+                </div>
+
+                <!-- Email Field -->
+                <div class="my-4">
+                    <label for="email" class="block text-gray-700 dark:text-gray-300">Email Address</label>
+                    <input type="email" id="email" name="email"
+                           class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white"
+                           placeholder="Email address" required
+                           value="@ViewData["Email"]" readonly disabled>
+                </div>
+                <hr class="dark:text-white"/>
+                <!-- Password Field with Change Button -->
+                <div class="my-4 relative ">
+                    <label for="password" class="block text-gray-700 dark:text-gray-300 mr-2">Password</label>
+                    <input type="password" id="password" name="password"
+                           class="w-9/12 p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white"
+                           placeholder="**********" readonly disabled>
+                    <!-- Change Password Text with Underline -->
+                    <a href="javascript:void(0);" id="change-password-btn" onclick="openChangePasswordModal()"
+                       class="w-full p-3 text-blue-500 hover:underline">
+                        Change
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- Profile Picture Section -->
+            <div class="w-full md:w-1/2 flex flex-col items-center justify-center">
+                <div class="text-center mb-4">
+                    <img id="profile-picture" class="rounded-full mx-auto w-40 h-40" src="~/img/profile-logo.png" alt="Profile Picture" />
+                </div>
+                <input type="file" id="file-input" class="hidden" accept="image/*">
+            </div>
+
+            <!-- Edit Button for Profile -->
+            <button id="edit-profile-btn" onclick="openEditProfileModal()" class="absolute top-1 right-1 bg-blue-500 dark:border-gray-500 text-white dark:text-gray-300 hover:bg-blue-600 px-3 py-2 rounded-lg transition duration-150 flex items-center mt-4 mr-4">
+                <i class="fas fa-edit mr-1"></i> Edit Profile
             </button>
-
-            <div class="flex items-center">
-                <!-- Profile Picture -->
-                <div class="text-center">
-                    <img id="profile-picture" class="w-20 h-20 rounded-full mx-auto" src="~/img/profile-logo.png" alt="Profile Picture" />
-                </div>
-
-                <!-- Change Picture Button -->
-                <div class="ml-6">
-                    <input type="file" id="file-input" class="hidden" accept="image/*">
-                    <button id="change-picture-btn" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none">
-                        Change Profile Picture
-                    </button>
-                </div>
-            </div>
-
-            <!-- Name Fields -->
-            <div class="mt-6 grid grid-cols-2 gap-4">
-                <div>
-                    <label for="first-name" class="block text-gray-700 dark:text-gray-300">First Name</label>
-                    <input type="text" id="first-name" name="first-name" class="w-full p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Enter first name">
-                </div>
-                <div>
-                    <label for="last-name" class="block text-gray-700 dark:text-gray-300">Last Name</label>
-                    <input type="text" id="last-name" name="last-name" class="w-full p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Enter last name">
-                </div>
-            </div>
         </div>
-
-        <!-- Change Email Section -->
-        <div class="p-6 shadow-md rounded-lg mb-6 bg-gray-50 dark:bg-gray-700">
-            <h3 class="text-lg font-semibold mb-4 dark:text-white">Email Address</h3>
-            <div class="flex justify-between items-center">
-                <p class="mb-0 dark:text-gray-300">Your email address is <strong>sample@gmail.com</strong></p>
-                <button class="text-blue-500 underline hover:text-blue-700 focus:outline-none">Change</button>
-            </div>
-        </div>
-
-        <!-- Change Password Section -->
-        <div class="p-6 shadow-md rounded-lg mb-6 bg-gray-50 dark:bg-gray-700">
-            <h3 class="text-lg font-semibold mb-4 dark:text-white">Password</h3>
-            <form>
-                <div class="grid grid-cols-3 gap-4 mb-4">
-                    <div class="mb-4 relative">
-                        <label for="current-password" class="block text-gray-700 dark:text-gray-300">Current Password:</label>
-                        <input type="password" id="current-password" name="current-password" class="w-full p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Enter current password" required />
-                        <i id="toggle-current-password" class="fas fa-eye-slash absolute bottom-1.5 right-3 transform -translate-y-1/2 cursor-pointer text-gray-500"></i>
-                    </div>
-                    <div class="mb-4 relative">
-                        <label for="new-password" class="block text-gray-700 dark:text-gray-300">New Password:</label>
-                        <input type="password" id="new-password" name="new-password" class="w-full p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Enter new password" required />
-                        <i id="toggle-new-password" class="fas fa-eye-slash absolute bottom-1.5 right-3 transform -translate-y-1/2 cursor-pointer text-gray-500"></i>
-                    </div>
-                    <div class="mb-4 relative">
-                        <label for="confirm-password" class="block text-gray-700 dark:text-gray-300">Confirm Password:</label>
-                        <input type="password" id="confirm-password" name="confirm-password" class="w-full p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Confirm new password" required />
-                        <i id="toggle-confirm-password" class="fas fa-eye-slash absolute bottom-1.5 right-3 transform -translate-y-1/2 cursor-pointer text-gray-500"></i>
-                    </div>
-                </div>
-                <div class="flex justify-end">
-                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none">
-                        Save Password
-                    </button>
-                </div>
-            </form>
-        </div>
-
     </div>
 </div>
 
-
-
-
+@Html.Partial("EditProfile")
+@Html.Partial("ChangePass")
 <script src="~/js/settings.js"></script>

@@ -1,4 +1,34 @@
 
-#theme-toggle {
-    transition: color 0.3s;
+
+.modal {
+    z-index: 1050;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+
+    .modal.flex {
+        display: flex;
+    }
+
+.modal-content {
+    max-width: 1000px;
+    max-height: 560px;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    background-color: white;
+    border-radius: 8px;
+}
+
+.modal-content-password {
+    max-width: 500px;
+    max-height: 600px;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    background-color: white;
+    border-radius: 8px;
 }

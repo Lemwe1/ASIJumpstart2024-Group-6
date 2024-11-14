@@ -1,0 +1,50 @@
+﻿@{
+    ViewData["Title"] = "ChangePass";
+}
+
+@using ASI.Basecode.Data.Models
+@using ASI.Basecode.Services.ServiceModels
+
+<!-- Modal Structure for Change Password -->
+<div id="changePasswordModal" class="modal fixed inset-0 bg-gray-800 bg-opacity-70 items-center justify-center hidden" aria-modal="true" role="dialog">
+    <div id="changePasswordContent" class="modal-content-password bg-gray-300 dark:bg-gray-700 py-6 px-8 rounded-lg shadow-lg w-full max-w-lg mx-auto">
+        <div class="flex justify-between items-center mb-2">
+            <h2 class="text-2xl font-bold dark:text-white">Change Password</h2>
+            <button id="closeChangePasswordModal" aria-label="Close" class="text-gray-400 hover:bg-gray-200 p-2 w-10 rounded-full">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <p class="text-gray-600 mb-4 dark:text-gray-300">Create a new, strong password.</p>
+        <form id="changePasswordForm" method="POST" action="/your-change-password-endpoint">
+            <div class="grid grid-cols-1 gap-4 mt-4">
+                <!-- Single column grid -->
+                <!-- Current Password Field -->
+                <div class="mb-4 relative">
+                    <label for="current-password" class="font-semibold block text-gray-700 dark:text-gray-300">Current Password</label>
+                    <input type="password" id="current-password" name="current-password" class="w-full px-2 py-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Enter current password" required />
+                    <i id="toggle-current-password" class="fas fa-eye-slash absolute bottom-3 right-3 transform -translate-y-1/2 cursor-pointer text-gray-500"></i>
+                </div>
+
+                <!-- New Password Field -->
+                <div class="mb-4 relative">
+                    <label for="new-password" class="font-semibold block text-gray-700 dark:text-gray-300">New Password</label>
+                    <input type="password" id="new-password" name="new-password" class="w-full px-2 py-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Enter new password" required />
+                    <i id="toggle-new-password" class="fas fa-eye-slash absolute bottom-3 right-3 transform -translate-y-1/2 cursor-pointer text-gray-500"></i>
+                </div>
+
+                <!-- Confirm New Password Field -->
+                <div class="mb-4 relative">
+                    <label for="confirm-password" class="font-semibold block text-gray-700 dark:text-gray-300">Confirm Password</label>
+                    <input type="password" id="confirm-password" name="confirm-password" class="w-full px-2 py-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Confirm new password" required />
+                    <i id="toggle-confirm-password" class="fas fa-eye-slash absolute bottom-3 right-3 transform -translate-y-1/2 cursor-pointer text-gray-500"></i>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex mt-6">
+                <button type="button" id="cancelChangePassButton" class="w-1/2 mr-3 bg-gray-200 text-gray-800 hover:bg-gray-300 py-3 rounded-md">Cancel</button>
+                <button type="submit" class="w-1/2 ml-3 bg-blue-500 hover:bg-blue-700 text-white py-3 rounded-md">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>

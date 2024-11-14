@@ -71,6 +71,20 @@
                     }, 2000);
                 });
         });
+        const togglePassword = document.getElementById('toggle-password');
+        const passwordField = document.getElementById('form2Example22');
+
+        if (togglePassword && passwordField) {
+            togglePassword.addEventListener('click', function () {
+                // Toggle the type of the password field between password and text
+                const type = passwordField.type === 'password' ? 'text' : 'password';
+                passwordField.type = type;
+
+                // Toggle the eye icon to show the correct status (open/closed)
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+        }
     }
 });
 
