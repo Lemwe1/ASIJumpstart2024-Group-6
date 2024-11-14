@@ -54,22 +54,40 @@
     // Initial filter on page load
     filterTableByCategory();
 
-
     // Event listener for category filter
     document.querySelector('select[name="filterByCategory"]').addEventListener('change', filterTableByCategory);
 
-
-    // Open modal for adding a new transaction
+    // Open modal for adding a new transaction, with wallet check
     function openAddTransactionModal() {
+        // Check if there are no wallets (only the placeholder option is present)
+        if (transactionWalletSelect.options.length <= 1) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'No Wallets Found',
+                text: 'It looks like there are no wallets available. Please add a wallet first!',
+                confirmButtonColor: '#3B82F6',
+                confirmButtonText: 'Add Wallet',
+                showCancelButton: true,
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/Wallet/Index'; // Redirect to add wallet page
+                }
+            });
+            return; // Stop the function from proceeding to open the modal
+        }
+
+        // If wallets are available, proceed to open the modal
         modal.classList.remove('hidden');
         modal.classList.add('flex');
-        document.body.classList.add('overflow-hidden'); //remove scroll for body when modal is open
+        document.body.classList.add('overflow-hidden');
         resetTransactionForm();
         updateTypeSelection('Expense');
         filterCategories('Expense');
         transactionCategorySelect.value = "";
         transactionWalletSelect.value = "";
     }
+
 
     // Open modal for editing a transaction
     function openEditTransactionModal(transaction) {
@@ -80,6 +98,8 @@
         updateTypeSelection(transaction.transactionType);
         filterCategories(transaction.transactionType);
     }
+
+
 
 
     // Reset form fields when the reset button is clicked
@@ -174,24 +194,31 @@
             return;
         }
 
-
-
         const { transactionId, amount, transactionDate, note, categoryId, walletId, transactionType, transactionSort } = transaction;
 
         currentTransactionId = transaction.transactionId;
 
         document.getElementById('editTransactionId').value = transactionId;
         document.getElementById('editTransactionAmount').value = amount ? amount.toFixed(2) : '0.00';
-        document.getElementById('editTransactionDate').value = transactionDate ? new Date(transactionDate).toISOString().slice(0, 10) : '';
+
+        if (transactionDate) {
+            // Convert the date to local date string
+            const localDate = new Date(transactionDate);
+            const localDateString = localDate.toLocaleDateString('en-CA'); // 'en-CA' gives the YYYY-MM-DD format
+            document.getElementById('editTransactionDate').value = localDateString;
+        } else {
+            document.getElementById('editTransactionDate').value = '';
+        }
+
         document.getElementById('editTransactionNote').value = note || '';
         document.getElementById('editTransactionCategory').value = categoryId || '';
         document.getElementById('editTransactionWallet').value = walletId || '';
         document.getElementById('editTransactionType').value = transactionType || 'Expense';
         document.getElementById('editTransactionSort').value = transactionSort;
 
-
         console.log("Transaction Data:", transaction);
     }
+
 
 
     // Function to update button styles based on the type
@@ -265,38 +292,27 @@
         });
     }
 
-
-
     // Function to handle input limiting
     const handleAmountInput = (inputElement) => {
-        inputElement.addEventListener('input', (event) => {
-            // Get the current value without formatting
-            let currentValue = inputElement.value;
+        inputElement.addEventListener('input', () => {
+            let currentValue = inputElement.value.replace(/[^0-9.]/g, '');
 
-            // Remove all non-digit characters and decimal point
-            currentValue = currentValue.replace(/[^0-9.]/g, '');
-
-            // Allow only one decimal point
-            if (currentValue.match(/\./g).length > 1) {
+            const decimalMatches = currentValue.match(/\./g);
+            if (decimalMatches && decimalMatches.length > 1) {
                 currentValue = currentValue.substring(0, currentValue.lastIndexOf('.'));
             }
 
-            // Check if the input value is greater than one trillion
             if (currentValue && Number(currentValue) > 1e12) {
-                // Show SweetAlert error message
                 Swal.fire({
                     title: 'Error',
                     text: 'Amount must be less than or equal to one trillion.',
                     icon: 'error'
                 });
-
-                // Clear the input field
-                inputElement.value = ''; // Clear the input to prevent submission errors
-                return; // Exit the function to prevent further processing
+                inputElement.value = '';
+                return;
             }
 
-            // Set the cleaned value back to the input
-            inputElement.value = currentValue; // Update input with cleaned value
+            inputElement.value = currentValue;
         });
     };
 
@@ -311,7 +327,6 @@
         event.preventDefault();
         const formData = new FormData(transactionForm);
 
-        // Convert FormData to a plain object (if needed)
         const data = {};
         formData.forEach((value, key) => {
             data[key] = value;
@@ -394,7 +409,6 @@
                 });
             });
     }
-
 
     // Response handler for adding/editing transactions
     function handleResponse(response) {
@@ -589,11 +603,11 @@
 
     // Mark form as dirty when there are changes
     transactionForm.addEventListener('input', () => {
-        isModalDirty = true; // Mark the modal as dirty when user interacts with the form
+        isModalDirty = true; 
     });
 
     editTransactionForm.addEventListener('input', () => {
-        isModalDirty = true; // Mark the edit modal as dirty when user interacts with the form
+        isModalDirty = true; 
     });
 
     // Attach event listeners for modal opening

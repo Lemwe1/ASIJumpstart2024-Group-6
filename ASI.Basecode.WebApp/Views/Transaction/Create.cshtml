@@ -35,8 +35,12 @@
                 </label>
                 <span class="text-gray-500 text-xs inline-block mb-2 dark:text-gray-300">(Select A type)</span>
                 <div class="flex space-x-4">
-                    <button type="button" id="createExpenseButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800">Expense</button>
-                    <button type="button" id="createIncomeButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800">Income</button>
+                    <button type="button" id="createExpenseButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 transform transition-transform duration-200 hover:scale-105">
+                        Expense
+                    </button>
+                    <button type="button" id="createIncomeButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 transform transition-transform duration-200 hover:scale-105">
+                        Income
+                    </button>
                 </div>
                 <input type="hidden" name="TransactionType" id="transactionType" value="Expense" />
                 <input type="hidden" name="TransactionSort" value="Transaction" />
@@ -61,7 +65,7 @@
                         }
                         else
                         {
-                            <option value="" disabled>No Entries yet</option>
+                            <option value="" disabled>&#x1F937; No Entries yet</option>
                         }
 
                     </select>
@@ -73,7 +77,7 @@
                         Wallet
                     </label>
                     <select id="transactionWallet" name="walletId" required class="dark:bg-gray-700 mt-1 block w-full px-4 py-2 border rounded-md text-gray-900 dark:text-white">
-                        <option class="text-gray-500" value="" disabled>Select Wallet</option>
+                        <option class="text-gray-500" value="" disabled selected>Select Wallet</option>
 
                         @if (ViewData["Wallets"] is List<WalletViewModel> wallets && wallets.Any())
                         {
@@ -82,11 +86,6 @@
                                 <option value="@wallet.WalletId">@wallet.WalletIcon @wallet.WalletName</option>
                             }
                         }
-                        else
-                        {
-                            <option value="" disabled>No entries yet</option>
-                        }
-
                     </select>
                 </div>
             </div>

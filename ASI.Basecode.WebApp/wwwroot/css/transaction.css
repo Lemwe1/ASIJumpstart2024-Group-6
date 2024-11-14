@@ -8,9 +8,9 @@
 }
 
    
-    .modal.flex {
-        display: flex; 
-    }
+.modal.flex {
+    display: flex; 
+}
 
 .modal-content {
     max-width: 700px;

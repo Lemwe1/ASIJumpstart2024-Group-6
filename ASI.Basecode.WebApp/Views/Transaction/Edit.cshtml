@@ -27,8 +27,12 @@
                 <label class="block text-sm font-medium text-gray-700 inline dark:text-gray-300">Type</label>
                 <span class="text-gray-500 text-xs inline-block ml-2 dark:text-gray-300 mb-2">(Select A type)</span>
                 <div class="flex space-x-4">
-                    <button type="button" id="editExpenseButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800"> Expense</button>
-                    <button type="button" id="editIncomeButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800"> Income</button>
+                    <button type="button" id="editExpenseButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 transform transition-transform duration-200 hover:scale-105">
+                        Expense
+                    </button>
+                    <button type="button" id="editIncomeButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 transform transition-transform duration-200 hover:scale-105">
+                        Income
+                    </button>
                 </div>
                 <input type="hidden" name="Type" id="editTransactionType" value="Expense" />
                 <input type="hidden" name="TransactionSort" id="editTransactionSort" />

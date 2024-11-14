@@ -1,9 +1,4 @@
-.accountCard {
-    padding: 1rem;
-    border-radius: 0.5rem;
-    color: #fff;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
+
 
 #addAccountButton {
     border-radius: 0.5rem;
@@ -17,22 +12,11 @@
 }
 
 
-/* Hover effect: scale up and add shadow */
+
 .accountCard:hover {
     transform: scale(1.05);
 }
 
-
-/* Edit Icon Styles */
-.accountCard a {
-    /* Transition for opacity */
-    transition: opacity 0.3s ease;
-    opacity: 0.8;
-}
-
-    .accountCard a:hover {
-        opacity: 1;
-    }
 
 
 
