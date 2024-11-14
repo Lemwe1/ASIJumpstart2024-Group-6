@@ -48,6 +48,7 @@ namespace ASI.Basecode.Services.Services
                 UserCode = data.UserCode,
                 FirstName = data.FirstName,
                 LastName = data.LastName,
+                Mail = data.Mail,
                 Password = PasswordManager.DecryptPassword(data.Password)
             };
             return model;
