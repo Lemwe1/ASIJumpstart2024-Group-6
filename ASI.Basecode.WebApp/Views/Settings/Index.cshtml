@@ -13,7 +13,7 @@
 <!-- Sidebar and Content -->
 <div class="flex min-h-screen mt-5 ml-10">
     <!-- Main Content Area -->
-    <div class="flex-1 container p-6 bg-gray-50 dark:bg-gray-800">
+    <div class="flex-1 container p-6 bg-gray-100 dark:bg-gray-800">
 
         <!-- Settings Header -->
         <div class="my-4">
@@ -21,35 +21,35 @@
         </div>
 
         <!-- Profile Section -->
-        <div class="relative p-6 shadow-md rounded-lg mb-6 bg-gray-50 dark:bg-gray-700 flex">
-            <div class="w-1/2 pr-6">
-                <h3 class="text-lg font-semibold mb-4 dark:text-white">Edit Profile</h3>
+        <div class="relative p-6 shadow-sm rounded-lg mb-6 bg-gray-50 dark:bg-gray-700 flex flex-col md:flex-row">
+            <!-- Profile Details Section -->
+            <div class="md:w-1/2 pr-6 mb-4 sm:mb-0">
+                <h3 class="text-lg font-semibold mb-4 dark:text-white">Profile</h3>
 
-                <!-- Form Fields -->
                 <!-- Username Field -->
                 <div class="mb-4">
                     <label for="usercode" class="block text-gray-700 dark:text-gray-300">Username</label>
                     <input type="text" id="usercode" name="usercode"
                            class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white"
                            placeholder="Username"
-                           value="@ViewData["UserCode"]" readonly>
+                           value="@ViewData["UserCode"]" readonly disabled>
                 </div>
 
                 <!-- Name Fields -->
-                <div class="flex space-x-4 w-full my-4">
-                    <div class="w-1/2">
+                <div class="flex flex-col sm:flex-row space-y-4 md:space-y-0 md:space-x-4 w-full my-4">
+                    <div class="w-full md:w-1/2">
                         <label for="first-name" class="block text-gray-700 dark:text-gray-300">First Name</label>
                         <input type="text" id="first-name" name="first-name"
                                class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white"
                                placeholder="First Name"
-                               value="@ViewData["FirstName"]">
+                               value="@ViewData["FirstName"]" readonly disabled>
                     </div>
-                    <div class="w-1/2">
+                    <div class="w-full md:w-1/2">
                         <label for="last-name" class="block text-gray-700 dark:text-gray-300">Last Name</label>
                         <input type="text" id="last-name" name="last-name"
                                class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white"
                                placeholder="Last Name"
-                               value="@ViewData["LastName"]">
+                               value="@ViewData["LastName"]" readonly disabled>
                     </div>
                 </div>
 
@@ -59,67 +59,40 @@
                     <input type="email" id="email" name="email"
                            class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white"
                            placeholder="Email address" required
-                           value="@ViewData["Email"]">
+                           value="@ViewData["Email"]" readonly disabled>
+                </div>
+                <hr class="dark:text-white"/>
+                <!-- Password Field with Change Button -->
+                <div class="my-4 relative ">
+                    <label for="password" class="block text-gray-700 dark:text-gray-300 mr-2">Password</label>
+                    <input type="password" id="password" name="password"
+                           class="w-9/12 p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white"
+                           placeholder="**********" readonly disabled>
+                    <!-- Change Password Text with Underline -->
+                    <a href="javascript:void(0);" id="change-password-btn" onclick="openChangePasswordModal()"
+                       class="w-full p-3 text-blue-500 hover:underline">
+                        Change
+                    </a>
                 </div>
 
-                <!-- Submit and Reset Buttons -->
-                <div class="flex mt-6">
-                    <button type="button" class="w-1/2 mr-3 bg-gray-200 text-gray-800 hover:bg-gray-300 py-3 rounded-md">
-                        Cancel
-                    </button>
-                    <button type="submit"
-                            class="w-1/2 ml-3 bg-blue-500 text-white py-3 rounded-md
-                            disabled:bg-blue-200 disabled:cursor-not-allowed disabled:hover:bg-blue-200"
-                            disabled>
-                        Confirm
-                    </button>
-                </div>
-
-                <!-- Edit Button for Profile -->
-                <button id="edit-profile-btn" class="absolute top-1 right-1 border border-gray-600 dark:border-gray-500 text-gray-600 dark:text-gray-300 hover:bg-gray-600 dark:hover:bg-gray-500 hover:text-white px-3 py-1 rounded-lg transition duration-150 flex items-center mt-4 mr-4">
-                    <i class="fas fa-edit mr-1"></i> Edit
-                </button>
             </div>
 
             <!-- Profile Picture Section -->
-            <div class="w-1/2 flex flex-col items-center justify-center">
+            <div class="w-full md:w-1/2 flex flex-col items-center justify-center">
                 <div class="text-center mb-4">
                     <img id="profile-picture" class="rounded-full mx-auto w-40 h-40" src="~/img/profile-logo.png" alt="Profile Picture" />
                 </div>
                 <input type="file" id="file-input" class="hidden" accept="image/*">
-                <button id="change-picture-btn" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none">
-                    Upload a Picture
-                </button>
             </div>
-        </div>
 
-        <!-- Change Password Section -->
-        <div class="relative p-6 shadow-md rounded-lg mb-6 bg-gray-50 dark:bg-gray-700">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold dark:text-white">Change Password</h3>
-            </div>
-            <form>
-                <div class="grid grid-cols-3 gap-4 mb-4">
-                    <div class="mb-4 relative">
-                        <label for="current-password" class="block text-gray-700 dark:text-gray-300">Current Password:</label>
-                        <input type="password" id="current-password" name="current-password" class="w-full p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Enter current password" required />
-                        <i id="toggle-current-password" class="fas fa-eye-slash absolute bottom-1.5 right-3 transform -translate-y-1/2 cursor-pointer text-gray-500"></i>
-                    </div>
-                    <div class="mb-4 relative">
-                        <label for="new-password" class="block text-gray-700 dark:text-gray-300">New Password:</label>
-                        <input type="password" id="new-password" name="new-password" class="w-full p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Enter new password" required />
-                        <i id="toggle-new-password" class="fas fa-eye-slash absolute bottom-1.5 right-3 transform -translate-y-1/2 cursor-pointer text-gray-500"></i>
-                    </div>
-                    <div class="mb-4 relative">
-                        <label for="confirm-password" class="block text-gray-700 dark:text-gray-300">Confirm Password:</label>
-                        <input type="password" id="confirm-password" name="confirm-password" class="w-full p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Confirm new password" required />
-                        <i id="toggle-confirm-password" class="fas fa-eye-slash absolute bottom-1.5 right-3 transform -translate-y-1/2 cursor-pointer text-gray-500"></i>
-                    </div>
-                </div>
-            </form>
+            <!-- Edit Button for Profile -->
+            <button id="edit-profile-btn" onclick="openEditProfileModal()" class="absolute top-1 right-1 bg-blue-500 dark:border-gray-500 text-white dark:text-gray-300 hover:bg-blue-600 px-3 py-2 rounded-lg transition duration-150 flex items-center mt-4 mr-4">
+                <i class="fas fa-edit mr-1"></i> Edit Profile
+            </button>
         </div>
-
     </div>
 </div>
 
+@Html.Partial("EditProfile")
+@Html.Partial("ChangePass")
 <script src="~/js/settings.js"></script>

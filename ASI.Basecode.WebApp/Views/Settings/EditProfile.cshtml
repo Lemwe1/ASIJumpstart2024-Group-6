@@ -1,0 +1,69 @@
+﻿@{
+    ViewData["Title"] = "EditProfile";
+}
+
+@using ASI.Basecode.Data.Models
+@using ASI.Basecode.Services.ServiceModels
+
+<!-- Modal Structure -->
+<div id="editProfileModal" class="modal fixed inset-0 bg-gray-800 bg-opacity-70 items-center justify-center hidden" aria-modal="true" role="dialog">
+    <div id="editProfileContent" class="modal-content bg-gray-300 dark:bg-gray-700 py-6 px-8 rounded-lg shadow-lg w-full max-w-lg mx-auto">
+        <div class="flex justify-between items-center mb-2">
+            <h2 class="text-2xl font-bold dark:text-white">Edit Profile</h2>
+            <button id="closeEditProfileModal" aria-label="Close" class="absolute top-2 right-2 text-gray-400 hover:bg-gray-200 p-2 w-10 rounded-full">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <form id="editProfileForm" method="post" action="/Profile/Update">
+            @Html.AntiForgeryToken()
+
+            <div class="relative py-6 flex flex-col md:flex-row">
+                <!-- Profile Picture Section - Displays first on small screens -->
+                <div class="md:w-1/2 flex flex-col items-center justify-center mb-6 md:mb-0 md:order-2">
+                    <div class="text-center mb-4">
+                        <img id="edit-profile-picture" class="rounded-full mx-auto w-40 h-40" src="~/img/profile-logo.png" alt="Profile Picture" />
+                    </div>
+                    <input type="file" id="file-input" class="hidden" accept="image/*">
+                    <button type="button" id="change-picture-btn" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none">
+                        Upload a Picture
+                    </button>
+                </div>
+
+                <!-- Form Fields - Stacks below profile picture on small screens -->
+                <div class="md:w-2/3 md:pr-6">
+                    <!-- Username, Name, Email Fields -->
+                    <div class="mb-4">
+                        <label for="usercode" class="block text-gray-700 dark:text-gray-300">Username</label>
+                        <input type="text" id="edit-usercode" name="edit-usercode" class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Username" value="@ViewData["UserCode"]" readonly>
+                    </div>
+
+                    <div class="md:flex md:space-x-4 w-full my-4">
+                        <!-- First Name -->
+                        <div class="w-full md:w-1/2 mb-4 md:mb-0">
+                            <label for="first-name" class="block text-gray-700 dark:text-gray-300">First Name</label>
+                            <input type="text" id="edit-first-name" name="edit-first-name" class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="First Name" value="@ViewData["FirstName"]" required>
+                        </div>
+                        <!-- Last Name -->
+                        <div class="w-full md:w-1/2">
+                            <label for="last-name" class="block text-gray-700 dark:text-gray-300">Last Name</label>
+                            <input type="text" id="edit-last-name" name="edit-last-name" class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Last Name" value="@ViewData["LastName"]" required>
+                        </div>
+                    </div>
+
+                    <!-- Email Field -->
+                    <div class="my-4">
+                        <label for="email" class="block text-gray-700 dark:text-gray-300">Email Address</label>
+                        <input type="email" id="edit-email" name="edit-email" class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Email address" required value="@ViewData["Email"]">
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="flex mt-6">
+                        <button type="button" id="cancelEditProfileButton" class="w-1/2 mr-3 bg-gray-200 text-gray-800 hover:bg-gray-300 py-3 rounded-md">Cancel</button>
+                        <button type="submit" class="w-1/2 ml-3 bg-blue-500 hover:bg-blue-700 text-white py-3 rounded-md">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
