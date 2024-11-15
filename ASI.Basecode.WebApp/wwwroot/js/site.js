@@ -25,4 +25,46 @@
         const theme = document.body.classList.contains('dark') ? 'dark' : 'light';
         localStorage.setItem('theme', theme);
     });
+
+    // Logout confirmation dialog
+    document.getElementById('miniLogoutLink').addEventListener('click', function (event) {
+        event.preventDefault();
+
+        Swal.fire({
+            text: "Are you sure you want to log out?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Logout',
+            confirmButtonColor: darkMode ? '#d33' : '#3085d6', 
+            cancelButtonColor: darkMode ? '#555' : '#a6a6a6', 
+            customClass: {
+                popup: darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900', 
+            },
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = this.getAttribute('href');
+            }
+        });
+    });
+
+    // Logout confirmation dialog
+    document.getElementById('logoutLink').addEventListener('click', function (event) {
+        event.preventDefault();
+
+        Swal.fire({
+            text: "Are you sure you want to log out?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Logout',
+            confirmButtonColor: darkMode ? '#d33' : '#3085d6',
+            cancelButtonColor: darkMode ? '#555' : '#a6a6a6',
+            customClass: {
+                popup: darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900',
+            },
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = this.getAttribute('href');
+            }
+        });
+    });
 });
