@@ -26,6 +26,8 @@
     const editTransactionType = document.getElementById('editTransactionType');
     const editWalletBalanceSpan = document.getElementById('editWalletBalance');
 
+
+
     let isModalDirty = false;
     // Function to filter table based on category
     const filterTableByCategory = () => {
@@ -247,13 +249,21 @@
         const balance = selectedOption ? parseFloat(selectedOption.getAttribute('data-balance')) : null;
 
         if (balance !== null) {
-            // Format the balance as currency
-            balanceSpan.textContent = `(Available Balance: ₱${balance.toFixed(2)})`;
+            // Format the balance with commas and two decimal places
+            const formattedBalance = balance.toLocaleString('en-US', {
+                style: 'currency',
+                currency: 'PHP',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+
+            balanceSpan.textContent = `(Available Balance: ${formattedBalance})`;
             balanceSpan.style.display = 'block'; // Show the balance span
         } else {
             balanceSpan.style.display = 'none'; // Hide the balance span if no wallet is selected
         }
     }
+
 
     // Event listener for the transaction wallet selection (Create Transaction)
     transactionWalletSelect.addEventListener('change', function () {
@@ -323,7 +333,7 @@
 
         if (transactionType === "Expense" && amount > balance) {
             amountInput.style.borderColor = 'red'; // Highlight the input field
-            errorMessage.textContent = 'The amount inputed exceeds the current wallet balance for expenses.';
+            errorMessage.textContent = 'Transaction amount exceeds the current wallet balance for expenses.';
             errorMessage.style.display = 'block'; // Show inline error message
 
             // Display a Swal warning
