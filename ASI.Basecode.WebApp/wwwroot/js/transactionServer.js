@@ -210,52 +210,6 @@
         console.log("Transaction Data:", transaction);
     }
 
-
-
-    // Function to update button styles based on the type
-    function updateButtonStyles(button, isSelected, isExpense) {
-        // Remove all color classes to avoid overlap
-        button.classList.remove('bg-red-400', 'bg-green-500', 'text-white', 'bg-gray-200', 'text-gray-800');
-
-        if (isSelected) {
-            // Apply styles based on whether the button is for expense or income
-            if (isExpense) {
-                button.classList.add('bg-red-400', 'text-white'); // Red for selected expense
-            } else {
-                button.classList.add('bg-green-500', 'text-white'); // Green for selected income
-            }
-        } else {
-            button.classList.add('bg-gray-200', 'text-gray-800'); // Gray for not selected
-        }
-    }
-
-    // Update the type button selection
-    function updateTypeSelection(type) {
-       
-        if (transactionType) {
-            transactionType.value = type;
-        } else {
-            console.error('Transaction Type element not found.');
-            return;
-        }
-
-        const isExpense = type === 'Expense';
-
-        // Update styles for create buttons
-        updateButtonStyles(createExpenseButton, isExpense, true);
-        updateButtonStyles(createIncomeButton, !isExpense, false);
-
-        // Update styles for edit buttons
-        updateButtonStyles(editExpenseButton, isExpense, true);
-        updateButtonStyles(editIncomeButton, !isExpense, false);
-    }
-
-    // Function to set type and apply filters
-    function handleTypeSelection(type) {
-        updateTypeSelection(type);
-        filterCategories(type);
-    }
-
     // Type selection buttons for creating transactions
     createExpenseButton.addEventListener('click', () => handleTypeSelection('Expense'));
     createIncomeButton.addEventListener('click', () => handleTypeSelection('Income'));
@@ -312,7 +266,6 @@
         const transactionTypeValue = transactionType.value;
 
         if (!balance) {
-            transactionAmountInput.style.borderColor = ''; // Reset styles if no wallet is selected
             errorMessage.style.display = 'none'; // Hide error message
             return;
         }
@@ -322,7 +275,6 @@
             errorMessage.textContent = 'Transaction amount exceeds the current wallet balance for expenses.';
             errorMessage.style.display = 'block'; // Show error message
         } else {
-            transactionAmountInput.style.borderColor = ''; // Reset styles
             errorMessage.style.display = 'none'; // Hide error message
         }
     });
@@ -359,18 +311,57 @@
 
             return; // Stop form submission
         }
-
-
        
-        transactionAmountInput.style.borderColor = ''; // Reset styles
         errorMessage.style.display = 'none'; // Hide error message
 
         // Proceed with the existing handleAddTransaction logic
         handleAddTransaction(event);
     }
 
-    // Attach the validateTransaction function to the form submit event
-    transactionForm.addEventListener('submit', validateTransaction);
+    // Function to update button styles based on the type
+    function updateButtonStyles(button, isSelected, isExpense) {
+        // Remove all color classes to avoid overlap
+        button.classList.remove('bg-red-400', 'bg-green-500', 'text-white', 'bg-gray-200', 'text-gray-800');
+
+        if (isSelected) {
+            // Apply styles based on whether the button is for expense or income
+            if (isExpense) {
+                button.classList.add('bg-red-400', 'text-white'); // Red for selected expense
+            } else {
+                button.classList.add('bg-green-500', 'text-white'); // Green for selected income
+                errorMessage.style.display = 'none'; // Hide error message
+            }
+        } else {
+            button.classList.add('bg-gray-200', 'text-gray-800'); // Gray for not selected
+        }
+    }
+
+    // Update the type button selection
+    function updateTypeSelection(type) {
+
+        if (transactionType) {
+            transactionType.value = type;
+        } else {
+            console.error('Transaction Type element not found.');
+            return;
+        }
+
+        const isExpense = type === 'Expense';
+
+        // Update styles for create buttons
+        updateButtonStyles(createExpenseButton, isExpense, true);
+        updateButtonStyles(createIncomeButton, !isExpense, false);
+
+        // Update styles for edit buttons
+        updateButtonStyles(editExpenseButton, isExpense, true);
+        updateButtonStyles(editIncomeButton, !isExpense, false);
+    }
+
+    // Function to set type and apply filters
+    function handleTypeSelection(type) {
+        updateTypeSelection(type);
+        filterCategories(type);
+    }
 
 
     // Reset form fields when the reset button is clicked
