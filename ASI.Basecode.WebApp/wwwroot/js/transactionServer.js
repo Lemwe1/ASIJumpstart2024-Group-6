@@ -1,29 +1,32 @@
 ﻿document.addEventListener("DOMContentLoaded", () => {
     const modal = document.getElementById('addTransactionModal');
-    const editModal = document.getElementById('editTransactionModal');
+
+    //add
     const addTransactionButton = document.getElementById('openAddTransactionModal');
     const closeAddModalButton = document.getElementById('closeTransactionModal');
-    const closeEditModalButton = document.getElementById('closeEditTransactionModal');
-
     const transactionForm = document.getElementById('transactionForm');
-    const editTransactionForm = document.getElementById('editTransactionForm');
 
     const createExpenseButton = document.getElementById('createExpenseButton');
     const createIncomeButton = document.getElementById('createIncomeButton');
-    const editExpenseButton = document.getElementById('editExpenseButton');
-    const editIncomeButton = document.getElementById('editIncomeButton');
-
     const transactionCategorySelect = document.getElementById('transactionCategory');
-    const editTransactionCategorySelect = document.getElementById('editTransactionCategory');
-
-
     const transactionAmountInput = document.getElementById('transactionAmount');
     const transactionWalletSelect = document.getElementById('transactionWallet');
     const transactionType = document.getElementById('transactionType');
     const walletBalanceSpan = document.getElementById('walletBalance');
 
-    let isModalDirty = false;
+    //edit
+    const editModal = document.getElementById('editTransactionModal');
+    const closeEditModalButton = document.getElementById('closeEditTransactionModal');
+    const editTransactionForm = document.getElementById('editTransactionForm');
+    const editExpenseButton = document.getElementById('editExpenseButton');
+    const editIncomeButton = document.getElementById('editIncomeButton');
+    const editTransactionCategorySelect = document.getElementById('editTransactionCategory');
+    const editTransactionAmountInput = document.getElementById('editTransactionAmount');
+    const editTransactionWalletSelect = document.getElementById('editTransactionWallet');
+    const editTransactionType = document.getElementById('editTransactionType');
+    const editWalletBalanceSpan = document.getElementById('editWalletBalance');
 
+    let isModalDirty = false;
     // Function to filter table based on category
     const filterTableByCategory = () => {
         const categoryFilter = document.querySelector('select[name="filterByCategory"]').value; // Get the selected category
@@ -100,6 +103,7 @@
         populateEditModalFields(transaction);
         updateTypeSelection(transaction.transactionType);
         filterCategories(transaction.transactionType);
+        updateWalletBalance(editTransactionWalletSelect, editWalletBalanceSpan);
     }
 
     // Close modal with confirmation if there are unsaved changes
@@ -161,7 +165,7 @@
         modal.classList.add('hidden');
         modal.classList.remove('flex');
         editModal.classList.add('hidden');
-        editModal.classList.remove('flex'); 
+        editModal.classList.remove('flex');
         document.body.classList.remove('overflow-hidden');
         resetTransactionForm();
     }
@@ -171,8 +175,8 @@
         transactionForm.reset(); // Reset the form fields
         transactionCategorySelect.selectedIndex = -1;
         transactionWalletSelect.selectedIndex = -1;
-        walletBalanceSpan.textContent = ''; 
-        walletBalanceSpan.style.display = 'none'; 
+        walletBalanceSpan.textContent = '';
+        walletBalanceSpan.style.display = 'none';
         errorMessage.textContent = ''; // Clear error message
         isModalDirty = false; // Reset the dirty flag
         currentTransactionId = null; // Reset transaction ID
@@ -236,18 +240,27 @@
             option.style.display = (option.dataset.type === type || option.value === "") ? 'block' : 'none';
         });
     }
-
-    // Event listener to update the wallet balance display
-    transactionWalletSelect.addEventListener('change', function () {
-        const selectedOption = transactionWalletSelect.options[transactionWalletSelect.selectedIndex];
-        const balance = selectedOption.getAttribute('data-balance');
+    // Function to update the wallet balance display
+    function updateWalletBalance(selectElement, balanceSpan) {
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        const balance = selectedOption ? selectedOption.getAttribute('data-balance') : null;
 
         if (balance) {
-            walletBalanceSpan.textContent = `(Wallet Balance: ${balance})`;
-            walletBalanceSpan.style.display = 'block'; // Show the balance span
+            balanceSpan.textContent = `(Wallet Balance: ${balance})`;
+            balanceSpan.style.display = 'block'; // Show the balance span
         } else {
-            walletBalanceSpan.style.display = 'none'; // Hide the balance span if no wallet is selected
+            balanceSpan.style.display = 'none'; // Hide the balance span if no wallet is selected
         }
+    }
+
+    // Event listener for the transaction wallet selection (Create Transaction)
+    transactionWalletSelect.addEventListener('change', function () {
+        updateWalletBalance(transactionWalletSelect, walletBalanceSpan);
+    });
+
+    // Event listener for the edit transaction wallet selection (Edit Transaction)
+    editTransactionWalletSelect.addEventListener('change', function () {
+        updateWalletBalance(editTransactionWalletSelect, editWalletBalanceSpan);
     });
 
     // Create an error message element for validation
@@ -261,23 +274,25 @@
     // Live validation while typing in the amount field
     transactionAmountInput.addEventListener('input', function () {
         const selectedOption = transactionWalletSelect.options[transactionWalletSelect.selectedIndex];
-        const balance = selectedOption ? parseFloat(selectedOption.getAttribute('data-balance') || 0) : null;
+        const balance = selectedOption ? parseFloat(selectedOption.getAttribute('data-balance') || 0) : 0;
         const amount = parseFloat(transactionAmountInput.value || 0);
         const transactionTypeValue = transactionType.value;
 
         if (!balance) {
-            errorMessage.style.display = 'none'; // Hide error message
+            errorMessage.style.display = 'none';
             return;
         }
 
         if (transactionTypeValue === "Expense" && amount > balance) {
-            transactionAmountInput.style.borderColor = 'red'; // Highlight the input field
-            errorMessage.textContent = 'Transaction amount exceeds the current wallet balance for expenses.';
-            errorMessage.style.display = 'block'; // Show error message
+            transactionAmountInput.style.borderColor = 'red';
+            errorMessage.textContent = `Amount exceeds the current wallet balance for expenses.`;
+            errorMessage.style.display = 'block';
         } else {
-            errorMessage.style.display = 'none'; // Hide error message
+            transactionAmountInput.style.borderColor = '';
+            errorMessage.style.display = 'none';
         }
     });
+
 
     // Validation on form submission
     function validateTransaction(event) {
@@ -311,7 +326,7 @@
 
             return; // Stop form submission
         }
-       
+
         errorMessage.style.display = 'none'; // Hide error message
 
         // Proceed with the existing handleAddTransaction logic
@@ -330,6 +345,7 @@
             } else {
                 button.classList.add('bg-green-500', 'text-white'); // Green for selected income
                 errorMessage.style.display = 'none'; // Hide error message
+
             }
         } else {
             button.classList.add('bg-gray-200', 'text-gray-800'); // Gray for not selected
@@ -441,7 +457,7 @@
 
         // Convert types and format date
         data.CategoryId = parseInt(data.CategoryId, 10);
-        data.walletId = parseInt(data.walletId, 10); 
+        data.walletId = parseInt(data.walletId, 10);
         data.TransactionId = currentTransactionId;
         data.TransactionType = transactionType.value;
         data.TransactionDate = new Date(data.TransactionDate).toISOString();
@@ -649,11 +665,11 @@
 
     // Mark form as dirty when there are changes
     transactionForm.addEventListener('input', () => {
-        isModalDirty = true; 
+        isModalDirty = true;
     });
 
     editTransactionForm.addEventListener('input', () => {
-        isModalDirty = true; 
+        isModalDirty = true;
     });
 
     // Attach event listeners for modal opening

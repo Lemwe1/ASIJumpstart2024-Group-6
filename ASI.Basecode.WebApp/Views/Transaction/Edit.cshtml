@@ -22,30 +22,8 @@
 
             <input type="hidden" name="TransactionId" id="editTransactionId" />
 
-            <!-- Type Field -->
-            <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 inline dark:text-gray-300">Type</label>
-                <span class="text-gray-500 text-xs inline-block ml-2 dark:text-gray-300 mb-2">(Select A type)</span>
-                <div class="flex space-x-4">
-                    <button type="button" id="editExpenseButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 transform transition-transform duration-200 hover:scale-105">
-                        Expense
-                    </button>
-                    <button type="button" id="editIncomeButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 transform transition-transform duration-200 hover:scale-105">
-                        Income
-                    </button>
-                </div>
-                <input type="hidden" name="Type" id="editTransactionType" value="Expense" />
-                <input type="hidden" name="TransactionSort" id="editTransactionSort" />
-            </div>
-
-            <!-- Amount Field -->
-            <div class="mb-6">
-                <label for="editTransactionAmount" class="block text-sm font-medium text-gray-700 dark:text-gray-300"> Amount <i class="text-red-500">*</i></label>
-                <input type="number" step="0.01" id="editTransactionAmount" name="Amount" placeholder="0.00" required class="mt-1 block w-full px-4 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300 text-gray-900" />
-            </div>
-
             <!-- Category and Wallet Fields in Two Columns -->
-            <div class="mb-6 flex space-x-4">
+            <div class="mb-2 flex space-x-4">
                 <!-- Category Field -->
                 <div class="w-1/2">
                     <label for="editTransactionCategory" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -76,21 +54,36 @@
                     </label>
                     <select id="editTransactionWallet" name="walletId" required class="mt-1 block w-full px-4 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300 text-gray-900">
                         <option value="" disabled>Select Wallet</option>
-
-                        @if (ViewData["Wallets"] is List<WalletViewModel> wallets && wallets.Any())
+                        @foreach (var wallet in ViewData["Wallets"] as List<WalletViewModel>)
                         {
-                            foreach (var wallet in wallets)
-                            {
-                                <option value="@wallet.WalletId">@wallet.WalletIcon @wallet.WalletName</option>
-                            }
-                        }
-                        else
-                        {
-                            <option value="" disabled>No entries yet</option>
+                            <option value="@wallet.WalletId" data-balance="@wallet.WalletBalance">@wallet.WalletIcon @wallet.WalletName</option>
                         }
                     </select>
+                    <span id="editWalletBalance" class="text-gray-500 text-xs mt-2 dark:text-gray-300" style="display: none;"></span>
                 </div>
 
+            </div>
+
+            <!-- Amount Field -->
+            <div class="mb-6">
+                <label for="editTransactionAmount" class="block text-sm font-medium text-gray-700 dark:text-gray-300"> Amount <i class="text-red-500">*</i></label>
+                <input type="number" step="0.01" id="editTransactionAmount" name="Amount" placeholder="0.00" required class="mt-1 block w-full px-4 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300 text-gray-900" />
+            </div>
+
+            <!-- Type Field -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 inline dark:text-gray-300">Type</label>
+                <span class="text-gray-500 text-xs inline-block ml-2 dark:text-gray-300 mb-2">(Select A type)</span>
+                <div class="flex space-x-4">
+                    <button type="button" id="editExpenseButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 transform transition-transform duration-200 hover:scale-105">
+                        Expense
+                    </button>
+                    <button type="button" id="editIncomeButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 transform transition-transform duration-200 hover:scale-105">
+                        Income
+                    </button>
+                </div>
+                <input type="hidden" name="Type" id="editTransactionType" value="Expense" />
+                <input type="hidden" name="TransactionSort" id="editTransactionSort" />
             </div>
 
             <!-- Date Field -->
