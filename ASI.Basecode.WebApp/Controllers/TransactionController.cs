@@ -262,5 +262,83 @@ namespace ASI.Basecode.WebApp.Controllers
             ViewBag.Categories = categories;
             ViewBag.Wallets = wallets;
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetMonthlyTrends()
+        {
+            var userId = GetUserId();
+            if (userId == null)
+            {
+                return BadRequest("Invalid user ID.");
+            }
+
+            var transactions = await _transactionService.GetAllTransactionsAsync(userId.Value);
+
+            // Group transactions by month and calculate totals for income and expense
+            var trends = transactions
+                .GroupBy(t => t.TransactionDate.ToString("yyyy-MM")) // Group by month (e.g., "2024-11")
+                .Select(g => new
+                {
+                    Month = g.Key,
+                    TotalExpense = g.Where(t => t.TransactionType == "Expense").Sum(t => t.Amount),
+                    TotalIncome = g.Where(t => t.TransactionType == "Income").Sum(t => t.Amount)
+                })
+                .OrderBy(x => x.Month)
+                .ToList();
+
+            return Json(trends);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetMonthlyExpense()
+        {
+            var userId = GetUserId();
+            if (userId == null)
+            {
+                return BadRequest("Invalid user ID.");
+            }
+
+            var transactions = await _transactionService.GetAllTransactionsAsync(userId.Value);
+
+            // Group expenses by month
+            var monthlyExpenses = transactions
+                .Where(t => t.TransactionType == "Expense")
+                .GroupBy(t => t.TransactionDate.ToString("yyyy-MM"))
+                .Select(g => new
+                {
+                    Month = g.Key,
+                    TotalExpense = g.Sum(t => t.Amount)
+                })
+                .OrderBy(x => x.Month)
+                .ToList();
+
+            return Json(monthlyExpenses);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetMonthlyIncome()
+        {
+            var userId = GetUserId();
+            if (userId == null)
+            {
+                return BadRequest("Invalid user ID.");
+            }
+
+            var transactions = await _transactionService.GetAllTransactionsAsync(userId.Value);
+
+            // Group income by month
+            var monthlyIncome = transactions
+                .Where(t => t.TransactionType == "Income")
+                .GroupBy(t => t.TransactionDate.ToString("yyyy-MM"))
+                .Select(g => new
+                {
+                    Month = g.Key,
+                    TotalIncome = g.Sum(t => t.Amount)
+                })
+                .OrderBy(x => x.Month)
+                .ToList();
+
+            return Json(monthlyIncome);
+        }
     }
 }

@@ -9,7 +9,7 @@
 <!-- Sidebar and Content -->
 <div class="flex min-h-screen mt-5 ml-10 ">
     <!-- Main Content Area -->
-    <div class="flex-1 p-6 bg-gray-100  container dark:bg-gray-800 text-gray-900 ">
+    <div class="flex-1 p-6 bg-gray-100 container dark:bg-gray-800 text-gray-900 ">
 
         <!-- Dashboard Header -->
         <div class="my-4">
@@ -23,33 +23,37 @@
                 <p class="mt-10 text-3xl font-bold">₱&nbsp;@ViewBag.TotalDebit.ToString("0.00")</p>
             </div>
             <div class="bg-red-500 border-2 border-gray-900 dark:border-gray-600 shadow-md text-white p-6 rounded-lg">
-                <h3 class="text-s ">Total Expenses</h3>
+                <h3 class="text-s">Total Expenses</h3>
                 <p class="mt-10 text-3xl font-bold">
                     <i class="fas fa-angles-up text-3xl font-bold mr-4"></i>₱&nbsp;@ViewBag.TotalExpense.ToString("0.00")
                 </p>
             </div>
             <div class="bg-blue-500 border-2 border-gray-900 dark:border-gray-600 text-white p-6 rounded-lg">
-                <h3 class="text-s ">Total Income</h3>
+                <h3 class="text-s">Total Income</h3>
                 <p class="mt-10 text-3xl font-bold">
                     <i class="fas fa-angles-down text-3xl font-bold mr-4"></i>₱&nbsp;@ViewBag.TotalIncome.ToString("0.00")
                 </p>
             </div>
         </div>
 
-
         <!-- Trends and Monthly Charts -->
         <div class="grid grid-cols-3 gap-6 mb-8">
+            <!-- Trends Chart -->
             <div class="bg-gray-50 dark:bg-gray-700 dark:text-white p-6 shadow-md rounded-lg">
                 <h4 class="font-semibold">Trends</h4>
-                <!-- Chart Placeholder -->
+                <canvas id="trendsChart" width="400" height="200"></canvas>
             </div>
+
+            <!-- Monthly Expense Chart -->
             <div class="bg-gray-50 dark:bg-gray-700 dark:text-white p-6 shadow-md rounded-lg">
                 <h4 class="font-semibold">Monthly Expense</h4>
-                <!-- Chart Placeholder -->
+                <canvas id="monthlyExpenseChart" width="400" height="200"></canvas>
             </div>
+
+            <!-- Monthly Income Chart -->
             <div class="bg-gray-50 dark:bg-gray-700 dark:text-white p-6 shadow-md rounded-lg">
                 <h4 class="font-semibold">Monthly Income</h4>
-                <!-- Chart Placeholder -->
+                <canvas id="monthlyIncomeChart" width="400" height="200"></canvas>
             </div>
         </div>
 
@@ -66,12 +70,9 @@
                     Click me to add transaction!
                 </div>
             </a>
-
         </div>
-
-
-
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="~/js/home.js" asp-append-version="true"></script>
