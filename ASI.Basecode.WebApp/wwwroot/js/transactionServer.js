@@ -26,6 +26,8 @@
     const editTransactionType = document.getElementById('editTransactionType');
     const editWalletBalanceSpan = document.getElementById('editWalletBalance');
 
+
+
     let isModalDirty = false;
     // Function to filter table based on category
     const filterTableByCategory = () => {
@@ -244,15 +246,24 @@
     // Function to update the wallet balance display
     function updateWalletBalance(selectElement, balanceSpan) {
         const selectedOption = selectElement.options[selectElement.selectedIndex];
-        const balance = selectedOption ? selectedOption.getAttribute('data-balance') : null;
+        const balance = selectedOption ? parseFloat(selectedOption.getAttribute('data-balance')) : null;
 
-        if (balance) {
-            balanceSpan.textContent = `(Wallet Balance: ${balance})`;
+        if (balance !== null) {
+            // Format the balance with commas and two decimal places
+            const formattedBalance = balance.toLocaleString('en-US', {
+                style: 'currency',
+                currency: 'PHP',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+
+            balanceSpan.textContent = `(Available Balance: ${formattedBalance})`;
             balanceSpan.style.display = 'block'; // Show the balance span
         } else {
             balanceSpan.style.display = 'none'; // Hide the balance span if no wallet is selected
         }
     }
+
 
     // Event listener for the transaction wallet selection (Create Transaction)
     transactionWalletSelect.addEventListener('change', function () {
@@ -294,7 +305,7 @@
 
             if (transactionTypeValue === "Expense" && amount > balance) {
                 inputElement.style.borderColor = 'red';
-                errorMessage.textContent = `Amount exceeds the current wallet balance for expenses.`;
+                errorMessage.textContent = `You do not have enough balance.`;
                 errorMessage.style.display = 'block';
             } else {
                 inputElement.style.borderColor = '';

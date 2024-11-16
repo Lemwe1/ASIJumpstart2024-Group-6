@@ -27,9 +27,12 @@
                 Total Balance
             </h2>
             <div class="flex items-center mt-2">
-                <span id="totalBalance" class="balanceSpacing balance-value text-5xl font-bold" data-visible="true">₱ @ViewBag.TotalDebit.ToString("0.00")</span>
-                <i id="toggleBalanceVisibility" class="fas fa-eye cursor-pointer balance-icon ml-2 dark:text-gray-400"></i>
+                <span id="totalBalance" class="balanceSpacing balance-value text-5xl font-bold" data-visible="true">
+                    ₱&nbsp;@String.Format("{0:#,0.00}", ViewBag.TotalDebit)
+                </span>
+                <i id="toggleBalanceVisibility" class="fas fa-eye cursor-pointer balance-icon ml-2 dark:text-gray-400" onclick="toggleBalanceVisibility(this)"></i>
             </div>
+
         </div>
 
 
