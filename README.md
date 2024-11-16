@@ -47,7 +47,7 @@ VALUES
     (6, N'Car', N'Expense', N'🚗', N'#0000FF', 1),
     (7, N'Income', N'Income', N'💸', N'#008000', 1);
 
-SET IDENTITY_INSERT M_Category OF;
+SET IDENTITY_INSERT M_Category OFF;
 
 
 ================================================
