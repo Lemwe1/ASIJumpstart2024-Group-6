@@ -52,13 +52,9 @@
                     </label>
                     <select id="transactionWallet" name="walletId" required class="dark:bg-gray-700 mt-1 block w-full px-4 py-2 border rounded-md text-gray-900 dark:text-white">
                         <option class="text-gray-500" value="" disabled selected>Select Wallet</option>
-
-                        @if (ViewData["Wallets"] is List<WalletViewModel> wallets && wallets.Any())
+                        @foreach (var wallet in ViewData["Wallets"] as List<WalletViewModel>)
                         {
-                            foreach (var wallet in wallets)
-                            {
-                                <option value="@wallet.WalletId" data-balance="@wallet.WalletBalance">@wallet.WalletIcon @wallet.WalletName</option>
-                            }
+                            <option value="@wallet.WalletId" data-balance="@wallet.WalletBalance">@wallet.WalletIcon @wallet.WalletName</option>
                         }
                     </select>
                     <span id="walletBalance" class="text-gray-500 text-xs mt-2 dark:text-gray-300" style="display: none;"></span>
