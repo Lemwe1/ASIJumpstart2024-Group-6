@@ -30,18 +30,12 @@
                     <select id="transactionCategory" name="CategoryId" required class="dark:bg-gray-700 mt-1 block w-full px-4 py-2 border rounded-md text-gray-900 dark:text-white">
                         <option class="text-gray-500" value="" disabled>Select category</option>
 
-                        @if (ViewData["Categories"] is List<MCategory> categories && categories.Any())
-                        {
-                            foreach (var category in categories)
+                            @foreach (var category in (ViewData["Categories"] as List<MCategory>))
                             {
-                                <option value="@category.CategoryId" data-type="@category.Type">@category.Icon @category.Name</option>
+                                <option value="@category.CategoryId" data-type="@category.Type">
+                                    @category.Icon @category.Name
+                                </option>
                             }
-                        }
-                        else
-                        {
-                            <option value="" disabled>&#x1F937; No Entries yet</option>
-                        }
-
                     </select>
                 </div>
 
@@ -67,8 +61,13 @@
                 <label for="transactionAmount" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Amount <i class="text-red-500">*</i>
                 </label>
-                <input type="number" step="0.01" id="transactionAmount" name="Amount" placeholder="0.00" required class="dark:bg-gray-700 mt-1 block w-full px-4 py-2 border rounded-md text dark:text-white" />
+                <div class="relative flex items-center">
+                    <span class="absolute left-2 text-gray-500 dark:text-gray-300 text-lg">₱</span>
+                    <input type="number" step="0.01" id="transactionAmount" name="Amount" placeholder="0.00" required
+                           class="dark:bg-gray-700 pl-10 mt-1 block w-full px-4 py-2 border rounded-md text dark:text-white" /> 
+                </div>
             </div>
+
 
             <!-- Type Field -->
             <div class="mb-6">

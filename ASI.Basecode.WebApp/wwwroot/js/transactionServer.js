@@ -244,10 +244,11 @@
     // Function to update the wallet balance display
     function updateWalletBalance(selectElement, balanceSpan) {
         const selectedOption = selectElement.options[selectElement.selectedIndex];
-        const balance = selectedOption ? selectedOption.getAttribute('data-balance') : null;
+        const balance = selectedOption ? parseFloat(selectedOption.getAttribute('data-balance')) : null;
 
-        if (balance) {
-            balanceSpan.textContent = `(Wallet Balance: ${balance})`;
+        if (balance !== null) {
+            // Format the balance as currency
+            balanceSpan.textContent = `(Available Balance: ₱${balance.toFixed(2)})`;
             balanceSpan.style.display = 'block'; // Show the balance span
         } else {
             balanceSpan.style.display = 'none'; // Hide the balance span if no wallet is selected
@@ -294,7 +295,7 @@
 
             if (transactionTypeValue === "Expense" && amount > balance) {
                 inputElement.style.borderColor = 'red';
-                errorMessage.textContent = `Amount exceeds the current wallet balance for expenses.`;
+                errorMessage.textContent = `You do not have enough balance.`;
                 errorMessage.style.display = 'block';
             } else {
                 inputElement.style.borderColor = '';
@@ -322,7 +323,7 @@
 
         if (transactionType === "Expense" && amount > balance) {
             amountInput.style.borderColor = 'red'; // Highlight the input field
-            errorMessage.textContent = 'Transaction amount exceeds the current wallet balance for expenses.';
+            errorMessage.textContent = 'The amount inputed exceeds the current wallet balance for expenses.';
             errorMessage.style.display = 'block'; // Show inline error message
 
             // Display a Swal warning

@@ -40,9 +40,12 @@
 
                     <!-- Balance Amount and Toggle Visibility Icon -->
                     <div class="flex items-center text-white mb-2">
-                        <span class="text-2xl font-bold">₱&nbsp;@debit.WalletBalance</span>
-                        <i class="fas fa-eye ml-2 cursor-pointer toggle-balance" data-account-id="@debit.WalletId"></i>
+                        <span id="walletBalance" class="text-2xl font-bold">
+                            ₱&nbsp;@String.Format("{0:#,0.00}", debit.WalletBalance)
+                        </span>
+                        <i class="fas fa-eye ml-2 cursor-pointer toggle-balance" data-account-id="@debit.WalletId" onclick="toggleBalanceVisibility(this)"></i>
                     </div>
+
 
                     <!-- Wallet Name and Type -->
                     <div class="mt-4">

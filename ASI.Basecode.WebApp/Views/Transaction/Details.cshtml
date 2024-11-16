@@ -37,13 +37,13 @@
                                     @if (transaction.TransactionType == "Expense")
                                     {
                                         <div class="bg-red-400 dark:bg-red-600 text-white px-2 py-1 rounded">
-                                            <span>-₱@transaction.Amount</span>
+                                        <span>-₱&nbsp;@String.Format("{0:#,0.00}", Math.Abs(transaction.Amount))</span>
                                         </div>
                                     }
                                     else
                                     {
                                         <div class="bg-green-400 dark:bg-green-600 text-white px-2 py-1 rounded">
-                                            <span>₱@transaction.Amount</span>
+                                        <span>₱&nbsp;@String.Format("{0:#,0.00}", transaction.Amount)</span>
                                         </div>
                                     }
                                 </div>
