@@ -99,7 +99,8 @@
     function openEditTransactionModal(transaction) {
         editModal.classList.remove('hidden');
         editModal.classList.add('flex');
-        document.body.classList.add('overflow-hidden');//remove scroll for body when modal is open
+        document.body.classList.add('overflow-hidden');
+        editErrorMessage.style.display = 'none';
         populateEditModalFields(transaction);
         updateTypeSelection(transaction.transactionType);
         filterCategories(transaction.transactionType);
@@ -263,58 +264,66 @@
         updateWalletBalance(editTransactionWalletSelect, editWalletBalanceSpan);
     });
 
-    // Create an error message element for validation
-    const errorMessage = document.createElement('div');
-    errorMessage.style.color = 'red';
-    errorMessage.style.fontSize = '0.875em';
-    errorMessage.style.marginTop = '0.25em';
-    errorMessage.style.display = 'none'; // Initially hidden
-    transactionAmountInput.parentNode.insertBefore(errorMessage, transactionAmountInput.nextSibling);
+    // Create an error message element for validation (for both transaction and edit elements)
+    function createErrorMessage(inputElement) {
+        const errorMessage = document.createElement('div');
+        errorMessage.style.color = 'red';
+        errorMessage.style.fontSize = '0.875em';
+        errorMessage.style.marginTop = '0.25em';
+        errorMessage.style.display = 'none'; // Initially hidden
+        inputElement.parentNode.insertBefore(errorMessage, inputElement.nextSibling);
+        return errorMessage;
+    }
 
-    // Live validation while typing in the amount field
-    transactionAmountInput.addEventListener('input', function () {
-        const selectedOption = transactionWalletSelect.options[transactionWalletSelect.selectedIndex];
-        const balance = selectedOption ? parseFloat(selectedOption.getAttribute('data-balance') || 0) : 0;
-        const amount = parseFloat(transactionAmountInput.value || 0);
-        const transactionTypeValue = transactionType.value;
+    // For both transaction and edit input elements, create error messages
+    const errorMessage = createErrorMessage(transactionAmountInput);
+    const editErrorMessage = createErrorMessage(editTransactionAmountInput);
 
-        if (!balance) {
-            errorMessage.style.display = 'none';
-            return;
-        }
+    // Live validation for transaction and edit input fields
+    function validateAmountInput(inputElement, walletSelect, errorMessage) {
+        inputElement.addEventListener('input', function () {
+            const selectedOption = walletSelect.options[walletSelect.selectedIndex];
+            const balance = selectedOption ? parseFloat(selectedOption.getAttribute('data-balance') || 0) : 0;
+            const amount = parseFloat(inputElement.value || 0);
+            const transactionTypeValue = transactionType.value;
 
-        if (transactionTypeValue === "Expense" && amount > balance) {
-            transactionAmountInput.style.borderColor = 'red';
-            errorMessage.textContent = `Amount exceeds the current wallet balance for expenses.`;
-            errorMessage.style.display = 'block';
-        } else {
-            transactionAmountInput.style.borderColor = '';
-            errorMessage.style.display = 'none';
-        }
-    });
+            if (!balance) {
+                errorMessage.style.display = 'none';
+                return;
+            }
 
+            if (transactionTypeValue === "Expense" && amount > balance) {
+                inputElement.style.borderColor = 'red';
+                errorMessage.textContent = `Amount exceeds the current wallet balance for expenses.`;
+                errorMessage.style.display = 'block';
+            } else {
+                inputElement.style.borderColor = '';
+                errorMessage.style.display = 'none';
+            }
+        });
+    }
+
+
+    validateAmountInput(transactionAmountInput, transactionWalletSelect, errorMessage);
+    validateAmountInput(editTransactionAmountInput, editTransactionWalletSelect, editErrorMessage);
 
     // Validation on form submission
-    function validateTransaction(event) {
+    function validateTransaction(event, amountInput, walletSelect, errorMessage, transactionType) {
         event.preventDefault(); // Prevent form submission
 
-        const selectedOption = transactionWalletSelect.options[transactionWalletSelect.selectedIndex];
+        const selectedOption = walletSelect.options[walletSelect.selectedIndex];
         const balance = selectedOption ? parseFloat(selectedOption.getAttribute('data-balance') || 0) : null;
-        const amount = parseFloat(transactionAmountInput.value || 0);
-        const transactionTypeValue = transactionType.value;
+        const amount = parseFloat(amountInput.value || 0);
 
         if (!balance) {
             toastr.error('Please select a wallet before entering an amount.', 'Validation Error');
             return; // Stop form submission
         }
 
-        if (transactionTypeValue === "Expense" && amount > balance) {
-            transactionAmountInput.style.borderColor = 'red'; // Highlight the input field
+        if (transactionType === "Expense" && amount > balance) {
+            amountInput.style.borderColor = 'red'; // Highlight the input field
             errorMessage.textContent = 'Transaction amount exceeds the current wallet balance for expenses.';
             errorMessage.style.display = 'block'; // Show inline error message
-
-            // Clear the input field
-            transactionAmountInput.value = '';
 
             // Display a Swal warning
             Swal.fire({
@@ -322,6 +331,7 @@
                 text: 'Transaction amount exceeds the current wallet balance for expenses.',
                 icon: 'warning',
                 confirmButtonText: 'OK',
+                confirmButtonColor: '#3B82F6',
             });
 
             return; // Stop form submission
@@ -329,8 +339,12 @@
 
         errorMessage.style.display = 'none'; // Hide error message
 
-        // Proceed with the existing handleAddTransaction logic
-        handleAddTransaction(event);
+        // Proceed with form submission (Add or Edit)
+        if (amountInput === transactionAmountInput) {
+            handleAddTransaction(event);
+        } else {
+            handleEditTransaction(event);
+        }
     }
 
     // Function to update button styles based on the type
@@ -677,7 +691,12 @@
     closeAddModalButton.addEventListener('click', closeTransactionModal);
     closeEditModalButton.addEventListener('click', closeEditTransactionModal);
 
-    // Handle form submission
-    transactionForm.addEventListener('submit', validateTransaction);
-    editTransactionForm.addEventListener('submit', handleEditTransaction);
+    // Handle form submission for both transaction and edit forms
+    transactionForm.addEventListener('submit', function (event) {
+        validateTransaction(event, transactionAmountInput, transactionWalletSelect, errorMessage, transactionType.value);
+    });
+
+    editTransactionForm.addEventListener('submit', function (event) {
+        validateTransaction(event, editTransactionAmountInput, editTransactionWalletSelect, editErrorMessage, editTransactionType.value);
+    });
 });
