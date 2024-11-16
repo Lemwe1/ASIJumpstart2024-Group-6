@@ -34,26 +34,26 @@
                 <div class="md:w-2/3 md:pr-6">
                     <!-- Username, Name, Email Fields -->
                     <div class="mb-4">
-                        <label for="usercode" class="block text-gray-700 dark:text-gray-300">Username</label>
+                        <label for="usercode" class="block text-gray-700 dark:text-gray-300">Username <i class="text-red-500">*</i></label>
                         <input type="text" id="edit-usercode" name="edit-usercode" class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Username" value="@ViewData["UserCode"]" readonly>
                     </div>
 
                     <div class="md:flex md:space-x-4 w-full my-4">
                         <!-- First Name -->
                         <div class="w-full md:w-1/2 mb-4 md:mb-0">
-                            <label for="first-name" class="block text-gray-700 dark:text-gray-300">First Name</label>
-                            <input type="text" id="edit-first-name" name="edit-first-name" class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="First Name" value="@ViewData["FirstName"]" required>
+                            <label for="first-name" class="block text-gray-700 dark:text-gray-300">First Name </label>
+                            <input type="text" id="edit-first-name" name="edit-first-name" class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Enter First Name" value="@ViewData["FirstName"]" required>
                         </div>
                         <!-- Last Name -->
                         <div class="w-full md:w-1/2">
                             <label for="last-name" class="block text-gray-700 dark:text-gray-300">Last Name</label>
-                            <input type="text" id="edit-last-name" name="edit-last-name" class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Last Name" value="@ViewData["LastName"]" required>
+                            <input type="text" id="edit-last-name" name="edit-last-name" class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Enter Last Name" value="@ViewData["LastName"]" required>
                         </div>
                     </div>
 
                     <!-- Email Field -->
                     <div class="my-4">
-                        <label for="email" class="block text-gray-700 dark:text-gray-300">Email Address</label>
+                        <label for="email" class="block text-gray-700 dark:text-gray-300">Email Address <i class="text-red-500">*</i></label>
                         <input type="email" id="edit-email" name="edit-email" class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Email address" required value="@ViewData["Email"]">
                     </div>
 
