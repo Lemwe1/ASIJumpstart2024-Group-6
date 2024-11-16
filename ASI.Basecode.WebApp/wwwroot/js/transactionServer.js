@@ -16,8 +16,11 @@
     const transactionCategorySelect = document.getElementById('transactionCategory');
     const editTransactionCategorySelect = document.getElementById('editTransactionCategory');
 
+
+    const transactionAmountInput = document.getElementById('transactionAmount');
     const transactionWalletSelect = document.getElementById('transactionWallet');
     const transactionType = document.getElementById('transactionType');
+    const walletBalanceSpan = document.getElementById('walletBalance');
 
     let isModalDirty = false;
 
@@ -99,21 +102,6 @@
         filterCategories(transaction.transactionType);
     }
 
-
-
-
-    // Reset form fields when the reset button is clicked
-    document.getElementById('resetTransactionFormButton').addEventListener('click', function () {
-        // Reset the form fields
-        document.getElementById('transactionForm').reset();
-
-
-
-        // Resetting to default (assuming the first option is disabled)
-        transactionCategorySelect.value = "";
-        transactionWalletSelect.value = "";
-    });
-
     // Close modal with confirmation if there are unsaved changes
     function closeTransactionModal() {
         if (isModalDirty) {
@@ -180,9 +168,12 @@
 
     // Reset the transaction form
     function resetTransactionForm() {
-        transactionForm.reset();
+        transactionForm.reset(); // Reset the form fields
         transactionCategorySelect.selectedIndex = -1;
         transactionWalletSelect.selectedIndex = -1;
+        walletBalanceSpan.textContent = ''; 
+        walletBalanceSpan.style.display = 'none'; 
+        errorMessage.textContent = ''; // Clear error message
         isModalDirty = false; // Reset the dirty flag
         currentTransactionId = null; // Reset transaction ID
     }
@@ -292,39 +283,112 @@
         });
     }
 
-    // Function to handle input limiting
-    const handleAmountInput = (inputElement) => {
-        inputElement.addEventListener('input', () => {
-            let currentValue = inputElement.value.replace(/[^0-9.]/g, '');
+    // Event listener to update the wallet balance display
+    transactionWalletSelect.addEventListener('change', function () {
+        const selectedOption = transactionWalletSelect.options[transactionWalletSelect.selectedIndex];
+        const balance = selectedOption.getAttribute('data-balance');
 
-            const decimalMatches = currentValue.match(/\./g);
-            if (decimalMatches && decimalMatches.length > 1) {
-                currentValue = currentValue.substring(0, currentValue.lastIndexOf('.'));
-            }
+        if (balance) {
+            walletBalanceSpan.textContent = `(Wallet Balance: ${balance})`;
+            walletBalanceSpan.style.display = 'block'; // Show the balance span
+        } else {
+            walletBalanceSpan.style.display = 'none'; // Hide the balance span if no wallet is selected
+        }
+    });
 
-            if (currentValue && Number(currentValue) > 1e12) {
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Amount must be less than or equal to one trillion.',
-                    icon: 'error'
-                });
-                inputElement.value = '';
-                return;
-            }
+    // Create an error message element for validation
+    const errorMessage = document.createElement('div');
+    errorMessage.style.color = 'red';
+    errorMessage.style.fontSize = '0.875em';
+    errorMessage.style.marginTop = '0.25em';
+    errorMessage.style.display = 'none'; // Initially hidden
+    transactionAmountInput.parentNode.insertBefore(errorMessage, transactionAmountInput.nextSibling);
 
-            inputElement.value = currentValue;
-        });
-    };
+    // Live validation while typing in the amount field
+    transactionAmountInput.addEventListener('input', function () {
+        const selectedOption = transactionWalletSelect.options[transactionWalletSelect.selectedIndex];
+        const balance = selectedOption ? parseFloat(selectedOption.getAttribute('data-balance') || 0) : null;
+        const amount = parseFloat(transactionAmountInput.value || 0);
+        const transactionTypeValue = transactionType.value;
 
-    const transactionAmountInput = document.getElementById('transactionAmount');
-    const editTransactionAmountInput = document.getElementById('editTransactionAmount');
+        if (!balance) {
+            transactionAmountInput.style.borderColor = ''; // Reset styles if no wallet is selected
+            errorMessage.style.display = 'none'; // Hide error message
+            return;
+        }
 
-    handleAmountInput(transactionAmountInput);
-    handleAmountInput(editTransactionAmountInput);
+        if (transactionTypeValue === "Expense" && amount > balance) {
+            transactionAmountInput.style.borderColor = 'red'; // Highlight the input field
+            errorMessage.textContent = 'Transaction amount exceeds the current wallet balance for expenses.';
+            errorMessage.style.display = 'block'; // Show error message
+        } else {
+            transactionAmountInput.style.borderColor = ''; // Reset styles
+            errorMessage.style.display = 'none'; // Hide error message
+        }
+    });
 
-    // Handle adding a new transaction
+    // Validation on form submission
+    function validateTransaction(event) {
+        event.preventDefault(); // Prevent form submission
+
+        const selectedOption = transactionWalletSelect.options[transactionWalletSelect.selectedIndex];
+        const balance = selectedOption ? parseFloat(selectedOption.getAttribute('data-balance') || 0) : null;
+        const amount = parseFloat(transactionAmountInput.value || 0);
+        const transactionTypeValue = transactionType.value;
+
+        if (!balance) {
+            toastr.error('Please select a wallet before entering an amount.', 'Validation Error');
+            return; // Stop form submission
+        }
+
+        if (transactionTypeValue === "Expense" && amount > balance) {
+            transactionAmountInput.style.borderColor = 'red'; // Highlight the input field
+            errorMessage.textContent = 'Transaction amount exceeds the current wallet balance for expenses.';
+            errorMessage.style.display = 'block'; // Show inline error message
+
+            // Clear the input field
+            transactionAmountInput.value = '';
+
+            // Display a Swal warning
+            Swal.fire({
+                title: 'Validation Error',
+                text: 'Transaction amount exceeds the current wallet balance for expenses.',
+                icon: 'warning',
+                confirmButtonText: 'OK',
+            });
+
+            return; // Stop form submission
+        }
+
+
+       
+        transactionAmountInput.style.borderColor = ''; // Reset styles
+        errorMessage.style.display = 'none'; // Hide error message
+
+        // Proceed with the existing handleAddTransaction logic
+        handleAddTransaction(event);
+    }
+
+    // Attach the validateTransaction function to the form submit event
+    transactionForm.addEventListener('submit', validateTransaction);
+
+
+    // Reset form fields when the reset button is clicked
+    document.getElementById('resetTransactionFormButton').addEventListener('click', function () {
+        // Reset the form fields
+        document.getElementById('transactionForm').reset();
+
+        walletBalanceSpan.textContent = '';
+        walletBalanceSpan.style.display = 'none';
+        errorMessage.textContent = ''; // Clear error message
+
+        // Resetting to default (assuming the first option is disabled)
+        transactionCategorySelect.value = "";
+        transactionWalletSelect.value = "";
+    });
+
+    // Function to handle adding a new transaction
     function handleAddTransaction(event) {
-        event.preventDefault();
         const formData = new FormData(transactionForm);
 
         const data = {};
@@ -343,6 +407,8 @@
             .then(handleResponse)
             .catch(handleError);
     }
+
+
     function handleEditTransaction(event) {
         event.preventDefault();
 
@@ -471,17 +537,6 @@
                 icon: 'error',
                 customClass: { popup: 'swal2-front' }
             });
-        });
-    }
-
-    // Handle network errors
-    function handleError(error) {
-        console.error('Network error:', error);
-        Swal.fire({
-            title: 'Error',
-            text: 'A network error occurred. Please try again later.',
-            icon: 'error',
-            customClass: { popup: 'swal2-front' }
         });
     }
 
@@ -616,6 +671,6 @@
     closeEditModalButton.addEventListener('click', closeEditTransactionModal);
 
     // Handle form submission
-    transactionForm.addEventListener('submit', handleAddTransaction);
+    transactionForm.addEventListener('submit', validateTransaction);
     editTransactionForm.addEventListener('submit', handleEditTransaction);
 });
