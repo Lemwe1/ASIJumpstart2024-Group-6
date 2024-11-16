@@ -203,15 +203,15 @@ function loadDebitForm() {
     if (addFormFields) {
         addFormFields.innerHTML = `
             <div class="mb-4">
-                <label class="block dark:text-gray-300">Name</label>
+                <label class="block dark:text-gray-300">Name <i class="text-red-500">*</i></label>
                 <input type="text" id="accountName" class="border p-2 w-full dark:bg-gray-700 dark:text-white" placeholder="Enter wallet name" required />
             </div>
             <div class="mb-4">
-                <label class="block dark:text-gray-300">Balance</label>
+                <label class="block dark:text-gray-300">Amount <i class="text-red-500">*</i></label>
                 <input type="number" id="accountBalance" class="border p-2 w-full dark:bg-gray-700 dark:text-white" placeholder="0.00" required step="any" />
             </div>
             <div class="mb-6">
-                <label for="createIcon" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Icon</label>
+                <label for="createIcon" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Icon <i class="text-red-500">*</i></label>
                 <select name="Icon" id="createIcon" class="mt-1 block w-full px-4 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 " required>
                     <option value="" disabled>Select Icon</option>
                     <option value="🏦">🏦 Bank</option>
@@ -221,7 +221,7 @@ function loadDebitForm() {
                 </select>
             </div>
             <div class="mb-4">
-                <label class="block dark:text-gray-300">Color</label>
+                <label class="block dark:text-gray-300">Color <i class="text-red-500">*</i></label>
                 <input type="color" id="accountColor" class="border mt-2 p-2 w-full dark:bg-gray-700" style="height: 50px;" title="Choose a color" required />
             </div>
         `;

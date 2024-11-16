@@ -22,7 +22,7 @@
             <!-- Type Field -->
             <div class="mb-6">
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 inline">Type</label>
-                <span class="text-gray-500 dark:text-gray-400 text-xs inline-block mb-2 dark:text-gray-300">(Select A type)</span>
+                <span class="text-gray-500 dark:text-gray-400 text-xs inline-block mb-2 dark:text-gray-300">(Select A type) <i class="text-red-500">*</i></span>
                 <div class="flex space-x-4">
                     <button type="button" id="createExpenseButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 transform transition-transform duration-200 hover:scale-105">
                         Expense
@@ -37,13 +37,13 @@
 
             <!-- Name Field -->
             <div class="mb-6">
-                <label for="createName" class="block text-sm font-medium text-gray-700 dark:text-gray-300"> Name</label>
+                <label for="createName" class="block text-sm font-medium text-gray-700 dark:text-gray-300"> Name <i class="text-red-500">*</i></label>
                 <input type="text" name="Name" id="createName" placeholder="Enter Name" class="mt-1 block w-full px-4 py-2 border rounded-md dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
             </div>
 
             <!-- Icon Field -->
             <div class="mb-6">
-                <label for="createIcon" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Icon</label>
+                <label for="createIcon" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Icon <i class="text-red-500">*</i></label>
                 <select name="Icon" id="createIcon" class="mt-1 block w-full px-4 py-2 border rounded-md dark:bg-gray-700 text-gray-900 dark:text-white">
                     <option value="" disabled>Select Icon</option>
                     <option value="💰" class="dark:text-gray-400 dark:text-white">💰 Money Bag</option>
@@ -59,7 +59,7 @@
 
             <!-- Color Picker Field -->
             <div class="mb-6">
-                <label for="createColorPicker" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Select Color</label>
+                <label for="createColorPicker" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Select Color <i class="text-red-500">*</i></label>
                 <input type="color" name="Color" id="createColorPicker" class="mt-1 block w-full h-12 border rounded-md dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
             </div>
 
