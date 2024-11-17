@@ -707,7 +707,25 @@
         validateTransaction(event, transactionAmountInput, transactionWalletSelect, errorMessage, transactionType.value);
     });
 
+    document.getElementById('editExpenseButton').addEventListener('click', function () {
+        // Set the hidden input value to "Expense" for Edit form
+        document.getElementById('editTransactionType').value = 'Expense';
+    });
+
+    document.getElementById('editIncomeButton').addEventListener('click', function () {
+        // Set the hidden input value to "Income" for Edit form
+        document.getElementById('editTransactionType').value = 'Income';
+    });
+
     editTransactionForm.addEventListener('submit', function (event) {
-        validateTransaction(event, editTransactionAmountInput, editTransactionWalletSelect, editErrorMessage, editTransactionType.value);
+        event.preventDefault(); // Prevent form submission
+
+        // Retrieve the current value of the transaction type from the hidden input field
+        const transactionTypeValue = document.getElementById('editTransactionType').value;
+
+        // Now validate the form with the current transaction type value
+        validateTransaction(event, editTransactionAmountInput, editTransactionWalletSelect, editErrorMessage, transactionTypeValue);
+
+        console.log('Selected transaction type (Edit):', transactionTypeValue); // Logs the selected value (Expense or Income)
     });
 });
