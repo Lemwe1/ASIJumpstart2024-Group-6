@@ -726,6 +726,6 @@
         // Now validate the form with the current transaction type value
         validateTransaction(event, editTransactionAmountInput, editTransactionWalletSelect, editErrorMessage, transactionTypeValue);
 
-        console.log('Selected transaction type (Edit):', transactionTypeValue); // Logs the selected value (Expense or Income)
+        console.log('Selected transaction type (Edit):', transactionTypeValue); 
     });
 });
