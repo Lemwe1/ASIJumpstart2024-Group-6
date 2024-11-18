@@ -20,6 +20,24 @@
         <form id="transactionForm" method="post" action="/Transaction/Create">
             @Html.AntiForgeryToken()
 
+            <!-- Type Field -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 inline dark:text-gray-300">
+                    Type
+                </label>
+                <span class="text-gray-500 text-xs inline-block mb-2 dark:text-gray-300">(Select A type) <i class="text-red-500">*</i></span>
+                <div class="flex space-x-4">
+                    <button type="button" id="createExpenseButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 transform transition-transform duration-200 hover:scale-105">
+                        Expense
+                    </button>
+                    <button type="button" id="createIncomeButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 transform transition-transform duration-200 hover:scale-105">
+                        Income
+                    </button>
+                </div>
+                <input type="hidden" name="TransactionType" id="transactionType" value="Expense" />
+                <input type="hidden" name="TransactionSort" value="Transaction" />
+            </div>
+
             <!-- Category and Wallet Fields in Two Columns -->
             <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-6 mb-2">
                 <!-- Category Field -->
@@ -71,25 +89,6 @@
                     <span class="absolute mb-3 ml-2 mt-3 pt-2 transform -translate-y-1/2 text-gray-500 dark:text-gray-300">₱</span>
                     <input type="number" step="0.01" id="transactionAmount" name="Amount" placeholder="0.00" required class="pl-8 mt-1 block w-full px-4 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300 text-gray-900" />
                 </div>
-            </div>
-
-
-            <!-- Type Field -->
-            <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 inline dark:text-gray-300">
-                    Type 
-                </label>
-                <span class="text-gray-500 text-xs inline-block mb-2 dark:text-gray-300">(Select A type) <i class="text-red-500">*</i></span>
-                <div class="flex space-x-4">
-                    <button type="button" id="createExpenseButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 transform transition-transform duration-200 hover:scale-105">
-                        Expense
-                    </button>
-                    <button type="button" id="createIncomeButton" class="type-button px-4 py-2 border rounded-md bg-gray-200 text-gray-800 transform transition-transform duration-200 hover:scale-105">
-                        Income
-                    </button>
-                </div>
-                <input type="hidden" name="TransactionType" id="transactionType" value="Expense" />
-                <input type="hidden" name="TransactionSort" value="Transaction" />
             </div>
 
             <!-- Date Field -->

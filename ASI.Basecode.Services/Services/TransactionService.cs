@@ -120,7 +120,7 @@ public class TransactionService : ITransactionService
                     throw new Exception("New wallet not found.");
                 }
 
-                // Apply the new transaction effect to the new wallet
+                // Apply the new transaction effect to the new wallet (for Income or Expense)
                 AdjustWalletBalance(newWallet, transaction.Amount, transaction.TransactionType);
                 await _walletRepository.UpdateAsync(newWallet);
             }

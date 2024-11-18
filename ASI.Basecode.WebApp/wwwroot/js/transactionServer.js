@@ -67,7 +67,6 @@
 
     // Open modal for adding a new transaction, with wallet check
     function openAddTransactionModal() {
-        // Check if there are no wallets (only the placeholder option is present)
         if (transactionWalletSelect.options.length <= 1) {
             Swal.fire({
                 icon: 'warning',
@@ -79,13 +78,12 @@
                 cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = '/Wallet/Index'; // Redirect to add wallet page
+                    window.location.href = '/Wallet/Index';
                 }
             });
-            return; // Stop the function from proceeding to open the modal
+            return;
         }
 
-        // If wallets are available, proceed to open the modal
         modal.classList.remove('hidden');
         modal.classList.add('flex');
         document.body.classList.add('overflow-hidden');
@@ -94,7 +92,21 @@
         filterCategories('Expense');
         transactionCategorySelect.value = "";
         transactionWalletSelect.value = "";
+
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+
+        const formattedDate = `${year}-${month}-${day}`;
+
+        const dateInput = document.getElementById('transactionDate');
+        if (dateInput) {
+            dateInput.value = formattedDate;
+        }
     }
+
+
 
 
     // Open modal for editing a transaction
@@ -294,20 +306,50 @@
     function validateAmountInput(inputElement, walletSelect, errorMessage) {
         inputElement.addEventListener('input', function () {
             const selectedOption = walletSelect.options[walletSelect.selectedIndex];
-            const balance = selectedOption ? parseFloat(selectedOption.getAttribute('data-balance') || 0) : 0;
-            const amount = parseFloat(inputElement.value || 0);
-            const transactionTypeValue = transactionType.value;
 
-            if (!balance) {
-                errorMessage.style.display = 'none';
+            // Check if a wallet is selected
+            if (!selectedOption || selectedOption.value === "") {
+                Swal.fire({
+                    title: 'Validation Error',
+                    text: 'Please select a wallet before entering an amount.',
+                    icon: 'warning',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#3B82F6',
+                });
                 return;
             }
 
-            if (transactionTypeValue === "Expense" && amount > balance) {
-                inputElement.style.borderColor = 'red';
+            const balance = parseFloat(selectedOption.getAttribute('data-balance') || 0);
+            let amount = parseFloat(inputElement.value);
+
+            // If the input is not a valid number, treat amount as 0
+            if (isNaN(amount)) {
+                amount = 0;
+            }
+
+            const transactionTypeValue = transactionType.value;
+
+            // If balance is not set and the transaction is Expense, show error
+            if (transactionTypeValue === "Expense" && balance <= 0) {
                 errorMessage.textContent = `You do not have enough balance.`;
                 errorMessage.style.display = 'block';
+                inputElement.style.borderColor = 'red';
+                return;
+            }
+
+            // Validation for Expense: Amount must be greater than 0 and not exceed balance
+            if (transactionTypeValue === "Expense" && (amount <= 0 || amount > balance)) {
+                errorMessage.textContent = `You do not have enough balance.`;
+                errorMessage.style.display = 'block';
+                inputElement.style.borderColor = 'red';
+            }
+            // Validation for Income: Amount must be greater than 0 and not exceed a trillion
+            else if (transactionTypeValue === "Income" && (amount <= 0 || amount > 1_000_000_000_000)) {
+                errorMessage.textContent = `Income amount cannot exceed one trillion.`;
+                errorMessage.style.display = 'block';
+                inputElement.style.borderColor = 'red';
             } else {
+                // Reset styles if validation passes
                 inputElement.style.borderColor = '';
                 errorMessage.style.display = 'none';
             }
@@ -315,10 +357,10 @@
     }
 
 
+
     validateAmountInput(transactionAmountInput, transactionWalletSelect, errorMessage);
     validateAmountInput(editTransactionAmountInput, editTransactionWalletSelect, editErrorMessage);
 
-    // Validation on form submission
     function validateTransaction(event, amountInput, walletSelect, errorMessage, transactionType) {
         event.preventDefault(); // Prevent form submission
 
@@ -326,29 +368,63 @@
         const balance = selectedOption ? parseFloat(selectedOption.getAttribute('data-balance') || 0) : null;
         const amount = parseFloat(amountInput.value || 0);
 
-        if (!balance) {
-            toastr.error('Please select a wallet before entering an amount.', 'Validation Error');
-            return; // Stop form submission
+        // Handle Expense transactions
+        if (transactionType === "Expense") {
+            if (balance <= 0 || amount <= 0 || amount > balance) {
+                // Highlight the input field and show the error message
+                amountInput.style.borderColor = 'red';
+                errorMessage.textContent = balance <= 0
+                    ? 'The selected wallet has no funds for expenses. Please choose another wallet or deposit funds before proceeding.'
+                    : amount <= 0
+                        ? 'The transaction amount must be greater than zero.'
+                        : 'Transaction amount exceeds the current wallet balance for expenses.';
+                errorMessage.style.display = 'block'; // Show inline error message
+
+                // Display a Swal warning
+                Swal.fire({
+                    title: 'Validation Error',
+                    text: balance <= 0
+                        ? 'The selected wallet has no funds for expenses. Please choose another wallet or deposit funds before proceeding.'
+                        : amount <= 0
+                            ? 'The transaction amount must be greater than zero.'
+                            : 'Transaction amount exceeds the current wallet balance for expenses.',
+                    icon: 'warning',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#3B82F6',
+                });
+
+                return; // Stop form submission
+            }
         }
 
-        if (transactionType === "Expense" && amount > balance) {
-            amountInput.style.borderColor = 'red'; // Highlight the input field
-            errorMessage.textContent = 'Transaction amount exceeds the current wallet balance for expenses.';
-            errorMessage.style.display = 'block'; // Show inline error message
+        // Handle Income transactions
+        if (transactionType === "Income") {
+            if (amount <= 0 || amount > 1_000_000_000_000) {
+                // Highlight the input field and show the error message
+                amountInput.style.borderColor = 'red';
+                errorMessage.textContent = amount <= 0
+                    ? 'The transaction amount must be greater than zero.'
+                    : 'Income amount cannot exceed one trillion.';
+                errorMessage.style.display = 'block'; // Show inline error message
 
-            // Display a Swal warning
-            Swal.fire({
-                title: 'Validation Error',
-                text: 'Transaction amount exceeds the current wallet balance for expenses.',
-                icon: 'warning',
-                confirmButtonText: 'OK',
-                confirmButtonColor: '#3B82F6',
-            });
+                // Display a Swal warning
+                Swal.fire({
+                    title: 'Validation Error',
+                    text: amount <= 0
+                        ? 'The transaction amount must be greater than zero.'
+                        : 'Income amount cannot exceed one trillion.',
+                    icon: 'warning',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#3B82F6',
+                });
 
-            return; // Stop form submission
+                return; // Stop form submission
+            }
         }
 
-        errorMessage.style.display = 'none'; // Hide error message
+        // Clear error messages and reset styling if validation passes
+        amountInput.style.borderColor = '';
+        errorMessage.style.display = 'none';
 
         // Proceed with form submission (Add or Edit)
         if (amountInput === transactionAmountInput) {
@@ -357,6 +433,8 @@
             handleEditTransaction(event);
         }
     }
+
+
 
     // Function to update button styles based on the type
     function updateButtonStyles(button, isSelected, isExpense) {

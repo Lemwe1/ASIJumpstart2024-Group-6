@@ -43,9 +43,6 @@ namespace ASI.Basecode.Data.Repositories
 
             if (existingTransaction != null)
             {
-                // Log the existing transaction's wallet ID for debugging
-                Console.WriteLine($"Updating Transaction ID: {existingTransaction.TransactionId} with new Wallet ID: {transaction.WalletId}");
-
                 // Update properties explicitly
                 existingTransaction.TransactionType = transaction.TransactionType;
                 existingTransaction.Amount = transaction.Amount;
