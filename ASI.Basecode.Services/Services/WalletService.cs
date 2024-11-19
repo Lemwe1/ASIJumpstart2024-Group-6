@@ -44,22 +44,31 @@ namespace ASI.Basecode.Services.Services
 
         public async Task UpdateWalletAsync(WalletViewModel viewModel)
         {
-            var model = await _walletRepository.GetByIdAsync(viewModel.WalletId);
+            // Retrieve the wallet from the repository
+            var wallet = await _walletRepository.GetByIdAsync(viewModel.WalletId);
 
-            if (model != null)
+            if (wallet == null)
             {
-                // Update WalletBalance based on the user input
-                model.WalletBalance = viewModel.WalletBalance;
-
-                if (model.WalletBalance != model.WalletOriginalBalance)
-                {
-                  
-                    model.WalletOriginalBalance = viewModel.WalletOriginalBalance;  
-                }
-
-                await _walletRepository.UpdateAsync(model);
+                throw new Exception($"Wallet with ID {viewModel.WalletId} not found.");
             }
+
+            // Track the original wallet balance if not already set
+            if (wallet.WalletOriginalBalance == 0)
+            {
+                wallet.WalletOriginalBalance = wallet.WalletBalance; // Set the original balance only once
+            }
+
+            // Update the current wallet balance
+            wallet.WalletBalance = viewModel.WalletBalance;
+
+            // Optionally log or handle the difference between the original and updated balances
+            var balanceChange = wallet.WalletBalance - wallet.WalletOriginalBalance;
+
+
+            // Save the updated wallet to the repository
+            await _walletRepository.UpdateAsync(wallet);
         }
+
 
         public async Task DeleteWalletAsync(int id)
         {

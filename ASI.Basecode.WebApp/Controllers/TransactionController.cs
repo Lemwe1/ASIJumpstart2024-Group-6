@@ -1,7 +1,6 @@
 ﻿using ASI.Basecode.Data.Models;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
-using ASI.Basecode.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
@@ -176,9 +175,8 @@ namespace ASI.Basecode.WebApp.Controllers
                 TransactionSort = transaction.TransactionSort
             };
 
-            // Ensure categories and wallets liabilities are loaded
-            ViewData["Categories"] = await _categoryService.GetCategoriesAsync(userId.Value); // Pass user ID
-            ViewData["Wallets"] = await _walletService.GetWalletAsync(userId.Value); // Pass user ID
+            ViewData["Categories"] = await _categoryService.GetCategoriesAsync(userId.Value); 
+            ViewData["Wallets"] = await _walletService.GetWalletAsync(userId.Value); 
 
             return View(transactionViewModel);
         }
