@@ -64,58 +64,55 @@ public class TransactionService : ITransactionService
             throw new Exception("Wallet not found.");
         }
 
-        // Adjust wallet balance based on the original balance before transaction changes
-        AdjustWalletBalance(wallet, transaction.Amount, transaction.TransactionType, true); // True indicates using original balance
+        // Adjust wallet balance for the new transaction
+        AdjustWalletBalance(wallet, transaction.Amount, transaction.TransactionType);
 
-        // Save the wallet update and add the transaction
+        // Save changes
         await _walletRepository.UpdateAsync(wallet);
         await _transactionRepository.AddAsync(transaction);
     }
 
     public async Task UpdateTransactionAsync(TransactionViewModel model)
     {
-        var transaction = MapToModel(model);
-        var existingTransaction = await _transactionRepository.GetByIdAsync(transaction.TransactionId);
+        var newTransaction = MapToModel(model);
+        var existingTransaction = await _transactionRepository.GetByIdAsync(newTransaction.TransactionId);
 
         if (existingTransaction == null)
         {
-            throw new Exception($"Transaction ID {transaction.TransactionId} not found for update.");
+            throw new Exception($"Transaction ID {newTransaction.TransactionId} not found.");
         }
 
-        var previousWalletId = existingTransaction.WalletId;
-        var previousWallet = await _walletRepository.GetByIdAsync(previousWalletId);
+        var wallet = await _walletRepository.GetByIdAsync(existingTransaction.WalletId);
 
-        if (previousWallet == null)
+        if (wallet == null)
         {
-            throw new Exception("Previous wallet not found.");
+            throw new Exception("Wallet not found.");
         }
 
-        // Undo balance effect if necessary and adjust based on WalletOriginalBalance
-        AdjustWalletBalance(previousWallet, -existingTransaction.Amount, existingTransaction.TransactionType, true);
+        // Undo the previous transaction's effect
+        AdjustWalletBalance(wallet, -existingTransaction.Amount, existingTransaction.TransactionType);
 
-        // If wallet or amount changed, update the wallet balance
-        if (transaction.WalletId != previousWalletId)
+        // If the wallet has changed, adjust the new wallet
+        if (newTransaction.WalletId != existingTransaction.WalletId)
         {
-            var newWallet = await _walletRepository.GetByIdAsync(transaction.WalletId);
+            var newWallet = await _walletRepository.GetByIdAsync(newTransaction.WalletId);
             if (newWallet == null)
             {
                 throw new Exception("New wallet not found.");
             }
 
-            AdjustWalletBalance(newWallet, transaction.Amount, transaction.TransactionType, false);
+            // Apply the new transaction's effect to the new wallet
+            AdjustWalletBalance(newWallet, newTransaction.Amount, newTransaction.TransactionType);
             await _walletRepository.UpdateAsync(newWallet);
         }
         else
         {
-            // Update the balance for the same wallet by considering the new transaction amount
-            var amountDifference = transaction.Amount - existingTransaction.Amount;
-            AdjustWalletBalance(previousWallet, amountDifference, transaction.TransactionType, false);
+            // Apply the updated transaction's effect to the same wallet
+            AdjustWalletBalance(wallet, newTransaction.Amount, newTransaction.TransactionType);
         }
 
-        // Update transaction details
-        UpdateTransactionDetails(existingTransaction, transaction);
-
-        // Save the updated transaction
+        // Update the transaction details
+        UpdateTransactionDetails(existingTransaction, newTransaction);
         await _transactionRepository.UpdateAsync(existingTransaction);
     }
 
@@ -133,36 +130,24 @@ public class TransactionService : ITransactionService
             throw new Exception("Wallet not found.");
         }
 
-        // Undo the effect of the transaction on the wallet balance
-        AdjustWalletBalance(wallet, -existingTransaction.Amount, existingTransaction.TransactionType, true);
+        // Undo the transaction's effect on the wallet balance
+        AdjustWalletBalance(wallet, -existingTransaction.Amount, existingTransaction.TransactionType);
 
-        // Update the wallet and delete the transaction
+        // Save changes
         await _walletRepository.UpdateAsync(wallet);
         await _transactionRepository.DeleteAsync(transactionId);
     }
 
-    // Helper method to adjust wallet balance considering WalletOriginalBalance
-    private void AdjustWalletBalance(MWallet wallet, decimal amount, string transactionType, bool isInitialAdjustment)
+    // Helper method to adjust wallet balance
+    private void AdjustWalletBalance(MWallet wallet, decimal amount, string transactionType)
     {
-        decimal balance = isInitialAdjustment ? wallet.WalletOriginalBalance : wallet.WalletBalance;
-
         if (transactionType == "Expense")
         {
-            balance -= amount;
+            wallet.WalletBalance -= amount;
         }
         else if (transactionType == "Income")
         {
-            balance += amount;
-        }
-
-        // Update the WalletBalance or WalletOriginalBalance accordingly
-        if (isInitialAdjustment)
-        {
-            wallet.WalletOriginalBalance = balance;
-        }
-        else
-        {
-            wallet.WalletBalance = balance;
+            wallet.WalletBalance += amount;
         }
     }
 
@@ -173,21 +158,10 @@ public class TransactionService : ITransactionService
         existingTransaction.Note = newTransaction.Note;
         existingTransaction.CategoryId = newTransaction.CategoryId;
         existingTransaction.TransactionSort = newTransaction.TransactionSort;
-
-        if (existingTransaction.TransactionType != newTransaction.TransactionType)
-        {
-            existingTransaction.TransactionType = newTransaction.TransactionType;
-        }
-        if (existingTransaction.Amount != newTransaction.Amount)
-        {
-            existingTransaction.Amount = newTransaction.Amount;
-        }
-        if (existingTransaction.WalletId != newTransaction.WalletId)
-        {
-            existingTransaction.WalletId = newTransaction.WalletId;
-        }
+        existingTransaction.TransactionType = newTransaction.TransactionType;
+        existingTransaction.Amount = newTransaction.Amount;
+        existingTransaction.WalletId = newTransaction.WalletId;
     }
-
 
     // Mapping from MTransaction to TransactionViewModel
     private TransactionViewModel MapToViewModel(MTransaction model)
