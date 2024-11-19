@@ -35,14 +35,40 @@ namespace ASI.Basecode.Services.Services
         public async Task AddWalletAsync(WalletViewModel viewModel)
         {
             var model = MapToModel(viewModel);
+
+            // Set WalletOriginalBalance when adding a new wallet
+            model.WalletOriginalBalance = model.WalletBalance; 
+
             await _walletRepository.AddAsync(model);
         }
 
         public async Task UpdateWalletAsync(WalletViewModel viewModel)
         {
-            var model = MapToModel(viewModel);
-            await _walletRepository.UpdateAsync(model);
+            // Retrieve the wallet from the repository
+            var wallet = await _walletRepository.GetByIdAsync(viewModel.WalletId);
+
+            if (wallet == null)
+            {
+                throw new Exception($"Wallet with ID {viewModel.WalletId} not found.");
+            }
+
+            // Track the original wallet balance if not already set
+            if (wallet.WalletOriginalBalance == 0)
+            {
+                wallet.WalletOriginalBalance = wallet.WalletBalance; // Set the original balance only once
+            }
+
+            // Update the current wallet balance
+            wallet.WalletBalance = viewModel.WalletBalance;
+
+            // Optionally log or handle the difference between the original and updated balances
+            var balanceChange = wallet.WalletBalance - wallet.WalletOriginalBalance;
+
+
+            // Save the updated wallet to the repository
+            await _walletRepository.UpdateAsync(wallet);
         }
+
 
         public async Task DeleteWalletAsync(int id)
         {
@@ -56,6 +82,7 @@ namespace ASI.Basecode.Services.Services
             {
                 WalletId = model.WalletId,
                 WalletBalance = model.WalletBalance,
+                WalletOriginalBalance = model.WalletOriginalBalance,
                 WalletIcon = model.WalletIcon,
                 WalletColor = model.WalletColor,
                 WalletName = model.WalletName,
@@ -70,6 +97,7 @@ namespace ASI.Basecode.Services.Services
             {
                 WalletId = viewModel.WalletId,
                 WalletBalance = viewModel.WalletBalance,
+                WalletOriginalBalance = viewModel.WalletOriginalBalance,
                 WalletIcon = viewModel.WalletIcon,
                 WalletColor = viewModel.WalletColor,
                 WalletName = viewModel.WalletName,

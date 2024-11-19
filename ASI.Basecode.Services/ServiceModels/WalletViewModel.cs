@@ -9,6 +9,7 @@ namespace ASI.Basecode.Services.ServiceModels
 
         [Required(ErrorMessage = "Balance is required")]
         public decimal WalletBalance { get; set; }
+        public decimal WalletOriginalBalance { get; set; }
 
         public string WalletIcon { get; set; }
         public string WalletColor { get; set; }
