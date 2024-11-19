@@ -35,13 +35,30 @@ namespace ASI.Basecode.Services.Services
         public async Task AddWalletAsync(WalletViewModel viewModel)
         {
             var model = MapToModel(viewModel);
+
+            // Set WalletOriginalBalance when adding a new wallet
+            model.WalletOriginalBalance = model.WalletBalance; 
+
             await _walletRepository.AddAsync(model);
         }
 
         public async Task UpdateWalletAsync(WalletViewModel viewModel)
         {
-            var model = MapToModel(viewModel);
-            await _walletRepository.UpdateAsync(model);
+            var model = await _walletRepository.GetByIdAsync(viewModel.WalletId);
+
+            if (model != null)
+            {
+                // Update WalletBalance based on the user input
+                model.WalletBalance = viewModel.WalletBalance;
+
+                if (model.WalletBalance != model.WalletOriginalBalance)
+                {
+                  
+                    model.WalletOriginalBalance = viewModel.WalletOriginalBalance;  
+                }
+
+                await _walletRepository.UpdateAsync(model);
+            }
         }
 
         public async Task DeleteWalletAsync(int id)
@@ -56,6 +73,7 @@ namespace ASI.Basecode.Services.Services
             {
                 WalletId = model.WalletId,
                 WalletBalance = model.WalletBalance,
+                WalletOriginalBalance = model.WalletOriginalBalance,
                 WalletIcon = model.WalletIcon,
                 WalletColor = model.WalletColor,
                 WalletName = model.WalletName,
@@ -70,6 +88,7 @@ namespace ASI.Basecode.Services.Services
             {
                 WalletId = viewModel.WalletId,
                 WalletBalance = viewModel.WalletBalance,
+                WalletOriginalBalance = viewModel.WalletOriginalBalance,
                 WalletIcon = viewModel.WalletIcon,
                 WalletColor = viewModel.WalletColor,
                 WalletName = viewModel.WalletName,

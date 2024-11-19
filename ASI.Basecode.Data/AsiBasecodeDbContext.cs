@@ -27,7 +27,7 @@ namespace ASI.Basecode.Data
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=NI¥O\\SQLEXPRESS;Database=AsiBasecodeDb;Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer("Server=DESKTOP-90VPBGF\\SQLEXPRESS;Database=AsiBasecodeDb;Trusted_Connection=True;");
             }
         }
 
@@ -36,13 +36,13 @@ namespace ASI.Basecode.Data
             modelBuilder.Entity<MCategory>(entity =>
             {
                 entity.HasKey(e => e.CategoryId)
-                    .HasName("PK__M_Catego__19093A0B42CADA57");
+                    .HasName("PK__M_Catego__19093A0B09DD4081");
 
                 entity.ToTable("M_Category");
 
                 entity.Property(e => e.Color).IsRequired();
 
-                entity.Property(e => e.Icon).IsRequired();
+                entity.Property(e => e.Icon).UseCollation("Latin1_General_100_CI_AS_SC_UTF8");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -59,7 +59,7 @@ namespace ASI.Basecode.Data
             modelBuilder.Entity<MTransaction>(entity =>
             {
                 entity.HasKey(e => e.TransactionId)
-                    .HasName("PK__M_Transa__55433A6BEABCDF3F");
+                    .HasName("PK__M_Transa__55433A6B0657FAE1");
 
                 entity.ToTable("M_Transaction");
 
@@ -116,8 +116,6 @@ namespace ASI.Basecode.Data
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.IsVerified).HasColumnName("isVerified");
-
                 entity.Property(e => e.LastName).HasMaxLength(50);
 
                 entity.Property(e => e.LastNameKana).HasMaxLength(50);
@@ -162,7 +160,7 @@ namespace ASI.Basecode.Data
             modelBuilder.Entity<MWallet>(entity =>
             {
                 entity.HasKey(e => e.WalletId)
-                    .HasName("PK__M_Wallet__84D4F90EF872A017");
+                    .HasName("PK__M_Wallet__84D4F90E01368F22");
 
                 entity.ToTable("M_Wallet");
 
@@ -179,6 +177,8 @@ namespace ASI.Basecode.Data
                 entity.Property(e => e.WalletName)
                     .IsRequired()
                     .HasMaxLength(50);
+
+                entity.Property(e => e.WalletOriginalBalance).HasColumnType("decimal(10, 2)");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.MWallets)

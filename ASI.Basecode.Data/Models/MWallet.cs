@@ -13,6 +13,7 @@ namespace ASI.Basecode.Data.Models
         public int WalletId { get; set; }
         public string WalletName { get; set; }
         public decimal WalletBalance { get; set; }
+        public decimal WalletOriginalBalance { get; set; }
         public string WalletIcon { get; set; }
         public string WalletColor { get; set; }
         public int UserId { get; set; }
