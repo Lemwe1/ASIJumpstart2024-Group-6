@@ -7,17 +7,16 @@
 }
 
 <!-- Sidebar and Content -->
-<div class="flex min-h-screen mt-5 ml-10 ">
+<div class="flex min-h-screen mt-5 ml-10">
     <!-- Main Content Area -->
-    <div class="flex-1 p-6 bg-gray-100 container dark:bg-gray-800 text-gray-900 ">
-
+    <div class="flex-1 p-6 bg-gray-100 container dark:bg-gray-800 text-gray-900">
         <!-- Dashboard Header -->
         <div class="my-4">
             <h2 class="text-2xl font-semibold dark:text-white">Dashboard</h2>
         </div>
 
         <!-- Dashboard Cards -->
-        <div class="grid grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <div class="bg-green-500 border-2 border-gray-900 dark:border-gray-600 shadow-md text-white p-6 rounded-lg">
                 <h3 class="text-s">Current Balance</h3>
                 <p class="mt-10 text-3xl font-bold">₱&nbsp;@String.Format("{0:#,0.00}", @ViewBag.TotalDebit)</p>
@@ -36,10 +35,8 @@
             </div>
         </div>
 
-
-
         <!-- Trends and Monthly Charts -->
-        <div class="grid grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <!-- Trends Chart -->
             <div class="bg-gray-50 dark:bg-gray-700 dark:text-white p-6 shadow-md rounded-lg">
                 <h4 class="font-semibold">Trends</h4>
@@ -59,8 +56,8 @@
             </div>
         </div>
 
+        <!-- Floating Button -->
         <div class="relative">
-            <!-- Button -->
             <a asp-controller="Transaction" asp-action="Index">
                 <button class="fixed bottom-8 right-8 bg-blue-500 text-white w-16 h-16 flex items-center justify-center rounded-full shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-300">
                     <i class="fas fa-plus text-2xl"></i>

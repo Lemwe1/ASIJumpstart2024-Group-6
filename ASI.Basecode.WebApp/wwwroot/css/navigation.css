@@ -37,6 +37,9 @@
         padding-left: 0;
     }
 
+    #dropdownMenu {
+        z-index: 9999;
+    }
 
 
     ul {
