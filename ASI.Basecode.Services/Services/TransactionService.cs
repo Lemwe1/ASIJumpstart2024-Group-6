@@ -162,7 +162,6 @@ public class TransactionService : ITransactionService
         existingTransaction.Amount = newTransaction.Amount;
         existingTransaction.WalletId = newTransaction.WalletId;
     }
-
     // Mapping from MTransaction to TransactionViewModel
     private TransactionViewModel MapToViewModel(MTransaction model)
     {
