@@ -63,7 +63,7 @@ function closeCreateModal() {
 
         modal.classList.add('hidden');
         modal.classList.remove('flex');
-        document.body.classList.remove('overflow-hidden'); // Ensure overflow is removed if modal is closed without changes
+        document.body.classList.remove('overflow-hidden'); 
     }
 }
 
@@ -133,7 +133,7 @@ function closeEditModal() {
     } else {
         modal.classList.add('hidden');
         modal.classList.remove('flex');
-        document.body.classList.remove('overflow-hidden'); // Ensure overflow is removed if modal is closed without changes
+        document.body.classList.remove('overflow-hidden'); 
     }
 }
 

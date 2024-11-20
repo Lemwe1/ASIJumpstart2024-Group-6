@@ -22,7 +22,7 @@
                 @Html.AntiForgeryToken()
                 foreach (var transaction in transactions)
                 {
-                    <tr data-category="@transaction.CategoryId" class="border-b border-gray-300 dark:border-gray-600 odd:bg-white even:bg-gray-100 dark:odd:bg-gray-800 dark:even:bg-gray-700">
+                    <tr data-category="@transaction.CategoryId" data-type="@transaction.TransactionType" class="border-b border-gray-300 dark:border-gray-600 odd:bg-white even:bg-gray-100 dark:odd:bg-gray-800 dark:even:bg-gray-700">
                         <td class="px-4 py-4 w-1/6 whitespace-nowrap">
                             <div class="flex items-center space-x-4">
                                 <span class="flex items-center justify-center p-2 w-12 h-12 rounded-full" style="background-color: @transaction.CategoryColor;">
@@ -81,39 +81,54 @@
 </div>
 
 <!-- Pagination Controls -->
-<div class="mt-4 text-right">
-    <ul class="pagination flex space-x-2 justify-end text-gray-50 dark:text-white">
-        @if (currentPage > 1)
-        {
-            <li>
-                <a href="@Url.Action("Index", new { page = currentPage - 1 })" 
-                class="pagination-link px-3 py-2 border rounded text-gray-700 dark:text-white bg-gray-50 dark:bg-gray-700 hover:no-underline hover:bg-gray-200 dark:hover:bg-gray-600">
-                    <span>&lt;</span> <!-- Left angle bracket -->
-                </a>
-            </li>
-        }
-
-        @for (var i = 1; i <= totalPages; i++)
-        {
-            <li>
-                <a href="@Url.Action("Index", new { page = i })"
-                   class="pagination-link px-3 py-2 border rounded
-                 @(i == currentPage ? "bg-blue-500 text-white hover:no-underline" : "bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-500 hover:no-underline")">
-                    @i
-                </a>
-            </li>
-        }
+<div class="mt-4 flex justify-end">
+    <!-- Container for two columns (X of Y items and Pagination) -->
+    <div class="grid grid-cols-2 gap-4">
+        <!-- Display "X of Y items" on the left side -->
+        <span id="item-count" class="text-gray-500 dark:text-white text-right">
+            @if (ViewData["TotalTransactions"] != null && ViewData["DisplayedItems"] != null)
+            {
+                int totalTransactions = (int)ViewData["TotalTransactions"];
+                int displayedItems = (int)ViewData["DisplayedItems"];
+                <span>@displayedItems of @totalTransactions items</span>
+            }
+        </span>
 
 
-        @if (currentPage < totalPages)
-        {
-            <li>
-                <a href="@Url.Action("Index", new { page = currentPage + 1 })" 
-                class="pagination-link px-3 py-2 border rounded text-gray-700 dark:text-white bg-gray-50 dark:bg-gray-700 hover:no-underline  hover:bg-gray-200 dark:hover:bg-gray-600">
-                    <span>&gt;</span> <!-- Right angle bracket -->
-                </a>
-            </li>
-        }
-    </ul>
+        <!-- Pagination Controls on the right side -->
+        <ul class="pagination space-x-2 justify-end text-gray-50 dark:text-white">
+            @if (currentPage > 1)
+            {
+                <li>
+                    <a href="@Url.Action("Index", new { page = currentPage - 1 })"
+                       class="pagination-link px-3 py-2 border rounded text-gray-700 dark:text-white bg-gray-50 dark:bg-gray-700 hover:no-underline hover:bg-gray-200 dark:hover:bg-gray-600">
+                        <span>&lt;</span> <!-- Left angle bracket -->
+                    </a>
+                </li>
+            }
+
+            @for (var i = 1; i <= totalPages; i++)
+            {
+                <li>
+                    <a href="@Url.Action("Index", new { page = i })"
+                       class="pagination-link px-3 py-2 border rounded
+                     @(i == currentPage ? "bg-blue-500 text-white hover:no-underline" : "bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-500 hover:no-underline")">
+                        @i
+                    </a>
+                </li>
+            }
+
+            @if (currentPage < totalPages)
+            {
+                <li>
+                    <a href="@Url.Action("Index", new { page = currentPage + 1 })"
+                       class="pagination-link px-3 py-2 border rounded text-gray-700 dark:text-white bg-gray-50 dark:bg-gray-700 hover:no-underline hover:bg-gray-200 dark:hover:bg-gray-600">
+                        <span>&gt;</span> <!-- Right angle bracket -->
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
 </div>
+
 

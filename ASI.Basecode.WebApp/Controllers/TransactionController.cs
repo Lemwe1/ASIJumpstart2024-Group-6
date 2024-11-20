@@ -25,7 +25,8 @@ namespace ASI.Basecode.WebApp.Controllers
             _transactionService = transactionService;
         }
 
-        public async Task<IActionResult> Index(int page = 1, string filterByCategory = "All")
+        // GET: Display the list of transactions
+        public async Task<IActionResult> Index(int page = 1)
         {
             var userId = GetUserId();
             if (userId == null)
@@ -33,6 +34,7 @@ namespace ASI.Basecode.WebApp.Controllers
                 return BadRequest("Invalid user ID.");
             }
 
+            // Define how many items per page
             int pageSize = 4;
             int skip = (page - 1) * pageSize;
 
@@ -42,16 +44,8 @@ namespace ASI.Basecode.WebApp.Controllers
             var categories = await _categoryService.GetCategoriesAsync(userId.Value);
             var wallets = await _walletService.GetWalletAsync(userId.Value);
 
-            // Get all transactions for the user
+            // Get all transactions and apply pagination (limiting to 6 entries for the current page)
             var transactions = await _transactionService.GetAllTransactionsAsync(userId.Value);
-
-            // Apply category filter if necessary
-            if (filterByCategory != "All")
-            {
-                transactions = transactions.Where(t => t.CategoryId.ToString() == filterByCategory).ToList();
-            }
-
-            // Apply pagination (limiting to 4 entries for the current page)
             var paginatedTransactions = transactions
                 .OrderByDescending(t => t.TransactionId)
                 .Skip(skip)
@@ -70,7 +64,12 @@ namespace ASI.Basecode.WebApp.Controllers
             ViewData["Transactions"] = paginatedTransactions;
             ViewData["TotalPages"] = totalPages;
             ViewData["CurrentPage"] = page;
-            ViewData["SelectedCategory"] = filterByCategory; 
+
+            // Calculate the number of items displayed on the current page
+            int displayedItems = Math.Min(pageSize, totalTransactions - ((page - 1) * pageSize));
+
+            ViewData["DisplayedItems"] = displayedItems; // Pass this to the view
+            ViewData["TotalTransactions"] = totalTransactions; // Pass the total number of items to the view
 
             return View(paginatedTransactions);
         }

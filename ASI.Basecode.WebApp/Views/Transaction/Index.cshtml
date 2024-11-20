@@ -9,9 +9,9 @@
 @using ASI.Basecode.Services.ServiceModels
 
 <!-- Sidebar and Content -->
-<div class="flex min-h-screen mt-5  ml-10">
+<div class="flex min-h-screen mt-5 ml-10">
     <!-- Main Content Area -->
-    <div class="flex-1 container p-6 bg-gray-100 dark:bg-gray-800 text-gray-900 ">
+    <div class="flex-1 container p-6 bg-gray-100 dark:bg-gray-800 text-gray-900">
         <!-- Transaction Header -->
         <div class="my-4">
             <h2 class="text-2xl font-semibold dark:text-white">Transactions</h2>
@@ -21,21 +21,32 @@
         <div class="overflow-x-auto rounded-lg">
             <div class="flex justify-between items-center mb-4">
                 <div class="flex items-center space-x-4">
+                    <!-- Filter by Category -->
                     <div>
                         <label for="category-filter" class="text-gray-500 font-regular mr-2 dark:text-white">Filter by category:</label>
-                        <select id="filterTransactionCategory" name="filterByCategory" class="border border-gray-300  dark:bg-gray-700 dark:text-white rounded-lg pl-2 pr-20 py-2 ">
+                        <select id="filterTransactionCategory" name="filterByCategory" class="border border-gray-300 dark:bg-gray-700 dark:text-white rounded-lg pl-2 pr-20 py-2 ">
                             <option value="All">All</option>
                             @if (ViewData["Categories"] is List<MCategory> categories && categories.Any())
                             {
                                 foreach (var category in categories)
                                 {
-                                    <option value="@category.CategoryId" data-type="@category.Type">@category.Name</option>
+                                    <option value="@category.CategoryId" data-type="@category.Type"> @category.Icon @category.Name</option>
                                 }
                             }
                             else
                             {
                                 <option value="" disabled>No Entries yet</option>
                             }
+                        </select>
+                    </div>
+
+                    <!-- Filter by Type (Expense / Income) -->
+                    <div>
+                        <label for="type-filter" class="text-gray-500 font-regular mr-2 dark:text-white">Filter by type:</label>
+                        <select id="filterTransactionType" name="filterByType" class="border border-gray-300 dark:bg-gray-700 dark:text-white rounded-lg pl-2 pr-20 py-2">
+                            <option value="All">All</option>
+                            <option value="Expense">💸 Expense</option>
+                            <option value="Income">💰 Income</option>
                         </select>
                     </div>
                 </div>
@@ -46,12 +57,11 @@
 
             <!-- Table Container -->
             <div class="overflow-x-auto">
-                @Html.Partial("Details") 
+                @Html.Partial("Details")
             </div>
         </div>
     </div>
 </div>
-
 
 @Html.Partial("Create")
 @Html.Partial("Edit")
