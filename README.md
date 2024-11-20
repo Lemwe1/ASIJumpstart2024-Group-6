@@ -52,17 +52,16 @@ SET IDENTITY_INSERT M_Category OFF;
 
 ================================================
 
-
 CREATE TABLE M_Wallet (
     WalletId INT PRIMARY KEY IDENTITY(1,1),
     WalletName NVARCHAR(50) NOT NULL,
     WalletBalance DECIMAL(10, 2) NOT NULL,
+    WalletOriginalBalance DECIMAL(10, 2) NOT NULL DEFAULT 0,
     WalletIcon NVARCHAR(255) NOT NULL,
     WalletColor NVARCHAR(20) NOT NULL,
     UserId INT NOT NULL,
     CONSTRAINT FK_M_Wallet_UserId FOREIGN KEY (UserId) REFERENCES M_User(UserId)
-); 
-
+);
 
 ================================================
 
