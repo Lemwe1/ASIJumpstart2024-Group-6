@@ -43,6 +43,22 @@ async function openEditModal(categoryId) {
                 setTypeSelection('edit', category.type);
                 console.log('Set Type selection to:', category.type);
 
+                // Hide the opposite type button in the edit modal
+                const expenseButton = document.getElementById('editExpenseButton');
+                const incomeButton = document.getElementById('editIncomeButton');
+
+                if (category.type === 'Expense') {
+                    incomeButton.classList.add('hidden');
+                } else if (category.type === 'Income') {
+                    expenseButton.classList.add('hidden');
+                }
+                console.log('Adjusted type buttons based on category type.');
+
+                // Disable the visible type button to prevent changing type
+                const typeButton = category.type === 'Expense' ? expenseButton : incomeButton;
+                typeButton.disabled = true;
+                typeButton.classList.add('opacity-50', 'cursor-not-allowed');
+
                 // Show the edit modal
                 const modal = document.getElementById('editCategoryModal');
                 modal.classList.remove('hidden');
@@ -219,12 +235,14 @@ function setTypeSelection(modalType, selectedType) {
     typeInput.value = selectedType;
     console.log(`Type input set to: ${selectedType}`);
 
-    // Reset both buttons to gray first
-    expenseButton.classList.remove('bg-red-400', 'text-white');
+    // Reset both buttons to default styles first
+    expenseButton.classList.remove('bg-red-400', 'text-white', 'opacity-50', 'cursor-not-allowed', 'hidden');
     expenseButton.classList.add('bg-gray-200', 'text-gray-800');
+    expenseButton.disabled = false;
 
-    incomeButton.classList.remove('bg-green-500', 'text-white');
+    incomeButton.classList.remove('bg-green-500', 'text-white', 'opacity-50', 'cursor-not-allowed', 'hidden');
     incomeButton.classList.add('bg-gray-200', 'text-gray-800');
+    incomeButton.disabled = false;
 
     // Then apply selected styles
     if (selectedType === 'Expense') {
@@ -234,13 +252,13 @@ function setTypeSelection(modalType, selectedType) {
     }
 }
 
-// Event listeners for type buttons in the edit modal
-document.getElementById('editExpenseButton').addEventListener('click', function () {
-    setTypeSelection('edit', 'Expense');
+// Event listeners for type buttons in the create modal only
+document.getElementById('createExpenseButton').addEventListener('click', function () {
+    setTypeSelection('create', 'Expense');
 });
 
-document.getElementById('editIncomeButton').addEventListener('click', function () {
-    setTypeSelection('edit', 'Income');
+document.getElementById('createIncomeButton').addEventListener('click', function () {
+    setTypeSelection('create', 'Income');
 });
 
 // Event listener to close the edit modal
@@ -248,4 +266,14 @@ document.getElementById('closeEditModal').addEventListener('click', function () 
     const modal = document.getElementById('editCategoryModal');
     modal.classList.add('hidden');
     modal.classList.remove('flex');
+
+    // Reset the disabled state and visibility of type buttons
+    const expenseButton = document.getElementById('editExpenseButton');
+    const incomeButton = document.getElementById('editIncomeButton');
+
+    expenseButton.disabled = false;
+    incomeButton.disabled = false;
+
+    expenseButton.classList.remove('opacity-50', 'cursor-not-allowed', 'hidden');
+    incomeButton.classList.remove('opacity-50', 'cursor-not-allowed', 'hidden');
 });
