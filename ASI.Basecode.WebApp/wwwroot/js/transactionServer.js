@@ -73,12 +73,12 @@
             pagination.style.display = ''; // Show pagination when no filters are applied
         }
 
-        // Hide item count if there are no transactions
+        // Hide item count if category or type is selected or if there are no visible transactions
         const itemCount = document.getElementById('item-count');
-        if (!hasVisibleTransactions) {
-            itemCount.style.display = 'none'; // Hide item count if no transactions are visible
+        if (categoryFilter !== 'All' || typeFilter !== 'All' || !hasVisibleTransactions) {
+            itemCount.style.display = 'none'; // Hide item count if filters are applied or no transactions are visible
         } else {
-            itemCount.style.display = ''; // Show item count if there are transactions
+            itemCount.style.display = ''; // Show item count if no filters are applied and transactions are visible
         }
 
         // Show "No transactions found" if the filter is set to "All" and there are no transactions
@@ -93,8 +93,6 @@
     // Event listeners for category and type filters
     document.querySelector('select[name="filterByCategory"]').addEventListener('change', filterTable);
     document.querySelector('select[name="filterByType"]').addEventListener('change', filterTable);
-
-
 
 
     // Open modal for adding a new transaction, with wallet check
