@@ -11,9 +11,9 @@
 @using ASI.Basecode.Services.ServiceModels
 
 <!-- Sidebar and Content -->
-<div class="flex min-h-screen mt-5 ml-10">
+<div class="grid min-h-screen mt-5 ml-10 grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- Main Content Area -->
-    <div class="flex-1 container p-6 bg-gray-100 dark:bg-gray-800">
+    <div class="col-span-1 lg:col-span-2 container p-6 bg-gray-100 dark:bg-gray-800">
 
         <!-- Settings Header -->
         <div class="my-4">
@@ -21,9 +21,17 @@
         </div>
 
         <!-- Profile Section -->
-        <div class="relative p-6 shadow-sm rounded-lg mb-6 bg-gray-50 dark:bg-gray-700 flex flex-col md:flex-row">
+        <div class="relative p-6 shadow-sm rounded-lg mb-6 bg-gray-50 dark:bg-gray-700 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Profile Picture Section -->
+            <div class="col-span-1 lg:order-2 flex flex-col items-center justify-center mb-4 lg:mb-0">
+                <div class="text-center mb-4">
+                    <img id="profile-picture" class="rounded-full mx-auto w-40 h-40" src="~/img/profile-logo.png" alt="Profile Picture" />
+                </div>
+                <input type="file" id="file-input" class="hidden" accept="image/*">
+            </div>
+
             <!-- Profile Details Section -->
-            <div class="md:w-1/2 pr-6 mb-4 sm:mb-0">
+            <div class="col-span-1 lg:order-1">
                 <h3 class="text-lg font-semibold mb-4 dark:text-white">Profile</h3>
 
                 <!-- Username Field -->
@@ -36,15 +44,15 @@
                 </div>
 
                 <!-- Name Fields -->
-                <div class="flex flex-col sm:flex-row space-y-4 md:space-y-0 md:space-x-4 w-full my-4">
-                    <div class="w-full md:w-1/2">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+                    <div>
                         <label for="first-name" class="block text-gray-700 dark:text-gray-300">First Name</label>
                         <input type="text" id="first-name" name="first-name"
                                class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white"
                                placeholder="First Name"
                                value="@ViewData["FirstName"]" readonly disabled>
                     </div>
-                    <div class="w-full md:w-1/2">
+                    <div>
                         <label for="last-name" class="block text-gray-700 dark:text-gray-300">Last Name</label>
                         <input type="text" id="last-name" name="last-name"
                                class="w-full p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white"
@@ -61,28 +69,20 @@
                            placeholder="Email address" required
                            value="@ViewData["Email"]" readonly disabled>
                 </div>
-                <hr class="dark:text-white"/>
+                <hr class="dark:text-white" />
+
                 <!-- Password Field with Change Button -->
-                <div class="my-4 relative ">
+                <div class="my-4 relative">
                     <label for="password" class="block text-gray-700 dark:text-gray-300 mr-2">Password</label>
                     <input type="password" id="password" name="password"
                            class="w-9/12 p-3 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white"
                            placeholder="**********" readonly disabled>
-                    <!-- Change Password Text with Underline -->
                     <a href="javascript:void(0);" id="change-password-btn" onclick="openChangePasswordModal()"
-                       class="w-full p-3 text-blue-500 hover:underline">
+                       class=" ml-2 -translate-y-1/2 text-blue-500 hover:underline">
                         Change
                     </a>
                 </div>
 
-            </div>
-
-            <!-- Profile Picture Section -->
-            <div class="w-full md:w-1/2 flex flex-col items-center justify-center">
-                <div class="text-center mb-4">
-                    <img id="profile-picture" class="rounded-full mx-auto w-40 h-40" src="~/img/profile-logo.png" alt="Profile Picture" />
-                </div>
-                <input type="file" id="file-input" class="hidden" accept="image/*">
             </div>
 
             <!-- Edit Button for Profile -->
@@ -90,7 +90,6 @@
                 <i class="fas fa-pen mr-1"></i> Edit Profile
             </button>
         </div>
-    </div>
 </div>
 
 @Html.Partial("EditProfile")

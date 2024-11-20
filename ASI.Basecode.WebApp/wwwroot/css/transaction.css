@@ -7,6 +7,9 @@
     padding: 20px;
 }
 
+.transaction-container {
+    max-height: 650px;
+}
    
 .modal.flex {
     display: flex; 

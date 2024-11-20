@@ -26,7 +26,7 @@ namespace ASI.Basecode.WebApp.Controllers
         }
 
         // GET: Display the list of transactions
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
             var userId = GetUserId();
             if (userId == null)
@@ -34,29 +34,48 @@ namespace ASI.Basecode.WebApp.Controllers
                 return BadRequest("Invalid user ID.");
             }
 
+            // Define how many items per page
+            int pageSize = 4;
+            int skip = (page - 1) * pageSize;
+
             ViewData["Title"] = "Transactions";
 
             // Fetch categories, wallets, and transactions for the user
             var categories = await _categoryService.GetCategoriesAsync(userId.Value);
             var wallets = await _walletService.GetWalletAsync(userId.Value);
-            var transactions = await _transactionService.GetAllTransactionsAsync(userId.Value);
 
-           
+            // Get all transactions and apply pagination (limiting to 6 entries for the current page)
+            var transactions = await _transactionService.GetAllTransactionsAsync(userId.Value);
+            var paginatedTransactions = transactions
+                .OrderByDescending(t => t.TransactionId)
+                .Skip(skip)
+                .Take(pageSize)
+                .ToList();
+
+            // Get the total count for pagination
+            var totalTransactions = transactions.Count();
+
+            // Calculate total pages
+            int totalPages = (int)Math.Ceiling(totalTransactions / (double)pageSize);
 
             // Pass data to the view
             ViewData["Categories"] = categories;
             ViewData["Wallets"] = wallets.ToList();
-            ViewData["Transactions"] = transactions.ToList();
+            ViewData["Transactions"] = paginatedTransactions;
+            ViewData["TotalPages"] = totalPages;
+            ViewData["CurrentPage"] = page;
 
-            // Prepare model (if necessary, though not currently used in the view)
-            var model = new TransactionViewModel
-            {
-                // Optionally populate properties if needed
-            };
+            // Calculate the number of items displayed on the current page
+            int displayedItems = Math.Min(pageSize, totalTransactions - ((page - 1) * pageSize));
 
-            return View(transactions);
+            ViewData["DisplayedItems"] = displayedItems; // Pass this to the view
+            ViewData["TotalTransactions"] = totalTransactions; // Pass the total number of items to the view
 
+            return View(paginatedTransactions);
         }
+
+
+
 
         // GET: Display the create transaction form
         [HttpGet]

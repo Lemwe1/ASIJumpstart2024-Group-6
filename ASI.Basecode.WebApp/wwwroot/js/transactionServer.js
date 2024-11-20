@@ -30,15 +30,21 @@
 
     let isModalDirty = false;
     // Function to filter table based on category
-    const filterTableByCategory = () => {
+    const filterTable = () => {
         const categoryFilter = document.querySelector('select[name="filterByCategory"]').value; // Get the selected category
-        const rows = Array.from(document.querySelectorAll('.transaction-table tbody tr[data-category]')); // Get all rows with category data
+        const typeFilter = document.querySelector('select[name="filterByType"]').value; // Get the selected type
+        const rows = Array.from(document.querySelectorAll('.transaction-table tbody tr')); // Get all rows
         let hasVisibleTransactions = false;
 
-        // Show or hide rows based on selected category
+        // Show or hide rows based on both category and type filters
         rows.forEach(row => {
             const rowCategory = row.dataset.category; // Get the category from the row
-            if (categoryFilter === 'All' || rowCategory === categoryFilter) {
+            const rowType = row.dataset.type; // Get the type from the row
+
+            const isCategoryMatch = (categoryFilter === 'All' || rowCategory === categoryFilter);
+            const isTypeMatch = (typeFilter === 'All' || rowType === typeFilter);
+
+            if (isCategoryMatch && isTypeMatch) {
                 row.style.display = ''; // Show matching row
                 hasVisibleTransactions = true;
             } else {
@@ -55,15 +61,41 @@
             noTransactionsRow.innerHTML = `<td colspan="6" class="px-4 py-3 text-center text-gray-500 dark:text-white">&#x1F937; No transactions found.</td>`;
             document.querySelector('.transaction-table tbody').appendChild(noTransactionsRow);
         }
+
         // Show "No transactions found" message only if no rows are visible
         noTransactionsRow.style.display = hasVisibleTransactions ? 'none' : '';
+
+        // Hide pagination only if any filter is applied
+        const pagination = document.querySelector('.pagination');
+        if (categoryFilter !== 'All' || typeFilter !== 'All') {
+            pagination.style.display = 'none'; // Hide pagination when filtering by category or type
+        } else {
+            pagination.style.display = ''; // Show pagination when no filters are applied
+        }
+
+        // Hide item count if there are no transactions
+        const itemCount = document.getElementById('item-count');
+        if (!hasVisibleTransactions) {
+            itemCount.style.display = 'none'; // Hide item count if no transactions are visible
+        } else {
+            itemCount.style.display = ''; // Show item count if there are transactions
+        }
+
+        // Show "No transactions found" if the filter is set to "All" and there are no transactions
+        if (categoryFilter === 'All' && typeFilter === 'All' && !hasVisibleTransactions) {
+            noTransactionsRow.style.display = ''; // Display "No transactions found"
+        }
     };
 
     // Initial filter on page load
-    filterTableByCategory();
+    filterTable();
 
-    // Event listener for category filter
-    document.querySelector('select[name="filterByCategory"]').addEventListener('change', filterTableByCategory);
+    // Event listeners for category and type filters
+    document.querySelector('select[name="filterByCategory"]').addEventListener('change', filterTable);
+    document.querySelector('select[name="filterByType"]').addEventListener('change', filterTable);
+
+
+
 
     // Open modal for adding a new transaction, with wallet check
     function openAddTransactionModal() {
