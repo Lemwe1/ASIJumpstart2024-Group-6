@@ -25,8 +25,7 @@ namespace ASI.Basecode.WebApp.Controllers
             _transactionService = transactionService;
         }
 
-        // GET: Display the list of transactions
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, string filterByCategory = "All")
         {
             var userId = GetUserId();
             if (userId == null)
@@ -34,29 +33,50 @@ namespace ASI.Basecode.WebApp.Controllers
                 return BadRequest("Invalid user ID.");
             }
 
+            int pageSize = 4;
+            int skip = (page - 1) * pageSize;
+
             ViewData["Title"] = "Transactions";
 
             // Fetch categories, wallets, and transactions for the user
             var categories = await _categoryService.GetCategoriesAsync(userId.Value);
             var wallets = await _walletService.GetWalletAsync(userId.Value);
+
+            // Get all transactions for the user
             var transactions = await _transactionService.GetAllTransactionsAsync(userId.Value);
 
-           
+            // Apply category filter if necessary
+            if (filterByCategory != "All")
+            {
+                transactions = transactions.Where(t => t.CategoryId.ToString() == filterByCategory).ToList();
+            }
+
+            // Apply pagination (limiting to 4 entries for the current page)
+            var paginatedTransactions = transactions
+                .OrderByDescending(t => t.TransactionId)
+                .Skip(skip)
+                .Take(pageSize)
+                .ToList();
+
+            // Get the total count for pagination
+            var totalTransactions = transactions.Count();
+
+            // Calculate total pages
+            int totalPages = (int)Math.Ceiling(totalTransactions / (double)pageSize);
 
             // Pass data to the view
             ViewData["Categories"] = categories;
             ViewData["Wallets"] = wallets.ToList();
-            ViewData["Transactions"] = transactions.ToList();
+            ViewData["Transactions"] = paginatedTransactions;
+            ViewData["TotalPages"] = totalPages;
+            ViewData["CurrentPage"] = page;
+            ViewData["SelectedCategory"] = filterByCategory; 
 
-            // Prepare model (if necessary, though not currently used in the view)
-            var model = new TransactionViewModel
-            {
-                // Optionally populate properties if needed
-            };
-
-            return View(transactions);
-
+            return View(paginatedTransactions);
         }
+
+
+
 
         // GET: Display the create transaction form
         [HttpGet]

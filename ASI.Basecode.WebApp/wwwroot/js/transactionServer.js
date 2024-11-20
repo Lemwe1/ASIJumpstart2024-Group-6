@@ -57,6 +57,14 @@
         }
         // Show "No transactions found" message only if no rows are visible
         noTransactionsRow.style.display = hasVisibleTransactions ? 'none' : '';
+
+        // Hide pagination only if a category filter is selected
+        const pagination = document.querySelector('.pagination');
+        if (categoryFilter !== 'All') {
+            pagination.style.display = 'none'; // Hide pagination when filtering by category
+        } else {
+            pagination.style.display = ''; // Show pagination when no category filter is applied
+        }
     };
 
     // Initial filter on page load
@@ -64,6 +72,7 @@
 
     // Event listener for category filter
     document.querySelector('select[name="filterByCategory"]').addEventListener('change', filterTableByCategory);
+
 
     // Open modal for adding a new transaction, with wallet check
     function openAddTransactionModal() {

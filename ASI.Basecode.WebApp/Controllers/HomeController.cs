@@ -77,8 +77,5 @@ namespace ASI.Basecode.WebApp.Controllers
             // Return the view with wallet data and transaction totals
             return View(userWallet);
         }
-
-
-
     }
 }
