@@ -1,7 +1,4 @@
-﻿
-
-
-document.addEventListener('DOMContentLoaded', () => {
+﻿document.addEventListener('DOMContentLoaded', () => {
     const fadeOutDialog = (dialog, duration) => {
         setTimeout(() => {
             dialog.classList.remove('opacity-100'); // Fade out
@@ -33,7 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.remove('dark');
         localStorage.setItem('theme', 'light');
     }
-
 
     let trendsChart; // Global reference to the chart instance
 
@@ -68,7 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const changeTrendView = (view) => {
-
         const expenseUrl = '/Transaction/GetMonthlyExpense';
         const incomeUrl = '/Transaction/GetMonthlyIncome';
         const url = view === 'weekly'
@@ -78,31 +73,47 @@ document.addEventListener('DOMContentLoaded', () => {
         fetch(url)
             .then(response => response.json())
             .then(data => {
+                console.log(data);  // Log the entire data to inspect its structure
+
                 if (view === 'weekly') {
                     const weeklyDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
                     const categoryData = {};
 
                     weeklyDays.forEach(day => {
                         data.filter(entry => entry.day === day).forEach(entry => {
+                            console.log(entry);  // Log each entry to inspect the structure
+
+                            // Default emoji if categoryIcon is missing
+                            const icon = entry.categoryIcon || '📦';  // Default icon (box emoji)
+
                             if (!categoryData[entry.categoryName]) {
-                                categoryData[entry.categoryName] = Array(7).fill(0);
+                                categoryData[entry.categoryName] = {
+                                    icon: icon,  // Use icon
+                                    amounts: Array(7).fill(0)
+                                };
                             }
+
                             const dayIndex = weeklyDays.indexOf(day);
                             if (dayIndex !== -1) {
-                                categoryData[entry.categoryName][dayIndex] = entry.totalAmount;
+                                categoryData[entry.categoryName].amounts[dayIndex] = entry.totalAmount;
                             }
                         });
                     });
 
-                    // Generate datasets for the chart
-                    const datasets = Object.entries(categoryData).map(([categoryName, data]) => ({
-                        label: categoryName,
-                        data: data,
-                        borderColor: `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 1)`,
-                        backgroundColor: 'rgba(0,0,0,0)',
-                        fill: true,
-                        tension: 0.5,
-                    }));
+                    // Create datasets with category icon (as text) and name
+                    const datasets = Object.entries(categoryData).map(([categoryName, data]) => {
+                        const totalAmountForCategory = data.amounts.reduce((sum, value) => sum + value, 0); // Calculate total for the category
+                        const labelWithIcon = `${data.icon} ${categoryName} - ₱ ${totalAmountForCategory.toFixed(2)}`; // Include icon (as text) with name and amount
+
+                        return {
+                            label: labelWithIcon,
+                            data: data.amounts,
+                            borderColor: `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 1)`,
+                            backgroundColor: 'rgba(0,0,0,0)',
+                            fill: true,
+                            tension: 0.5,
+                        };
+                    });
 
                     renderTrendsChart(weeklyDays, datasets); // Render with correct labels
                 } else {
@@ -113,24 +124,37 @@ document.addEventListener('DOMContentLoaded', () => {
                     allMonths.forEach(month => {
                         data.filter(entry => new Date(entry.month).toLocaleString('default', { month: 'short' }) === month)
                             .forEach(entry => {
+                                console.log(entry);  // Log each entry to inspect the structure
+
+                                // Default emoji if categoryIcon is missing
+                                const icon = entry.categoryIcon || '📦';  // Default icon (box emoji)
+
                                 if (!categoryData[entry.categoryName]) {
-                                    categoryData[entry.categoryName] = Array(12).fill(0);
+                                    categoryData[entry.categoryName] = {
+                                        icon: icon,  // Use icon
+                                        amounts: Array(12).fill(0)
+                                    };
                                 }
                                 const monthIndex = allMonths.indexOf(month);
                                 if (monthIndex !== -1) {
-                                    categoryData[entry.categoryName][monthIndex] = entry.totalAmount;
+                                    categoryData[entry.categoryName].amounts[monthIndex] = entry.totalAmount;
                                 }
                             });
                     });
 
-                    const datasets = Object.entries(categoryData).map(([categoryName, data]) => ({
-                        label: categoryName,
-                        data: data,
-                        borderColor: `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 1)`,
-                        backgroundColor: 'rgba(0,0,0,0)',
-                        fill: true,
-                        tension: 0.5,
-                    }));
+                    const datasets = Object.entries(categoryData).map(([categoryName, data]) => {
+                        const totalAmountForCategory = data.amounts.reduce((sum, value) => sum + value, 0); 
+                        const labelWithIcon = `${data.icon} ${categoryName} ₱ ${totalAmountForCategory.toFixed(2)}`; 
+
+                        return {
+                            label: labelWithIcon,
+                            data: data.amounts,
+                            borderColor: `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 1)`,
+                            backgroundColor: 'rgba(0,0,0,0)',
+                            fill: true,
+                            tension: 0.5,
+                        };
+                    });
 
                     renderTrendsChart(allMonths, datasets);
                 }
@@ -138,12 +162,20 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(error => console.error(`Error fetching ${view} trends data:`, error));
     };
 
+
     // Attach to global scope
     window.changeTrendView = changeTrendView;
 
-
     // Initial load: Monthly trends by default
     changeTrendView('monthly');
+
+    // Listen for change event on the select dropdown to change trend view
+    const trendFilterSelect = document.getElementById('trendFilter');
+    if (trendFilterSelect) {
+        trendFilterSelect.addEventListener('change', (event) => {
+            changeTrendView(event.target.value);
+        });
+    }
 
     const renderMonthlyExpenseChart = () => {
         const expenseUrl = '/Transaction/GetMonthlyExpense';
@@ -229,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderMonthlyExpenseChart();
     renderMonthlyIncomeChart();
 
-}); 
+});
 function toggleDropdown() {
     const dropdown = document.getElementById('trendsDropdownMenu');
     const isHidden = dropdown.classList.contains('hidden');
@@ -237,8 +269,26 @@ function toggleDropdown() {
     if (isHidden) {
         dropdown.classList.remove('hidden', 'opacity-0');
         dropdown.classList.add('block', 'opacity-100');
+        // Add event listener to close dropdown when clicking outside
+        document.addEventListener('click', handleOutsideClick);
     } else {
-        dropdown.classList.remove('block', 'opacity-100');
-        dropdown.classList.add('hidden', 'opacity-0');
+        closeDropdown(dropdown);
+    }
+}
+
+function closeDropdown(dropdown) {
+    dropdown.classList.remove('block', 'opacity-100');
+    dropdown.classList.add('hidden', 'opacity-0');
+    // Remove the outside click listener to avoid duplicate listeners
+    document.removeEventListener('click', handleOutsideClick);
+}
+
+function handleOutsideClick(event) {
+    const dropdown = document.getElementById('trendsDropdownMenu');
+    const dropdownButton = document.getElementById('dropdownButton'); // Update with the actual button's ID
+
+    // Check if the click is outside the dropdown and button
+    if (!dropdown.contains(event.target) && !dropdownButton.contains(event.target)) {
+        closeDropdown(dropdown);
     }
 }

@@ -60,22 +60,23 @@ namespace ASI.Basecode.WebApp.Controllers
             var totalIncome = transactions.Where(t => t.TransactionType == "Income" && t.TransactionSort == "Transaction").Sum(t => t.Amount);
             var totalExpense = transactions.Where(t => t.TransactionType == "Expense" && t.TransactionSort == "Transaction").Sum(t => t.Amount);
 
-            // Calculate total wallet balance (total debit)
-            var totalDebit = userWallet.Sum(x => x.WalletBalance);
+            // Calculate net balance (Income - Expense)
+            var netBalance = totalIncome - totalExpense;
 
             // Add totals to ViewBag to display them in the view
-            ViewBag.TotalDebit = totalDebit;
+            ViewBag.NetBalance = netBalance;
             ViewBag.TotalIncome = totalIncome;
             ViewBag.TotalExpense = totalExpense;
 
             if (json)
             {
                 // Return the wallet and transactions in JSON format if requested
-                return Json(new { userWallet, totalIncome, totalExpense });
+                return Json(new { userWallet, totalIncome, totalExpense, netBalance });
             }
 
             // Return the view with wallet data and transaction totals
             return View(userWallet);
         }
+
     }
 }

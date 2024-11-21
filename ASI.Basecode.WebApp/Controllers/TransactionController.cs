@@ -37,7 +37,7 @@ namespace ASI.Basecode.WebApp.Controllers
             }
 
             // Define how many items per page
-            int pageSize = 4;
+            int pageSize = 5;
             int skip = (page - 1) * pageSize;
 
             ViewData["Title"] = "Transactions";
@@ -70,8 +70,8 @@ namespace ASI.Basecode.WebApp.Controllers
             // Calculate the number of items displayed on the current page
             int displayedItems = Math.Min(pageSize, totalTransactions - ((page - 1) * pageSize));
 
-            ViewData["DisplayedItems"] = displayedItems; // Pass this to the view
-            ViewData["TotalTransactions"] = totalTransactions; // Pass the total number of items to the view
+            ViewData["DisplayedItems"] = displayedItems; 
+            ViewData["TotalTransactions"] = totalTransactions;  
 
             return View(paginatedTransactions);
         }
@@ -297,9 +297,9 @@ namespace ASI.Basecode.WebApp.Controllers
             // Filter transactions to only include "Expense" type (string comparison)
             transactions = transactions.Where(t => t.TransactionType == "Expense").ToList();
 
-            // Fetch all categories for the user to map CategoryId to CategoryName
+            // Fetch all categories for the user to map CategoryId to CategoryName and Icon
             var categories = await _categoryService.GetCategoriesAsync(userId.Value);
-            var categoryMap = categories.ToDictionary(c => c.CategoryId, c => c.Name);
+            var categoryMap = categories.ToDictionary(c => c.CategoryId, c => new { c.Name, c.Icon });
 
             // Group transactions by month and category, then calculate totals
             var trends = transactions
@@ -308,7 +308,8 @@ namespace ASI.Basecode.WebApp.Controllers
                 {
                     Month = g.Key.Month,
                     CategoryId = g.Key.CategoryId,
-                    CategoryName = categoryMap.ContainsKey(g.Key.CategoryId) ? categoryMap[g.Key.CategoryId] : "Unknown",
+                    CategoryName = categoryMap.ContainsKey(g.Key.CategoryId) ? categoryMap[g.Key.CategoryId].Name : "Unknown",
+                    CategoryIcon = categoryMap.ContainsKey(g.Key.CategoryId) ? categoryMap[g.Key.CategoryId].Icon : "📦", // Add icon
                     TotalAmount = g.Sum(t => t.Amount)  // Sum up amounts per category per month
                 })
                 .OrderBy(x => x.Month)
@@ -317,6 +318,7 @@ namespace ASI.Basecode.WebApp.Controllers
 
             return Json(trends);
         }
+
 
         [HttpGet]
         public async Task<IActionResult> GetWeeklyTrends()
@@ -333,7 +335,7 @@ namespace ASI.Basecode.WebApp.Controllers
             transactions = transactions.Where(t => t.TransactionType == "Expense").ToList();
 
             var categories = await _categoryService.GetCategoriesAsync(userId.Value);
-            var categoryMap = categories.ToDictionary(c => c.CategoryId, c => c.Name);
+            var categoryMap = categories.ToDictionary(c => c.CategoryId, c => new { c.Name, c.Icon });
 
             // Define the order of days (Monday to Sunday)
             var dayOrder = new[] { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
@@ -356,7 +358,8 @@ namespace ASI.Basecode.WebApp.Controllers
                 {
                     Day = g.Key.DayOfWeek,  // "Mon", "Tue", etc.
                     CategoryId = g.Key.CategoryId,
-                    CategoryName = categoryMap.ContainsKey(g.Key.CategoryId) ? categoryMap[g.Key.CategoryId] : "Unknown",
+                    CategoryName = categoryMap.ContainsKey(g.Key.CategoryId) ? categoryMap[g.Key.CategoryId].Name : "Unknown",
+                    CategoryIcon = categoryMap.ContainsKey(g.Key.CategoryId) ? categoryMap[g.Key.CategoryId].Icon : "📦", // Add icon
                     TotalAmount = g.Sum(t => t.Amount)
                 })
                 .OrderBy(x => Array.IndexOf(dayOrder, x.Day)) // Sort days properly
@@ -372,6 +375,7 @@ namespace ASI.Basecode.WebApp.Controllers
                         Day = day,
                         CategoryId = c.CategoryId,
                         CategoryName = c.Name,
+                        CategoryIcon = c.Icon, 
                         TotalAmount = trends
                             .FirstOrDefault(t => t.Day == day && t.CategoryId == c.CategoryId)?.TotalAmount ?? 0 // Handle missing data
                     }))
@@ -381,6 +385,7 @@ namespace ASI.Basecode.WebApp.Controllers
 
             return Json(completeTrends);
         }
+
 
         [HttpGet]
         public async Task<IActionResult> GetMonthlyExpense()
