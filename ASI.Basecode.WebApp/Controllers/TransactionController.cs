@@ -4,6 +4,8 @@ using ASI.Basecode.Services.ServiceModels;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -289,25 +291,35 @@ namespace ASI.Basecode.WebApp.Controllers
                 return BadRequest("Invalid user ID.");
             }
 
+            // Fetch all transactions for the user
             var transactions = await _transactionService.GetAllTransactionsAsync(userId.Value);
 
-            // Group transactions by month and calculate totals for income and expense
+            // Filter transactions to only include "Expense" type (string comparison)
+            transactions = transactions.Where(t => t.TransactionType == "Expense").ToList();
+
+            // Fetch all categories for the user to map CategoryId to CategoryName
+            var categories = await _categoryService.GetCategoriesAsync(userId.Value);
+            var categoryMap = categories.ToDictionary(c => c.CategoryId, c => c.Name);
+
+            // Group transactions by month and category, then calculate totals
             var trends = transactions
-                .GroupBy(t => t.TransactionDate.ToString("yyyy-MM")) // Group by month (e.g., "2024-11")
+                .GroupBy(t => new { Month = t.TransactionDate.ToString("yyyy-MM"), t.CategoryId }) // Group by month and category
                 .Select(g => new
                 {
-                    Month = g.Key,
-                    TotalExpense = g.Where(t => t.TransactionType == "Expense").Sum(t => t.Amount),
-                    TotalIncome = g.Where(t => t.TransactionType == "Income").Sum(t => t.Amount)
+                    Month = g.Key.Month,
+                    CategoryId = g.Key.CategoryId,
+                    CategoryName = categoryMap.ContainsKey(g.Key.CategoryId) ? categoryMap[g.Key.CategoryId] : "Unknown",
+                    TotalAmount = g.Sum(t => t.Amount)  // Sum up amounts per category per month
                 })
                 .OrderBy(x => x.Month)
+                .ThenBy(x => x.CategoryName)
                 .ToList();
 
             return Json(trends);
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetMonthlyExpense()
+        public async Task<IActionResult> GetWeeklyTrends()
         {
             var userId = GetUserId();
             if (userId == null)
@@ -317,7 +329,70 @@ namespace ASI.Basecode.WebApp.Controllers
 
             var transactions = await _transactionService.GetAllTransactionsAsync(userId.Value);
 
-            // Group expenses by month
+            // Filter transactions to only include "Expense" type (string comparison)
+            transactions = transactions.Where(t => t.TransactionType == "Expense").ToList();
+
+            var categories = await _categoryService.GetCategoriesAsync(userId.Value);
+            var categoryMap = categories.ToDictionary(c => c.CategoryId, c => c.Name);
+
+            // Define the order of days (Monday to Sunday)
+            var dayOrder = new[] { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+
+            // Get the list of categories that are actually used in the transactions
+            var usedCategories = transactions
+                .GroupBy(t => t.CategoryId)
+                .Select(g => g.Key)
+                .ToList();
+
+            // Group transactions by day of the week and category
+            var trends = transactions
+                .Where(t => usedCategories.Contains(t.CategoryId)) // Only include categories present in transactions
+                .GroupBy(t => new
+                {
+                    DayOfWeek = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedDayName(t.TransactionDate.DayOfWeek), // Get day abbreviation
+                    t.CategoryId
+                })
+                .Select(g => new
+                {
+                    Day = g.Key.DayOfWeek,  // "Mon", "Tue", etc.
+                    CategoryId = g.Key.CategoryId,
+                    CategoryName = categoryMap.ContainsKey(g.Key.CategoryId) ? categoryMap[g.Key.CategoryId] : "Unknown",
+                    TotalAmount = g.Sum(t => t.Amount)
+                })
+                .OrderBy(x => Array.IndexOf(dayOrder, x.Day)) // Sort days properly
+                .ThenBy(x => x.CategoryName) // Sort categories alphabetically
+                .ToList();
+
+            // Ensure all days are present, with default values for missing data
+            var completeTrends = dayOrder
+                .SelectMany(day => categories
+                    .Where(c => usedCategories.Contains(c.CategoryId)) // Only include categories used in transactions
+                    .Select(c => new
+                    {
+                        Day = day,
+                        CategoryId = c.CategoryId,
+                        CategoryName = c.Name,
+                        TotalAmount = trends
+                            .FirstOrDefault(t => t.Day == day && t.CategoryId == c.CategoryId)?.TotalAmount ?? 0 // Handle missing data
+                    }))
+                .OrderBy(x => Array.IndexOf(dayOrder, x.Day))
+                .ThenBy(x => x.CategoryName)
+                .ToList();
+
+            return Json(completeTrends);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetMonthlyExpense()
+        {
+            var userId = GetUserId();
+            if (userId == null)
+            {
+                return BadRequest(new { Error = "Invalid user ID." });
+            }
+
+            var transactions = await _transactionService.GetAllTransactionsAsync(userId.Value);
+
             var monthlyExpenses = transactions
                 .Where(t => t.TransactionType == "Expense")
                 .GroupBy(t => t.TransactionDate.ToString("yyyy-MM"))
@@ -329,7 +404,13 @@ namespace ASI.Basecode.WebApp.Controllers
                 .OrderBy(x => x.Month)
                 .ToList();
 
-            return Json(monthlyExpenses);
+            return Json(new
+            {
+                TotalExpense = transactions
+                    .Where(t => t.TransactionType == "Expense")
+                    .Sum(t => t.Amount),
+                MonthlyData = monthlyExpenses // Always an array
+            });
         }
 
         [HttpGet]
@@ -338,12 +419,11 @@ namespace ASI.Basecode.WebApp.Controllers
             var userId = GetUserId();
             if (userId == null)
             {
-                return BadRequest("Invalid user ID.");
+                return BadRequest(new { Error = "Invalid user ID." });
             }
 
             var transactions = await _transactionService.GetAllTransactionsAsync(userId.Value);
 
-            // Group income by month
             var monthlyIncome = transactions
                 .Where(t => t.TransactionType == "Income")
                 .GroupBy(t => t.TransactionDate.ToString("yyyy-MM"))
@@ -355,7 +435,13 @@ namespace ASI.Basecode.WebApp.Controllers
                 .OrderBy(x => x.Month)
                 .ToList();
 
-            return Json(monthlyIncome);
+            return Json(new
+            {
+                TotalIncome = transactions
+                    .Where(t => t.TransactionType == "Income")
+                    .Sum(t => t.Amount),
+                MonthlyData = monthlyIncome // Always an array
+            });
         }
     }
 }
