@@ -17,38 +17,65 @@
 
         <!-- Dashboard Cards -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Current Balance -->
             <div class="bg-green-500 border-2 border-gray-900 dark:border-gray-600 shadow-md text-white p-6 rounded-lg">
-                <h3 class="text-s">Current Balance</h3>
-                <p class="mt-10 text-3xl font-bold">₱&nbsp;@String.Format("{0:#,0.00}", @ViewBag.TotalDebit)</p>
+                <h3 class="text-sm">Current Balance</h3>
+                <p class="mt-10 text-3xl font-bold">₱ @String.Format("{0:#,0.00}", ViewBag.TotalDebit)</p>
             </div>
+            <!-- Total Expenses -->
             <div class="bg-red-500 border-2 border-gray-900 dark:border-gray-600 shadow-md text-white p-6 rounded-lg">
-                <h3 class="text-s">Total Expenses</h3>
+                <h3 class="text-sm">Total Expenses</h3>
                 <p class="mt-10 text-3xl font-bold">
-                    <i class="fas fa-angles-up text-3xl font-bold mr-4"></i>₱&nbsp;@String.Format("{0:#,0.00}", @ViewBag.TotalExpense)
+                    <i class="fas fa-angles-up text-3xl font-bold mr-4"></i>₱ @String.Format("{0:#,0.00}", ViewBag.TotalExpense)
                 </p>
             </div>
+            <!-- Total Income -->
             <div class="bg-blue-500 border-2 border-gray-900 dark:border-gray-600 text-white p-6 rounded-lg">
-                <h3 class="text-s">Total Income</h3>
+                <h3 class="text-sm">Total Income</h3>
                 <p class="mt-10 text-3xl font-bold">
-                    <i class="fas fa-angles-down text-3xl font-bold mr-4"></i>₱&nbsp;@String.Format("{0:#,0.00}", @ViewBag.TotalIncome)
+                    <i class="fas fa-angles-down text-3xl font-bold mr-4"></i>₱ @String.Format("{0:#,0.00}", ViewBag.TotalIncome)
                 </p>
             </div>
         </div>
 
-        <!-- Trends and Monthly Charts -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <!-- Trends Chart -->
-            <div class="bg-gray-50 dark:bg-gray-700 dark:text-white p-6 shadow-md rounded-lg">
+        <div class="bg-gray-50 dark:bg-gray-700 dark:text-white p-6 shadow-md rounded-lg mb-8 relative">
+            <!-- Header Section with Dropdown -->
+            <div class="flex justify-between items-center mb-4">
                 <h4 class="font-semibold">Trends</h4>
-                <canvas id="trendsChart" width="400" height="200"></canvas>
-            </div>
+                <!-- Dropdown Button -->
+                <div class="relative">
+                    <button id="dropdownButton"
+                            class="flex items-center justify-center w-8 h-8 bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-white rounded-full shadow hover:bg-gray-300 focus:outline-none focus:ring-4 focus:ring-blue-300"
+                            onclick="toggleDropdown()">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <div id="trendsDropdownMenu"
+                         class="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-700 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 hidden opacity-0 transition-opacity duration-300 z-50">
+                        <ul>
+                            <li class="hover:bg-gray-100 dark:hover:bg-gray-600 px-4 py-2 cursor-pointer"
+                                onclick="changeTrendView('weekly')">
+                                Weekly
+                            </li>
+                            <li class="hover:bg-gray-100 dark:hover:bg-gray-600 px-4 py-2 cursor-pointer"
+                                onclick="changeTrendView('monthly')">
+                                Monthly
+                            </li>
+                        </ul>
+                    </div>
+                </div>
 
+            </div>
+            <!-- Chart -->
+            <canvas id="trendsChart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- Monthly Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <!-- Monthly Expense Chart -->
             <div class="bg-gray-50 dark:bg-gray-700 dark:text-white p-6 shadow-md rounded-lg">
                 <h4 class="font-semibold">Monthly Expense</h4>
                 <canvas id="monthlyExpenseChart" width="400" height="200"></canvas>
             </div>
-
             <!-- Monthly Income Chart -->
             <div class="bg-gray-50 dark:bg-gray-700 dark:text-white p-6 shadow-md rounded-lg">
                 <h4 class="font-semibold">Monthly Income</h4>
@@ -63,12 +90,9 @@
                     <i class="fas fa-plus text-2xl"></i>
                 </button>
             </a>
-
-            <a asp-controller="Transaction" asp-action="Index">
-                <div id="dialog-message" class="fixed bottom-8 right-24 bg-gray-50 dark:bg-gray-700 dark:text-white border-2 border-blue-200 text-gray-700 text-sm rounded-lg p-3 shadow transition-opacity duration-300 opacity-0 mr-2">
-                    Click me to add transaction!
-                </div>
-            </a>
+            <div id="dialog-message" class="fixed bottom-8 right-24 bg-gray-50 dark:bg-gray-700 dark:text-white border-2 border-blue-200 text-sm rounded-lg p-3 shadow transition-opacity duration-300 opacity-0">
+                Click me to add transaction!
+            </div>
         </div>
     </div>
 </div>
