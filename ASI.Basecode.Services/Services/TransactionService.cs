@@ -10,11 +10,13 @@ public class TransactionService : ITransactionService
 {
     private readonly ITransactionRepository _transactionRepository;
     private readonly IWalletRepository _walletRepository;
+    private readonly IBudgetService _budgetService;
 
-    public TransactionService(ITransactionRepository transactionRepository, IWalletRepository walletRepository)
+    public TransactionService(ITransactionRepository transactionRepository, IWalletRepository walletRepository, IBudgetService budgetService)
     {
         _transactionRepository = transactionRepository;
         _walletRepository = walletRepository;
+        _budgetService = budgetService;
     }
 
     public async Task<IEnumerable<TransactionViewModel>> GetAllTransactionsAsync(int userId)
@@ -64,13 +66,33 @@ public class TransactionService : ITransactionService
             throw new Exception("Wallet not found.");
         }
 
-        // Adjust wallet balance for the new transaction
         AdjustWalletBalance(wallet, transaction.Amount, transaction.TransactionType);
 
-        // Save changes
+        if (transaction.TransactionType == "Expense")
+        {
+            // Use BudgetService to fetch and update the budget
+            var budgets = await _budgetService.GetBudgetsAsync(transaction.UserId);
+            var budget = budgets.FirstOrDefault(b => b.CategoryId == transaction.CategoryId);
+
+            if (budget != null)
+            {
+                if (budget.RemainingBudget < transaction.Amount)
+                {
+                    throw new Exception("Transaction exceeds the remaining budget.");
+                }
+
+                budget.RemainingBudget -= transaction.Amount;
+
+                // Update the budget
+                await _budgetService.AddBudgetAsync(budget); // Handle updates through AddBudgetAsync
+            }
+        }
+
         await _walletRepository.UpdateAsync(wallet);
         await _transactionRepository.AddAsync(transaction);
     }
+
+
 
     public async Task UpdateTransactionAsync(TransactionViewModel model)
     {

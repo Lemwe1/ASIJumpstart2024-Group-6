@@ -1,0 +1,67 @@
+@{
+    ViewData["Title"] = "CreateBudget";
+}
+@section styles {
+    <link rel="stylesheet" href="~/css/home.css" />
+}
+@using ASI.Basecode.Data.Models
+@using ASI.Basecode.Services.ServiceModels
+<!-- Budget Modal -->
+<div id="budgetModal" class="hidden fixed z-50 inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
+    <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg w-96">
+        <div class="flex justify-between items-center mb-2">
+            <h2 class="text-2xl font-bold dark:text-white">Add Budget</h2>
+            <button id="closeTransactionModal" class="absolute top-2 right-2 text-gray-400 hover:bg-gray-200 p-2 w-10 rounded-full">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <p class="text-gray-600 mb-4 dark:text-gray-300">Fill out all the fields below to add a budget.</p>
+        <form id="budgetForm">
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="userId" value="@User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value" />
+            <!-- Category Dropdown -->
+            <div class="mb-4">
+                <label for="transactionCategory" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Category <i class="text-red-500">*</i>
+                </label>
+                <select id="transactionCategory" name="CategoryId" required class="dark:bg-gray-700 mt-1 block w-full px-4 py-2 border rounded-md text-gray-900 dark:text-white">
+                    <option class="text-gray-500" value="" disabled>Select category</option>
+
+                    @if (ViewData["Categories"] is List<MCategory> categories && categories.Any(c => c.Type == "Expense"))
+                    {
+                        foreach (var category in categories.Where(c => c.Type == "Expense"))
+                        {
+                            <option value="@category.CategoryId" data-type="@category.Type">@category.Icon @category.Name</option>
+                        }
+                    }
+                    else
+                    {
+                        <option value="" disabled>No categories available</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Budget Amount -->
+            <div class="mb-4">
+                <label for="budgetAmount" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Budget  <i class="text-red-500">*</i></label>
+
+                <div class="relative mt-1">
+                    <!-- Wrapper for the input field and the peso sign -->
+                    <span class="absolute mb-3 ml-2 mt-3 pt-2 transform -translate-y-1/2 text-gray-500 dark:text-gray-300">₱</span>
+                    <input type="number" step="0.01" id="budgetAmount" name="budgetAmount" placeholder="0.00" required class="pl-8 mt-1 block w-full px-4 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300 text-gray-900" />
+                </div>
+
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex justify-end gap-4">
+                <button type="button" id="cancelButton" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500">
+                    Cancel
+                </button>
+                <button type="submit" id="saveBudgetButton" class="px-4 py-2 bg-blue-500 text-gray-300  rounded-lg hover:bg-blue-600">
+                    Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

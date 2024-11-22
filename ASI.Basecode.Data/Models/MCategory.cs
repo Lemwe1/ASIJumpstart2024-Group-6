@@ -7,6 +7,7 @@ namespace ASI.Basecode.Data.Models
     {
         public MCategory()
         {
+            MBudgets = new HashSet<MBudget>();
             MTransactions = new HashSet<MTransaction>();
         }
 
@@ -19,6 +20,7 @@ namespace ASI.Basecode.Data.Models
         public bool IsGlobal { get; set; }
 
         public virtual MUser User { get; set; }
+        public virtual ICollection<MBudget> MBudgets { get; set; }
         public virtual ICollection<MTransaction> MTransactions { get; set; }
     }
 }
