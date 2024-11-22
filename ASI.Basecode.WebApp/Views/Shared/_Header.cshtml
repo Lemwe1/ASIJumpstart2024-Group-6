@@ -1,16 +1,26 @@
 ﻿@using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
+@section styles {
+    <link rel="stylesheet" href="~/css/main.css" />
+}
 <!-- Header -->
 <header class="bg-gray-50 dark:bg-gray-900 p-4 w-full z-40 fixed top-0 left-0 lg:ml-64 ml-10 border-b border-gray-200 dark:border-gray-700">
     <div class="flex justify-between items-center w-full">
-        <div class="flex items-center space-x-4">
-            <button class="text-black dark:text-white focus:outline-none">
+        <div class="flex items-center space-x-4 my-4 relative">
+            <!-- Search Icon -->
+            <button class="text-gray-500 dark:text-gray-300">
                 <i class="fas fa-search text-xl"></i>
             </button>
-            <input type="text" class="p-2 w-80 rounded-lg bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200" placeholder="Search..." />
+            <input id="search-input"
+                   type="text"
+                   class="p-2 w-80 rounded-lg bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 pr-8"
+                   placeholder="Search..." />
+            <!-- Clear Button -->
+            <button id="clear-btn" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-300 hidden">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
 
-        <!-- Wrapping the theme toggle within the flex container to ensure visibility -->
         <div class="flex items-center space-x-4 lg:mr-72 mr-20">
             <label id="theme-toggle" class="inline-flex items-center cursor-pointer">
                 <input type="checkbox" class="sr-only peer" id="theme-checkbox">
@@ -18,12 +28,12 @@
                 <div class="relative w-12 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:bg-blue-600">
                     <!-- Sun Icon with Border and Circle -->
                     <div id="sun-icon" class="w-6 h-6 bg-white border-2 border-gray-300 rounded-full flex items-center justify-center  text-yellow-500 transition-transform transform peer-checked:translate-x-full">
-                        <span class="text-sm">☀️</span> <!-- Emoji for Sun -->
+                        <span class="text-sm">☀️</span> 
                     </div>
 
                     <!-- Moon Icon with Border and Circle -->
                     <div id="moon-icon" class="w-6 h-6 p-2 bg-gray-100 border-2 dark:border-white rounded-full flex items-center justify-center absolute right-1 dark:text-gray-300 transition-transform transform peer-checked:-translate-x-full">
-                        <span class="text-sm">🌑</span> <!-- Emoji for Moon -->
+                        <span class="text-sm">🌑</span> 
                     </div>
 
                 </div>
@@ -65,6 +75,65 @@
             const theme = document.body.classList.contains('dark') ? 'dark' : 'light';
             localStorage.setItem('theme', theme);
         });
+
+        const searchInput = document.getElementById("search-input");
+        const clearButton = document.getElementById("clear-btn");
+
+        searchInput.addEventListener("input", () => {
+            const query = searchInput.value.trim();
+            highlightText(query);
+
+            // Toggle clear button visibility based on input content
+            if (query.length > 0) {
+                clearButton.classList.remove("hidden");
+            } else {
+                clearButton.classList.add("hidden");
+            }
+        });
+
+        clearButton.addEventListener("click", () => {
+            searchInput.value = ""; // Clear input field
+            clearButton.classList.add("hidden"); // Hide the clear button
+            highlightText(""); // Remove all highlights
+        });
+
+        const highlightText = (query) => {
+            // Remove all existing highlights
+            document.querySelectorAll(".highlight").forEach(span => {
+                const parent = span.parentNode;
+                parent.replaceChild(document.createTextNode(span.textContent), span);
+                parent.normalize();
+            });
+
+            if (!query) return; // Exit if search is empty
+
+            // Create a regex pattern for the query
+            const regex = new RegExp(`(${query})`, "gi");
+
+            // Search through all text nodes in the body
+            const elements = Array.from(document.body.querySelectorAll("*"))
+                .filter(el => el !== searchInput && el.offsetParent !== null);
+
+            elements.forEach(element => {
+                element.childNodes.forEach(node => {
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        const originalText = node.nodeValue;
+                        if (regex.test(originalText)) {
+                            // Wrap matched text in <span> with highlight class
+                            const wrapper = document.createElement("div");
+                            wrapper.innerHTML = originalText.replace(
+                                regex,
+                                `<span class="highlight">$1</span>`
+                            );
+                            while (wrapper.firstChild) {
+                                element.insertBefore(wrapper.firstChild, node);
+                            }
+                            element.removeChild(node);
+                        }
+                    }
+                });
+            });
+        };
     });
 
 </script>
