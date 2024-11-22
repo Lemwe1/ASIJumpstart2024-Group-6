@@ -19,22 +19,22 @@
                 </div>
 
                 <!-- Dashboard Cards -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                <div class="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                     <!-- Current Balance -->
-                    <div class="bg-green-500 border-2 border-gray-900 dark:border-gray-600 shadow-md text-white p-4 rounded-lg flex flex-col justify-between h-full">
-                        <h3 class="text-sm font-medium">Net Balance</h3>
+                    <div class="bg-green-500 border-2 border-gray-900 dark:border-gray-600 shadow-md text-white p-3 rounded-lg flex flex-col justify-between h-full">
+                        <h3 class="text-md font-medium">Net Balance</h3>
                         <p class="mt-10 text-2xl font-bold">₱ @String.Format("{0:#,0.00}", ViewBag.NetBalance)</p>
                     </div>
                     <!-- Total Expenses -->
-                    <div class="bg-red-500 border-2 border-gray-900 dark:border-gray-600 shadow-md text-white p-4 rounded-lg flex flex-col justify-between h-full">
-                        <h3 class="text-sm font-medium">Total Expenses</h3>
+                    <div class="bg-red-500 border-2 border-gray-900 dark:border-gray-600 shadow-md text-white p-3 rounded-lg flex flex-col justify-between h-full">
+                        <h3 class="text-md font-medium">Total Expenses</h3>
                         <p class="mt-10 text-2xl font-bold">
                             <i class="fas fa-angles-up text-2xl font-bold mr-2"></i>₱ @String.Format("{0:#,0.00}", ViewBag.TotalExpense)
                         </p>
                     </div>
                     <!-- Total Income -->
-                    <div class="bg-blue-500 border-2 border-gray-900 dark:border-gray-600 text-white p-4 rounded-lg flex flex-col justify-between h-full">
-                        <h3 class="text-sm font-medium">Total Income</h3>
+                    <div class="bg-blue-500 border-2 border-gray-900 dark:border-gray-600 text-white p-3 rounded-lg flex flex-col justify-between h-full">
+                        <h3 class="text-md font-medium">Total Income</h3>
                         <p class="mt-10 text-2xl font-bold">
                             <i class="fas fa-angles-down text-2xl font-bold mr-2"></i>₱ @String.Format("{0:#,0.00}", ViewBag.TotalIncome)
                         </p>
@@ -79,7 +79,7 @@
             </div>
 
             <!-- Budgets Section -->
-            <div class="w-72 bg-gray-50 dark:bg-gray-800 p-4 border-l-2 border-gray-300 dark:border-gray-600 flex flex-col justify-start">
+            <div class="w-72 bg-gray-50 dark:bg-gray-900 my-2 p-4 border-2 border-gray-300 dark:border-gray-600  justify-start overflow-y-auto">
                 <h3 class="text-xl font-semibold dark:text-white mb-4">Budgets</h3>
 
                 <!-- Add Budget Button Card -->
@@ -131,7 +131,7 @@
                     <i class="fas fa-plus text-2xl"></i>
                 </button>
             </a>
-            <div id="dialog-message" class="fixed bottom-8 right-24 bg-blue-600 mr-2 text-white border-2 border-gray-900 dark:border-gray-600 text-sm rounded-lg p-3 shadow transition-opacity duration-300 opacity-0">
+            <div id="dialog-message" class="fixed bottom-8 right-24 bg-blue-600 mr-2 text-white text-sm rounded-lg p-3 shadow transition-opacity duration-300 opacity-0">
                 Click me to add transaction!
             </div>
         </div>
