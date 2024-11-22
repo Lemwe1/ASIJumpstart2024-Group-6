@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ASI.Basecode.Data.Interfaces;
@@ -33,9 +34,13 @@ namespace ASI.Basecode.Data.Repositories
 
         public async Task AddAsync(MBudget budget)
         {
+            if (budget == null)
+                throw new ArgumentNullException(nameof(budget));
+
             await _context.MBudgets.AddAsync(budget);
             await _context.SaveChangesAsync();
         }
+
 
         public async Task UpdateAsync(MBudget budget)
         {

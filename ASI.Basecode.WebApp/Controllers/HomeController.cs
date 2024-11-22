@@ -1,34 +1,27 @@
 ﻿using ASI.Basecode.Data.Models;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
-using ASI.Basecode.WebApp.Mvc;
-using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace ASI.Basecode.WebApp.Controllers
 {
-    public class HomeController : ControllerBase<HomeController>
+    public class HomeController : Controller
     {
         private readonly IWalletService _walletService;
         private readonly ITransactionService _transactionService;
         private readonly IBudgetService _budgetService;
         private readonly ICategoryService _categoryService;
 
-        public HomeController(IHttpContextAccessor httpContextAccessor,
-                              ILoggerFactory loggerFactory,
-                              IConfiguration configuration,
-                              IWalletService walletService,
-                              ITransactionService transactionService,
-                              IBudgetService budgetService,
-                              ICategoryService categoryService,
-                              IMapper mapper = null) : base(httpContextAccessor, loggerFactory, configuration, mapper)
+        public HomeController(
+            IWalletService walletService,
+            ITransactionService transactionService,
+            IBudgetService budgetService,
+            ICategoryService categoryService)
         {
             _walletService = walletService ?? throw new ArgumentNullException(nameof(walletService));
             _transactionService = transactionService ?? throw new ArgumentNullException(nameof(transactionService));
@@ -36,73 +29,132 @@ namespace ASI.Basecode.WebApp.Controllers
             _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
         }
 
+        // GET: /Home/
         public async Task<IActionResult> Index(bool json = false)
         {
-            int userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "UserId").Value);
+            var userId = GetUserId();
+            if (userId == null)
+            {
+                return Unauthorized(new { success = false, message = "User not authenticated." });
+            }
 
-            var wallet = await _walletService.GetWalletAsync(userId);
-            var userWallet = wallet.Where(x => x.UserId == userId).ToList();
+            // Fetch wallets and transactions
+            var wallets = await _walletService.GetWalletAsync(userId.Value);
+            var transactions = await _transactionService.GetAllTransactionsAsync(userId.Value);
+            var budgets = await _budgetService.GetBudgetsAsync(userId.Value);  // Fetch budgets
+            var categories = await _categoryService.GetCategoriesAsync(userId.Value);
 
-            var transactions = await _transactionService.GetAllTransactionsAsync(userId);
+            // Pass data to the view
+            ViewData["Budgets"] = budgets; // Ensure that this is correctly populated
+            ViewData["Categories"] = categories;
 
-            var totalIncome = transactions.Where(t => t.TransactionType == "Income" && t.TransactionSort == "Transaction").Sum(t => t.Amount);
-            var totalExpense = transactions.Where(t => t.TransactionType == "Expense" && t.TransactionSort == "Transaction").Sum(t => t.Amount);
-
+            // Calculate totals
+            var totalIncome = transactions.Where(t => t.TransactionType == "Income").Sum(t => t.Amount);
+            var totalExpense = transactions.Where(t => t.TransactionType == "Expense").Sum(t => t.Amount);
             var netBalance = totalIncome - totalExpense;
 
-            var budgets = await _budgetService.GetBudgetsAsync(userId);
-
+            // Pass totals to ViewBag
             ViewBag.NetBalance = netBalance;
             ViewBag.TotalIncome = totalIncome;
             ViewBag.TotalExpense = totalExpense;
-            ViewData["Budgets"] = budgets;
 
             if (json)
             {
-                return Json(new { userWallet, totalIncome, totalExpense, netBalance, budgets });
+                return Json(new { wallets, totalIncome, totalExpense, netBalance, budgets, categories });
             }
 
-            return View(userWallet);
+            return View(wallets);
         }
 
+
+        // POST: /Home/AddBudget
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddBudget([FromBody] BudgetViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new { message = "Invalid budget data." });
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Invalid budget data.",
+                    errors
+                });
             }
 
             try
             {
+                // Fetch the logged-in user's ID from claims
+                var userClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId");
+                if (userClaim == null)
+                {
+                    return BadRequest(new { success = false, message = "User not authenticated." });
+                }
+
+                model.UserId = int.Parse(userClaim.Value);
+
+                // Call the service to add the budget
                 await _budgetService.AddBudgetAsync(model);
-                return Ok(new { message = "Budget added successfully." });
+
+                return Json(new { success = true, message = "Budget added successfully." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ex.Message });
+                return StatusCode(500, new { success = false, message = $"Server error: {ex.Message}" });
             }
         }
 
+
+        // POST: /Home/UpdateBudget
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateBudget([FromBody] BudgetViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new { message = "Invalid budget data." });
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Invalid budget data.",
+                    errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                });
             }
 
             try
             {
+                // Get the currently logged-in user's ID
+                var userId = GetUserId();
+                if (userId == null)
+                {
+                    return BadRequest(new { success = false, message = "User not authenticated." });
+                }
+
+                model.UserId = userId.Value;
+
                 await _budgetService.UpdateBudgetAsync(model);
-                return Ok(new { message = "Budget updated successfully." });
+                return Json(new { success = true, message = "Budget updated successfully." });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ex.Message });
+                return StatusCode(500, new { success = false, message = $"Server error: {ex.Message}" });
             }
         }
 
+        // Helper method to get the logged-in user's ID
+        private int? GetUserId()
+        {
+            var userClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId");
+            if (userClaim == null)
+            {
+                return null;
+            }
 
+            return int.TryParse(userClaim.Value, out var userId) ? userId : (int?)null;
+        }
     }
 }

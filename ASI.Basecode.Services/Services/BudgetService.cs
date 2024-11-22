@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ASI.Basecode.Data.Interfaces;
 using ASI.Basecode.Data.Models;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
+using Newtonsoft.Json;
 
 namespace ASI.Basecode.Services.Services
 {
@@ -23,25 +25,29 @@ namespace ASI.Basecode.Services.Services
             return budgets.Select(b => new BudgetViewModel
             {
                 BudgetId = b.BudgetId,
-                BudgetName = b.BudgetName,
                 CategoryId = b.CategoryId,
                 UserId = b.UserId,
                 MonthlyBudget = b.MonthlyBudget,
-                RemainingBudget = b.RemainingBudget,
-                CategoryName = b.Category?.Name,
-                CategoryIcon = b.Category?.Icon
+                RemainingBudget = b.RemainingBudget
             });
         }
 
+
         public async Task AddBudgetAsync(BudgetViewModel model)
         {
+            if (model == null)
+                throw new ArgumentNullException(nameof(model), "Budget data is null.");
+
+            if (model.UserId <= 0 || model.CategoryId <= 0 || model.MonthlyBudget <= 0)
+                throw new ArgumentException("Invalid budget details.");
+
             var budget = new MBudget
             {
-                BudgetName = model.BudgetName,
+                BudgetName = $"Budget-{model.CategoryId}", // Temporary name
                 CategoryId = model.CategoryId,
                 UserId = model.UserId,
                 MonthlyBudget = model.MonthlyBudget,
-                RemainingBudget = model.MonthlyBudget
+                RemainingBudget = model.MonthlyBudget // Initialize remaining budget
             };
 
             await _budgetRepository.AddAsync(budget);
@@ -49,18 +55,22 @@ namespace ASI.Basecode.Services.Services
 
         public async Task UpdateBudgetAsync(BudgetViewModel model)
         {
-            var existingBudget = await _budgetRepository.GetByIdAsync(model.BudgetId);
+            if (!model.BudgetId.HasValue)
+                throw new ArgumentException("Budget ID is required for updating a budget.");
+
+            var existingBudget = await _budgetRepository.GetByIdAsync(model.BudgetId.Value);
 
             if (existingBudget == null)
-            {
                 throw new KeyNotFoundException($"Budget with ID {model.BudgetId} not found.");
-            }
 
-            existingBudget.MonthlyBudget = model.MonthlyBudget;
-            existingBudget.RemainingBudget = model.RemainingBudget; // Update remaining budget based on logic
+            // Update properties
             existingBudget.CategoryId = model.CategoryId;
+            existingBudget.MonthlyBudget = model.MonthlyBudget;
+            existingBudget.RemainingBudget = model.RemainingBudget;
 
             await _budgetRepository.UpdateAsync(existingBudget);
         }
+
+
     }
 }
