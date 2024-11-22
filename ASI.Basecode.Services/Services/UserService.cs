@@ -5,10 +5,12 @@ using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.Manager;
 using ASI.Basecode.Services.ServiceModels;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using ASI.Basecode.Data;
 using static ASI.Basecode.Resources.Constants.Enums;
 
 namespace ASI.Basecode.Services.Services
@@ -17,11 +19,15 @@ namespace ASI.Basecode.Services.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<UserService> _logger;
+        private readonly AsiBasecodeDbContext _dbContext;
 
-        public UserService(IUserRepository repository, IMapper mapper)
+        public UserService(AsiBasecodeDbContext dbContext, IUserRepository repository, IMapper mapper, ILogger<UserService> logger)
         {
+            _dbContext = dbContext;
             _mapper = mapper;
             _userRepository = repository;
+            _logger = logger;
         }
 
         public IEnumerable<UserViewModel> RetrieveAll(int? id = null, string firstName = null)
@@ -53,6 +59,7 @@ namespace ASI.Basecode.Services.Services
             };
             return model;
         }
+
         public MUser GetByUserCode(string userCode)
         {
             return _userRepository.GetUsers().SingleOrDefault(u => u.UserCode == userCode && !u.Deleted);
@@ -60,94 +67,102 @@ namespace ASI.Basecode.Services.Services
 
         public MUser GetByEmail(string email)
         {
-            // Retrieve user by email from the repository
             return _userRepository.GetUsers().SingleOrDefault(u => u.Mail == email && !u.Deleted);
         }
 
         public MUser GetByResetToken(string token)
         {
-            // Retrieve user by reset token from the repository
             return _userRepository.GetUsers().SingleOrDefault(u => u.PasswordResetToken == token && u.PasswordResetExpiration > DateTime.Now && !u.Deleted);
         }
 
         public MUser GetByVerificationToken(string token)
         {
-            // Ensure we are correctly filtering for tokens that haven't expired and are not deleted
             return _userRepository.GetUsers().SingleOrDefault(u => u.VerificationToken == token && u.VerificationTokenExpiration > DateTime.Now && !u.Deleted);
         }
 
-
-        /// <summary>
-        /// Adds a new user, including the verification token for email verification.
-        /// </summary>
         public void Add(MUser newUser)
         {
             var newModel = new MUser
             {
                 UserCode = newUser.UserCode,
                 Mail = newUser.Mail,
-                Password = PasswordManager.EncryptPassword(newUser.Password),  // Password is already encrypted
-                UserRole = 1,  // Assuming 1 is for regular users
+                Password = PasswordManager.EncryptPassword(newUser.Password),
+                UserRole = 1,
                 InsDt = DateTime.Now,
                 UpdDt = DateTime.Now,
                 Deleted = false,
-                VerificationToken = newUser.VerificationToken,  // Use the token generated in the controller
-                VerificationTokenExpiration = newUser.VerificationTokenExpiration,  // Use the expiration generated in the controller
-                IsVerified = false  // Account is initially unverified
+                VerificationToken = newUser.VerificationToken,
+                VerificationTokenExpiration = newUser.VerificationTokenExpiration,
+                IsVerified = false
             };
 
             _userRepository.AddUser(newModel);
         }
 
-
-        /// <summary>
-        /// Updates the user details, including resetting or clearing tokens.
-        /// </summary>
         public void Update(MUser model, bool isPasswordUpdate = false)
         {
             var existingData = _userRepository.GetUsers().FirstOrDefault(s => !s.Deleted && s.UserId == model.UserId);
 
             if (existingData != null)
             {
-                // Update UserCode, but avoid overwriting verification tokens unless explicitly provided
                 existingData.UserCode = model.UserCode;
+                existingData.FirstName = model.FirstName ?? existingData.FirstName;
+                existingData.LastName = model.LastName ?? existingData.LastName;
 
-                // Allow updating First Name and Last Name
-                existingData.FirstName = model.FirstName ?? existingData.FirstName;  // Only update if provided
-                existingData.LastName = model.LastName ?? existingData.LastName;     // Only update if provided
-
-                // Update password only if it is part of the operation
                 if (isPasswordUpdate && !string.IsNullOrEmpty(model.Password))
                 {
                     existingData.Password = PasswordManager.EncryptPassword(model.Password);
                 }
 
-                // Update the password reset token and expiration if provided
                 if (!string.IsNullOrEmpty(model.PasswordResetToken))
                 {
                     existingData.PasswordResetToken = model.PasswordResetToken;
                     existingData.PasswordResetExpiration = model.PasswordResetExpiration;
                 }
 
-                // Update the verification token and expiration only if provided
                 if (!string.IsNullOrEmpty(model.VerificationToken))
                 {
                     existingData.VerificationToken = model.VerificationToken;
                     existingData.VerificationTokenExpiration = model.VerificationTokenExpiration;
                 }
 
-                // Optionally, allow updating verification status (if needed)
                 existingData.IsVerified = model.IsVerified;
-
-                // Persist changes to the database
                 _userRepository.UpdateUser(existingData);
             }
         }
 
+        public async Task<bool> UpdateUserInformationAsync(UserViewModel model)
+        {
+            // Fetch the user from the correct DbContext using the provided user ID
+            var user = await _dbContext.MUsers.FindAsync(model.Id);
 
-        /// <summary>
-        /// Deletes the specified identifier.
-        /// </summary>
+            if (user == null)
+            {
+                // Log the error and return false if the user is not found
+                _logger.LogError($"User with ID {model.Id} not found.");
+                return false;
+            }
+
+            // Update the user details
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.Mail = model.Mail;
+
+            try
+            {
+                // Attempt to save the changes to the database
+                await _dbContext.SaveChangesAsync();
+                _logger.LogInformation($"Successfully updated user with ID {model.Id}");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Log any exceptions and return false
+                _logger.LogError($"Error updating user with ID {model.Id}: {ex.Message}");
+                return false;
+            }
+        }
+
         public void Delete(int id)
         {
             _userRepository.DeleteUser(id);
@@ -163,5 +178,4 @@ namespace ASI.Basecode.Services.Services
             return user != null ? LoginResult.Success : LoginResult.Failed;
         }
     }
-
 }

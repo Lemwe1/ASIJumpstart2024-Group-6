@@ -19,7 +19,28 @@
         }
     };
 
+    const setupHoverEffect = () => {
+        const button = document.querySelector('.fixed.bottom-8.right-8');
+        const dialog = document.getElementById('dialog-message');
+
+        if (button && dialog) {
+            button.addEventListener('mouseenter', () => {
+                dialog.classList.remove('opacity-0');
+                dialog.classList.add('opacity-100'); // Fade in on hover
+            });
+
+            button.addEventListener('mouseleave', () => {
+                fadeOutDialog(dialog, 3000); // Fade out after hover
+            });
+        }
+    };
+
+    // Initialize dialog on page load
     initializeDialog();
+
+    // Set up hover effect
+    setupHoverEffect();
+
 
     // Check if 'dark' theme is saved in localStorage or applied on body
     const savedTheme = localStorage.getItem('theme') || 'light';
@@ -144,7 +165,7 @@
 
                     const datasets = Object.entries(categoryData).map(([categoryName, data]) => {
                         const totalAmountForCategory = data.amounts.reduce((sum, value) => sum + value, 0); 
-                        const labelWithIcon = `${data.icon} ${categoryName} ₱ ${totalAmountForCategory.toFixed(2)}`; 
+                        const labelWithIcon = `${data.icon} ${categoryName} - ₱ ${totalAmountForCategory.toFixed(2)}`; 
 
                         return {
                             label: labelWithIcon,
