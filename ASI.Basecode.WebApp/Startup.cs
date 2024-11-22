@@ -108,6 +108,10 @@ namespace ASI.Basecode.WebApp
             // Registering the CategoryService
             services.AddScoped<CategoryService>();
 
+            services.AddScoped<IBudgetService, BudgetService>();
+            services.AddScoped<IBudgetRepository, BudgetRepository>();
+
+
             services.AddScoped<IWalletRepository, WalletRepository>();
             services.AddScoped<WalletService>();
             services.AddScoped<IWalletService, WalletService>();

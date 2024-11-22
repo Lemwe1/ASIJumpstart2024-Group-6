@@ -1,5 +1,6 @@
-﻿using ASI.Basecode.Services.Interfaces;
-using ASI.Basecode.Services.Services;
+﻿using ASI.Basecode.Data.Models;
+using ASI.Basecode.Services.Interfaces;
+using ASI.Basecode.Services.ServiceModels;
 using ASI.Basecode.WebApp.Mvc;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
@@ -7,76 +8,101 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace ASI.Basecode.WebApp.Controllers
 {
-    /// <summary>
-    /// Home Controller
-    /// </summary>
     public class HomeController : ControllerBase<HomeController>
     {
-
         private readonly IWalletService _walletService;
         private readonly ITransactionService _transactionService;
+        private readonly IBudgetService _budgetService;
+        private readonly ICategoryService _categoryService;
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="httpContextAccessor"></param>
-        /// <param name="loggerFactory"></param>
-        /// <param name="configuration"></param>
-        /// <param name="localizer"></param>
-        /// <param name="mapper"></param>
         public HomeController(IHttpContextAccessor httpContextAccessor,
                               ILoggerFactory loggerFactory,
                               IConfiguration configuration,
                               IWalletService walletService,
-                               ITransactionService transactionService,
+                              ITransactionService transactionService,
+                              IBudgetService budgetService,
+                              ICategoryService categoryService,
                               IMapper mapper = null) : base(httpContextAccessor, loggerFactory, configuration, mapper)
         {
             _walletService = walletService ?? throw new ArgumentNullException(nameof(walletService));
-            _transactionService = transactionService;
-
+            _transactionService = transactionService ?? throw new ArgumentNullException(nameof(transactionService));
+            _budgetService = budgetService ?? throw new ArgumentNullException(nameof(budgetService));
+            _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
         }
-
 
         public async Task<IActionResult> Index(bool json = false)
         {
-            // Get the logged-in user's ID
             int userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "UserId").Value);
 
-            // Fetch the wallet data for the logged-in user
             var wallet = await _walletService.GetWalletAsync(userId);
-            var userWallet = wallet
-                .Where(x => x.UserId == userId)
-                .ToList(); // Convert to List<DebitLiabilityViewModel>
+            var userWallet = wallet.Where(x => x.UserId == userId).ToList();
 
-            // Get all transactions (Income and Expense) for the logged-in user
             var transactions = await _transactionService.GetAllTransactionsAsync(userId);
 
-            // Calculate the totals for Income and Expense
             var totalIncome = transactions.Where(t => t.TransactionType == "Income" && t.TransactionSort == "Transaction").Sum(t => t.Amount);
             var totalExpense = transactions.Where(t => t.TransactionType == "Expense" && t.TransactionSort == "Transaction").Sum(t => t.Amount);
 
-            // Calculate net balance (Income - Expense)
             var netBalance = totalIncome - totalExpense;
 
-            // Add totals to ViewBag to display them in the view
+            var budgets = await _budgetService.GetBudgetsAsync(userId);
+
             ViewBag.NetBalance = netBalance;
             ViewBag.TotalIncome = totalIncome;
             ViewBag.TotalExpense = totalExpense;
+            ViewData["Budgets"] = budgets;
 
             if (json)
             {
-                // Return the wallet and transactions in JSON format if requested
-                return Json(new { userWallet, totalIncome, totalExpense, netBalance });
+                return Json(new { userWallet, totalIncome, totalExpense, netBalance, budgets });
             }
 
-            // Return the view with wallet data and transaction totals
             return View(userWallet);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> AddBudget([FromBody] BudgetViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Invalid budget data." });
+            }
+
+            try
+            {
+                await _budgetService.AddBudgetAsync(model);
+                return Ok(new { message = "Budget added successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateBudget([FromBody] BudgetViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Invalid budget data." });
+            }
+
+            try
+            {
+                await _budgetService.UpdateBudgetAsync(model);
+                return Ok(new { message = "Budget updated successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
 
     }
 }

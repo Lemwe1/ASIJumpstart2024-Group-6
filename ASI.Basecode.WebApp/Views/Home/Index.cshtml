@@ -2,8 +2,17 @@
     Layout = "_Layout";
     ViewData["Title"] = "Home Page";
 }
+
+@using ASI.Basecode.Data.Models
+@using ASI.Basecode.Services.ServiceModels
+
 @section styles {
     <link rel="stylesheet" href="~/css/home.css" />
+}
+
+@section scripts {
+    <script src="~/js/budget.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 }
 
 <!-- Sidebar and Content -->
@@ -41,7 +50,7 @@
                     </div>
                 </div>
 
-
+                <!-- Expense Trends Section -->
                 <div class="flex justify-between items-center mb-4">
                     <h4 class="font-medium text-gray-600 text-lg dark:text-gray-300">Expense Trends</h4>
                     <!-- Dropdown Menu -->
@@ -57,6 +66,7 @@
                 <div class="bg-gray-50 dark:bg-gray-700 dark:text-white p-6 rounded-lg mb-4 border border-gray-300 dark:border-gray-600">
                     <canvas id="trendsChart" width="424" style="height: 200px;" class="text-gray-900 dark:text-white text-xl"></canvas>
                 </div>
+
                 <!-- Monthly Charts -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                     <!-- Monthly Expense Chart -->
@@ -88,43 +98,88 @@
                     <span class="text-gray-500 dark:text-gray-300">Add Budget</span>
                 </div>
 
-                <!-- Example Budget Card -->
-                <div class="bg-gray-50 dark:bg-gray-700 pl-2 py-4 pr-3 rounded-lg border-2 border:gray-900 dark:border-gray-600 mb-4 flex flex-col relative">
-                    <!-- Edit Icon -->
-                    <div class="absolute top-2 right-2">
-                        <button class="w-8 h-8 flex items-center justify-center text-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">
-                            <i class="text-gray-900 dark:text-gray-300 text-sm"> Edit</i>
-                        </button>
-                    </div>
-
-                    <!-- Main Card Content -->
-                    <div class="flex items-center">
-                        <!-- Icon Column -->
-                        <div class="w-14 h-14 rounded-lg flex items-center justify-center bg-gray-300 dark:bg-gray-600 text-3xl mr-2">
-                            🚗
-                        </div>
-                        <!-- Text Content -->
-                        <div class="flex-1">
-                            <h5 class="font-semibold text-lg dark:text-white">New Car</h5>
-                            <p class="text-gray-600 dark:text-gray-300 text-sm">Target: ₱50,000</p>
-                        </div>
-                    </div>
-
-                    <!-- Date, Savings, and Progress -->
-                    <div class="mt-4">
-                        <p class="text-sm text-gray-600 dark:text-gray-300">Date: November 2024</p>
-                        <p class="text-sm font-semibold text-green-500">Saving: ₱27,563</p>
-                        <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2 mt-2">
-                            <div class="bg-green-500 h-2 rounded-full" style="width: 55%;"></div>
-                        </div>
-                    </div>
+                <div id="budgetCards">
+                    @if (ViewData["Budgets"] is List<MBudget> budgets && budgets.Any())
+                    {
+                        foreach (var budget in budgets)
+                        {
+                            <div class="budgetCard p-4 rounded-lg bg-gray-50 dark:bg-gray-700 flex flex-col relative mb-4">
+                                <div class="flex justify-between">
+                                    <h4 class="text-lg font-medium">@budget.Category.Name</h4>
+                                    <a href="#" class="text-sm text-blue-500">Edit</a>
+                                </div>
+                                <p class="text-sm text-gray-500">Budget: ₱ @String.Format("{0:#,0}", budget.MonthlyBudget)</p>
+                                <p class="text-sm text-gray-500">Remaning Budget: ₱ @String.Format("{0:#,0}", budget.RemainingBudget)</p>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                                    <div class="bg-blue-500 h-2.5 rounded-full"
+                                         style="width: @((budget.RemainingBudget / budget.MonthlyBudget) * 100)%"></div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-gray-500">No budgets available. Add one now!</p>
+                    }
                 </div>
-
 
             </div>
         </div>
     </div>
 </div>
 
+<!-- Budget Modal -->
+<div id="budgetModal" class="hidden fixed z-50 inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg w-96">
+        <h3 id="modalTitle" class="text-xl font-semibold mb-4 dark:text-white">Add Budget</h3>
+
+        <form id="budgetForm">
+            <!-- Category Dropdown -->
+            <div class="mb-4">
+                <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
+                <select id="transactionCategory" name="CategoryId" required class="dark:bg-gray-700 mt-1 block w-full px-4 py-2 border rounded-md text-gray-900 dark:text-white">
+                    <option class="text-gray-500" value="" disabled>Select category</option>
+
+                    @if (ViewData["Categories"] is List<MCategory> categories && categories.Any(c => c.Type == "Expense"))
+                    {
+                        foreach (var category in categories.Where(c => c.Type == "Expense"))
+                        {
+                            <option value="@category.CategoryId" data-type="@category.Type">@category.Icon @category.Name</option>
+                        }
+                    }
+                    else
+                    {
+                        <option value="" disabled>&#x1F937; No Expense Categories</option>
+                    }
+                </select>
+
+            </div>
+
+            <!-- Budget Amount -->
+            <div class="mb-4">
+                <label for="budgetAmount" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Budget</label>
+                <input type="number" id="budgetAmount" name="budgetAmount"
+                       class="mt-1 block w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                       required>
+            </div>
+
+
+            <!-- Buttons -->
+            <div class="flex justify-end gap-4">
+                <button type="button" id="cancelButton"
+                        class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500">
+                    Cancel
+                </button>
+                <button type="submit" id="saveBudgetButton"
+                        class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                    Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="~/js/home.js" asp-append-version="true"></script>
+

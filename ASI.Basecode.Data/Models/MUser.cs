@@ -7,6 +7,7 @@ namespace ASI.Basecode.Data.Models
     {
         public MUser()
         {
+            MBudgets = new HashSet<MBudget>();
             MCategories = new HashSet<MCategory>();
             MTransactions = new HashSet<MTransaction>();
             MWallets = new HashSet<MWallet>();
@@ -34,6 +35,7 @@ namespace ASI.Basecode.Data.Models
         public string VerificationToken { get; set; }
         public DateTime? VerificationTokenExpiration { get; set; }
 
+        public virtual ICollection<MBudget> MBudgets { get; set; }
         public virtual ICollection<MCategory> MCategories { get; set; }
         public virtual ICollection<MTransaction> MTransactions { get; set; }
         public virtual ICollection<MWallet> MWallets { get; set; }
