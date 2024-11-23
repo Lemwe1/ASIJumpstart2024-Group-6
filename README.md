@@ -85,6 +85,19 @@ CREATE TABLE M_Transaction (
 
 ================================================
 
+CREATE TABLE M_Budgets (
+    BudgetId INT PRIMARY KEY IDENTITY(1,1),
+    BudgetName NVARCHAR(50) NOT NULL,
+    CategoryId INT NOT NULL,
+    UserId INT NOT NULL,
+    MonthlyBudget DECIMAL(18,2) NOT NULL,
+    RemainingBudget DECIMAL(18,2) NOT NULL,
+    FOREIGN KEY (CategoryId) REFERENCES M_Category(CategoryId),
+    FOREIGN KEY (UserId) REFERENCES M_User(UserId)
+);
+
+
+================================================
 SCAFFOLDING 
 
 Scaffold-DbContext "Addr=(LocalDB)\MSSQLLocalDB;database=AsiBasecodeDb;Integrated Security=False;Trusted_Connection=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -ContextDir . -F
