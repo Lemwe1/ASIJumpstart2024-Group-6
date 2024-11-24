@@ -74,12 +74,17 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     function populateEditModalFields(budget) {
-        const { budgetId, MonthlyBudget, categoryId } = budget;
+        const { budgetId, monthlyBudget, categoryId } = budget;
 
         document.getElementById('budgetId').value = budgetId;
-        document.getElementById('editBudgetAmount').value = MonthlyBudget ? MonthlyBudget.toFixed(2) : '0.00';
+        // Ensure MonthlyBudget is a number before calling .toFixed()
+        const formattedMonthlyBudget = isNaN(monthlyBudget) ? 0.00 : parseFloat(monthlyBudget).toFixed(2);
+        document.getElementById('editBudgetAmount').value = formattedMonthlyBudget;
         document.getElementById('editBudgetCategory').value = categoryId || '';
+
+        console.log("Budget data:", budget);
     }
+
 
     // Handle form submission for adding a budget
     function handleBudgetFormSubmit(e) {
@@ -144,12 +149,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // Handle budget deletion
     document.getElementById('deleteBudgetButton').addEventListener('click', async function () {
         const id = parseInt(document.getElementById('budgetId').value, 10);
+        console.log("Budget ID to be deleted:", id);
 
-        if (!id) {
-            console.error('No budget ID specified for deletion.');
+        if (isNaN(id) || id <= 0) {
+            console.error('Invalid budget ID specified for deletion.');
             Swal.fire({
                 title: 'Error',
-                text: 'No budget selected for deletion.',
+                text: 'Invalid budget ID. Please try again.',
                 icon: 'error',
                 confirmButtonColor: '#3B82F6'
             });
@@ -169,6 +175,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (isConfirmed) {
             const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            if (!token) {
+                console.error('Request verification token missing.');
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Session expired. Please refresh the page and try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#3B82F6'
+                });
+                return;
+            }
 
             try {
                 const response = await fetch('/Home/DeleteBudget', {
@@ -211,5 +228,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+
+    document.getElementById('editBudgetForm').addEventListener('submit', function (e) {
+        const budgetId = document.getElementById('budgetId').value;
+        console.log('Budget ID being sent:', budgetId);
+    });
 
 });

@@ -24,7 +24,7 @@
                 <label for="budgetCategory" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Category <i class="text-red-500">*</i>
                 </label>
-                <select id="budgetCategory" name="CategoryId" required class="dark:bg-gray-700 mt-1 block w-full p-2 border rounded-md text-gray-900 dark:text-white">
+                <select id="budgetCategory" name="CategoryId" required class="dark:bg-gray-700 mt-1 block w-full px-1 py-3 border rounded-md text-gray-900 dark:text-white">
                     <option class="text-gray-500" value="" disabled>Select category</option>
 
                     @if (ViewData["Categories"] is List<MCategory> categories && categories.Any(c => c.Type == "Expense"))
@@ -47,8 +47,8 @@
 
                 <div class="relative mt-1">
                     <!-- Wrapper for the input field and the peso sign -->
-                    <span class="absolute mb-3 ml-2 mt-3 pt-2 transform -translate-y-1/2 text-gray-500 dark:text-gray-300">₱</span>
-                    <input type="number" step="0.01" id="budgetAmount" name="budgetAmount" placeholder="0.00" required class="pl-8 mt-1 block w-full px-4 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300 text-gray-900" />
+                    <span class="absolute mb-3 ml-2 mt-4 pt-2 transform -translate-y-1/2 text-gray-500 dark:text-gray-300">₱</span>
+                    <input type="number" step="0.01" id="budgetAmount" name="budgetAmount" placeholder="0.00" required class="pl-8 mt-1 block w-full px-4 py-3 border rounded-md dark:bg-gray-700 dark:text-gray-300 text-gray-900" />
                 </div>
 
             </div>

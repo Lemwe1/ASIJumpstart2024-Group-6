@@ -210,32 +210,29 @@ namespace ASI.Basecode.WebApp.Controllers
         }
 
 
-        // POST: /Home/DeleteBudget/{id}
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteBudget(int id)
         {
             try
             {
-                // Get user ID
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (string.IsNullOrEmpty(userId))
-                {
-                    return Unauthorized(new { success = false, message = "User is not authenticated." });
-                }
-
                 await _budgetService.DeleteBudgetAsync(id);
-                return Json(new { success = true, message =  "Budget deleted successfully." });
+                return Ok(new { success = true, message = "Budget deleted successfully." });
             }
-            catch (KeyNotFoundException knfEx)
+            catch (ArgumentException ex)
             {
-                return NotFound(new { success = false, message = knfEx.Message });
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { success = false, message = $"Internal server error: {ex.Message}" });
+                Console.WriteLine($"Error occurred: {ex.Message}");
+                return StatusCode(500, new { success = false, message = "An internal server error occurred." });
             }
         }
+
 
         // Helper method to get the logged-in user's ID
         private int? GetUserId()

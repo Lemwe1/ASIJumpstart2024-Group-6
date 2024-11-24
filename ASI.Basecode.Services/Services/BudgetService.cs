@@ -49,7 +49,8 @@ namespace ASI.Basecode.Services.Services
                 CategoryId = model.CategoryId,
                 UserId = model.UserId,
                 MonthlyBudget = model.MonthlyBudget,
-                RemainingBudget = model.MonthlyBudget // Initial remaining budget matches monthly budget
+                RemainingBudget = model.MonthlyBudget 
+
             };
 
             await _budgetRepository.AddAsync(budget);
@@ -74,19 +75,37 @@ namespace ASI.Basecode.Services.Services
             await _budgetRepository.UpdateAsync(existingBudget);
         }
 
-        // Delete a budget by its ID
         public async Task DeleteBudgetAsync(int budgetId)
         {
-            if (budgetId <= 0)
-                throw new ArgumentException("Invalid budget ID.", nameof(budgetId));
+            try
+            {
+                if (budgetId <= 0)
+                    throw new ArgumentException("Invalid budget ID.", nameof(budgetId));
 
-            var existingBudget = await _budgetRepository.GetByIdAsync(budgetId);
+                var existingBudget = await _budgetRepository.GetByIdAsync(budgetId);
 
-            if (existingBudget == null)
-                throw new KeyNotFoundException($"Budget with ID {budgetId} not found.");
+                if (existingBudget == null)
+                    throw new KeyNotFoundException($"Budget with ID {budgetId} not found.");
 
-            await _budgetRepository.DeleteAsync(budgetId);
+                await _budgetRepository.DeleteAsync(budgetId);
+            }
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine($"Validation error: {ex.Message}");
+                throw; // Re-throw to allow higher layers to handle it
+            }
+            catch (KeyNotFoundException ex)
+            {
+                Console.WriteLine($"Entity not found: {ex.Message}");
+                throw; // Re-throw to allow higher layers to handle it
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unexpected error while deleting budget: {ex.Message}");
+                throw; // Re-throw for a 500 response
+            }
         }
+
 
         // Helper method to map MBudget to BudgetViewModel
         private BudgetViewModel MapToViewModel(MBudget model)
