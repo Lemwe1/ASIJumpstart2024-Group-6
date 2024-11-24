@@ -47,5 +47,17 @@ namespace ASI.Basecode.Data.Repositories
             _context.MBudgets.Update(budget);
             await _context.SaveChangesAsync();
         }
+
+        public async Task DeleteAsync(int budgetId)
+        {
+            var budget = await _context.MBudgets.FirstOrDefaultAsync(b => b.BudgetId == budgetId);
+
+            // If the budget is found, remove it from the context
+            if (budget != null)
+            {
+                _context.MBudgets.Remove(budget);
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }

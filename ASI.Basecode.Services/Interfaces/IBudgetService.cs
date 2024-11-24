@@ -7,7 +7,11 @@ namespace ASI.Basecode.Services.Interfaces
     public interface IBudgetService
     {
         Task<IEnumerable<BudgetViewModel>> GetBudgetsAsync(int userId);
+        Task<BudgetViewModel> GetBudgetByIdAsync(int model);
         Task AddBudgetAsync(BudgetViewModel model);
-        Task UpdateBudgetAsync(BudgetViewModel model); // Add this method
+        Task UpdateBudgetAsync(BudgetViewModel model);
+        Task DeleteBudgetAsync(int id);
+
+
     }
 }

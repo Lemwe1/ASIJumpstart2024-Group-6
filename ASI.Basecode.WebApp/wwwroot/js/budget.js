@@ -1,80 +1,215 @@
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', function () {
+
+    // Add modal elements
+    const addBudgetModal = document.getElementById('addBudgetModal');
+    const addForm = document.getElementById('budgetForm');
+
+    // Edit modal elements
+    const editBudgetModal = document.getElementById('editBudgetModal');
+    const editForm = document.getElementById('editBudgetForm');
+
+    // Function to open the Add Budget modal
+    function openAddBudgetModal() {
+        addBudgetModal.classList.remove('hidden');
+        addBudgetModal.classList.add('flex');
+        document.body.classList.add('overflow-hidden');
+        resetAddFormFields();
+    }
+
+    // Function to open the Edit Budget modal
+    function openEditBudgetModal(budget) {
+        editBudgetModal.classList.remove('hidden');
+        editBudgetModal.classList.add('flex');
+        document.body.classList.add('overflow-hidden');
+        populateEditModalFields(budget);
+    }
+
     // Open modal for adding budget
-    $('#addBudgetButton').on('click', function () {
-        $('#budgetModal').removeClass('hidden'); // Show the modal
-        $('#modalTitle').text('Add Budget'); // Set the modal title to "Add Budget"
-        $('#budgetForm')[0].reset(); // Reset the form fields
-        $('#transactionCategory').val(''); // Clear the category dropdown
-        $('#budgetAmount').val(''); // Clear the input field for budget amount
-        $('#budgetForm').data('edit', false); // Mark as 'add' (not editing)
+    document.getElementById('addBudgetButton').addEventListener('click', function () {
+        openAddBudgetModal();
     });
 
-    // Open modal for editing budget
-    $(document).on('click', '.editBudgetButton', function () {
-        const id = $(this).data('id');
-        const category = $(this).data('category');
-        const budget = $(this).data('budget');
-
-        $('#budgetModal').removeClass('hidden'); // Show the modal
-        $('#modalTitle').text('Edit Budget'); // Set the modal title to "Edit Budget"
-        $('#transactionCategory').val(category); // Set the category in the dropdown
-        $('#budgetAmount').val(budget); // Set the budget amount
-        $('#budgetForm').data('edit', true).data('id', id); // Mark as 'edit' and store the budget ID
+    // Edit budget buttons
+    document.querySelectorAll('.editBudgetButton').forEach(button => {
+        button.addEventListener('click', () => {
+            const budgetId = button.getAttribute('data-id');
+            fetchBudget(budgetId);
+        });
     });
 
-    // Close modal
-    $('#cancelButton').on('click', function () {
-        $('#budgetModal').addClass('hidden'); // Hide the modal when clicking Cancel
+    // Fetch budget for editing
+    async function fetchBudget(budgetId) {
+        try {
+            const response = await fetch(`/Home/GetBudget/${budgetId}`);
+            const result = await response.json();
+
+            if (result.success) {
+                const budget = result.data;
+                openEditBudgetModal(budget);
+            } else {
+                console.error('Error fetching budget:', result.message);
+                alert(result.message);
+            }
+        } catch (error) {
+            console.error('Error fetching budget:', error);
+            alert('Error fetching budget data.');
+        }
+    }
+
+    function resetAddFormFields() {
+        document.getElementById('budgetAmount').value = '';
+        document.getElementById('budgetCategory').value = '';
+    }
+
+    // Close add modal
+    document.getElementById('closeBudgetModalBtn').addEventListener('click', function () {
+        addBudgetModal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
     });
 
-    // Handle form submission
-    $('#budgetForm').on('submit', function (e) {
-        e.preventDefault(); // Prevent default form submission
+    // Close edit modal
+    document.getElementById('closeEditBudgetModalBtn').addEventListener('click', function () {
+        editBudgetModal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    });
 
-        const isEdit = $('#budgetForm').data('edit'); // Check if we're editing
-        const userId = $('#userId').val(); // Get the UserId from the hidden input field
+    function populateEditModalFields(budget) {
+        const { budgetId, MonthlyBudget, categoryId } = budget;
+
+        document.getElementById('budgetId').value = budgetId;
+        document.getElementById('editBudgetAmount').value = MonthlyBudget ? MonthlyBudget.toFixed(2) : '0.00';
+        document.getElementById('editBudgetCategory').value = categoryId || '';
+    }
+
+    // Handle form submission for adding a budget
+    function handleBudgetFormSubmit(e) {
+        e.preventDefault();
+
+        const userId = document.getElementById('userId').value;
         const data = {
-            BudgetId: isEdit ? $('#budgetForm').data('id') : null, // Use ID if editing
-            CategoryId: parseInt($('#transactionCategory').val(), 10), // Ensure CategoryId is an integer
-            MonthlyBudget: parseFloat($('#budgetAmount').val()), // Ensure MonthlyBudget is a float
-            UserId: parseInt(userId, 10) // Ensure UserId is an integer
+            BudgetId: null, // Null for adding
+            CategoryId: parseInt(document.getElementById('budgetCategory').value, 10),
+            MonthlyBudget: parseFloat(document.getElementById('budgetAmount').value),
+            UserId: parseInt(userId, 10)
         };
 
-        console.log('Payload:', data); // Log the payload to check the data being sent
+        console.log('Add Budget Payload:', data);
 
-        const url = isEdit ? '/Home/UpdateBudget' : '/Home/AddBudget'; // Choose the correct API endpoint based on whether it's an edit or add
-        const method = isEdit ? 'PUT' : 'POST'; // Use PUT for editing, POST for adding
-
-        // Send the AJAX request
-        $.ajax({
+        fetch('/Home/AddBudget', {
+            method: 'POST',
             headers: {
-                "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val() // Include the CSRF token
+                "Content-Type": "application/json",
+                "RequestVerificationToken": document.querySelector('input[name="__RequestVerificationToken"]').value
             },
-            url: url,
-            type: method,
-            contentType: 'application/json',
-            data: JSON.stringify(data), // Send data as a JSON string
-            success: function (response) {
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .then(data => {
                 Swal.fire({
                     icon: 'success',
                     title: 'Success',
-                    text: response.message, // Show success message
+                    text: data.message
                 }).then(() => {
-                    location.reload(); // Reload the page to reflect changes
+                    location.reload();
                 });
-            },
-            error: function (error) {
-                console.error('Full Error Response:', error); // Log full error response for debugging
-                let errorMessage = 'An unknown error occurred. Please try again.';
-                if (error.responseJSON) {
-                    errorMessage = error.responseJSON.message || error.responseJSON.errors?.join(', ') || errorMessage;
-                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: errorMessage, // Display error message
+                    text: error.message || 'An unknown error occurred. Please try again.'
+                });
+            });
+    }
+
+    // Handle add form submission
+    document.getElementById('addBudgetForm').addEventListener('submit', handleBudgetFormSubmit);
+
+    // Close the modal if clicked outside the modal content
+    addBudgetModal.addEventListener('click', function (event) {
+        if (event.target === addBudgetModal) {
+            addBudgetModal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+    });
+
+    editBudgetModal.addEventListener('click', function (event) {
+        if (event.target === editBudgetModal) {
+            editBudgetModal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+    });
+
+    // Handle budget deletion
+    document.getElementById('deleteBudgetButton').addEventListener('click', async function () {
+        const id = parseInt(document.getElementById('budgetId').value, 10);
+
+        if (!id) {
+            console.error('No budget ID specified for deletion.');
+            Swal.fire({
+                title: 'Error',
+                text: 'No budget selected for deletion.',
+                icon: 'error',
+                confirmButtonColor: '#3B82F6'
+            });
+            return;
+        }
+
+        const { isConfirmed } = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you really want to delete this budget?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#a6a6a6',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel!'
+        });
+
+        if (isConfirmed) {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            try {
+                const response = await fetch('/Home/DeleteBudget', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': token
+                    },
+                    body: JSON.stringify({ id: id }) // Send the budget ID in the request body
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    Swal.fire({
+                        title: 'Success',
+                        text: result.message,
+                        icon: 'success',
+                        confirmButtonColor: '#3B82F6'
+                    }).then(() => {
+                        location.reload(); // Reload to reflect the change
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error',
+                        text: result.message || 'An error occurred during deletion.',
+                        icon: 'error',
+                        confirmButtonColor: '#3B82F6'
+                    });
+                }
+            } catch (error) {
+                console.error('Error deleting budget:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'There was an issue deleting the budget. Please try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#3B82F6'
                 });
             }
-        });
+        }
     });
+
+
 });

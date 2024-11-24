@@ -2,6 +2,16 @@
 #budget-column{
     height:900px;
 }
+.modal-content {
+    max-width: 600px;
+    max-height: 400px;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    background-color: white;
+    border-radius: 8px;
+}
+
 @media (max-width: 768px) {
     #addModalContent {
         max-width: 90%;

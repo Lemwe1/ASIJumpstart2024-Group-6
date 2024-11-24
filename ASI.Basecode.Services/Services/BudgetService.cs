@@ -4,47 +4,37 @@ using System.Linq;
 using System.Threading.Tasks;
 using ASI.Basecode.Data.Interfaces;
 using ASI.Basecode.Data.Models;
-using ASI.Basecode.Data.Repositories;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
-using Newtonsoft.Json;
 
 namespace ASI.Basecode.Services.Services
 {
     public class BudgetService : IBudgetService
     {
         private readonly IBudgetRepository _budgetRepository;
-        private readonly ITransactionRepository _transactionRepository;
 
-        public BudgetService(IBudgetRepository budgetRepository, ITransactionRepository transactionRepository)
+        public BudgetService(IBudgetRepository budgetRepository)
         {
             _budgetRepository = budgetRepository;
-            _transactionRepository = transactionRepository;
         }
 
+        // Get all budgets for a specific user
         public async Task<IEnumerable<BudgetViewModel>> GetBudgetsAsync(int userId)
         {
-            // Get all budgets from the repository including related data
             var budgets = await _budgetRepository.GetBudgetsByUserIdAsync(userId);
-
-            // Filter budgets by userId and map MBudget to BudgetViewModel
-            var budgetViewModels = budgets
+            return budgets
                 .Where(budget => budget.UserId == userId)
-                .Select(budget => new BudgetViewModel
-                {
-                    BudgetId = budget.BudgetId,
-                    CategoryId = budget.CategoryId,
-                    UserId = budget.UserId,
-                    MonthlyBudget = budget.MonthlyBudget,
-                    RemainingBudget = budget.RemainingBudget,
-                    CategoryName = budget.Category?.Name ?? string.Empty,
-                    CategoryIcon = budget.Category?.Icon ?? string.Empty,
-                    CategoryColor = budget.Category?.Color ?? string.Empty
-                });
-
-            return budgetViewModels;
+                .Select(MapToViewModel); 
         }
 
+        // Get a specific budget by its ID
+        public async Task<BudgetViewModel> GetBudgetByIdAsync(int budgetId)
+        {
+            var budget = await _budgetRepository.GetByIdAsync(budgetId);
+            return budget != null ? MapToViewModel(budget) : null;
+        }
+
+        // Add a new budget
         public async Task AddBudgetAsync(BudgetViewModel model)
         {
             if (model == null)
@@ -55,16 +45,17 @@ namespace ASI.Basecode.Services.Services
 
             var budget = new MBudget
             {
-                BudgetName = $"Budget-{model.CategoryId}", // Temporary name
+                BudgetName = $"Budget-{model.CategoryId}", // Temporary budget name
                 CategoryId = model.CategoryId,
                 UserId = model.UserId,
                 MonthlyBudget = model.MonthlyBudget,
-                RemainingBudget = model.MonthlyBudget // Initialize remaining budget
+                RemainingBudget = model.MonthlyBudget // Initial remaining budget matches monthly budget
             };
 
             await _budgetRepository.AddAsync(budget);
         }
 
+        // Update an existing budget
         public async Task UpdateBudgetAsync(BudgetViewModel model)
         {
             if (!model.BudgetId.HasValue)
@@ -83,6 +74,34 @@ namespace ASI.Basecode.Services.Services
             await _budgetRepository.UpdateAsync(existingBudget);
         }
 
+        // Delete a budget by its ID
+        public async Task DeleteBudgetAsync(int budgetId)
+        {
+            if (budgetId <= 0)
+                throw new ArgumentException("Invalid budget ID.", nameof(budgetId));
 
+            var existingBudget = await _budgetRepository.GetByIdAsync(budgetId);
+
+            if (existingBudget == null)
+                throw new KeyNotFoundException($"Budget with ID {budgetId} not found.");
+
+            await _budgetRepository.DeleteAsync(budgetId);
+        }
+
+        // Helper method to map MBudget to BudgetViewModel
+        private BudgetViewModel MapToViewModel(MBudget model)
+        {
+            return new BudgetViewModel
+            {
+                BudgetId = model.BudgetId,
+                CategoryId = model.CategoryId,
+                UserId = model.UserId,
+                MonthlyBudget = model.MonthlyBudget,
+                RemainingBudget = model.RemainingBudget,
+                CategoryName = model.Category?.Name ?? string.Empty,
+                CategoryIcon = model.Category?.Icon ?? string.Empty,
+                CategoryColor = model.Category?.Color ?? string.Empty
+            };
+        }
     }
 }

@@ -81,7 +81,7 @@
             <!-- Budget Column -->
             <div id="budget-column"class="w-full lg:w-1/3 bg-gray-50 dark:bg-gray-900 p-4 border border-gray-300 dark:border-gray-600 my-4 rounded-lg mr-5 overflow-auto">
                 <h3 class="text-xl font-semibold dark:text-white mb-4">Budgets</h3>
-
+             
                 <!-- Add Budget Button -->
                 <div id="addBudgetButton" class="accountCard p-4 rounded-lg flex flex-col items-center justify-center cursor-pointer relative border-4 border-dashed border-gray-400 dark:border-gray-600 mb-4">
                     <i class="fas fa-plus text-3xl text-gray-400 dark:text-gray-600 mb-2"></i>
@@ -89,13 +89,20 @@
                 </div>
 
                 <!-- Display Budgets -->
-                <div id="budgetCards">   
+                <div id="budgetCards">
                     @if (ViewData["Budgets"] is List<BudgetViewModel> budgets && budgets.Any())
                     {
                         @Html.AntiForgeryToken()
                         foreach (var budget in budgets)
                         {
-                            <div class="budgetCard bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border dark:border-gray-600 mb-4">
+                            <div class="budgetCard bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border dark:border-gray-600 mb-4">
+                                <div class="flex justify-end">
+                                    <button data-id="@budget.BudgetId"
+                                            class="editBudgetButton text-sm p-1 dark:bg-gray-700 text-gray-500 dark:text-gray-300 rounded-lg hover:text-blue-500 focus:outline-none focus:ring-none">
+                                        Edit
+                                    </button>
+                                </div>
+
                                 <div class="flex items-center">
                                     <div class="w-14 h-14 rounded-lg flex items-center justify-center text-3xl mr-4" style="background-color:@budget.CategoryColor">
                                         @budget.CategoryIcon
@@ -136,13 +143,24 @@
                     }
 
                 </div>
-                @Html.Partial("CreateBudget")
+                @Html.Partial("Create")
 
+            </div>
+            <!-- Floating Button -->
+            <div class="relative">
+                <a asp-controller="Transaction" asp-action="Index">
+                    <button class="fixed bottom-8 right-8 bg-blue-500 text-white w-16 h-16 flex items-center justify-center rounded-full shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                        <i class="fas fa-plus text-2xl"></i>
+                    </button>
+                </a>
+                <div id="dialog-message" class="mr-2 fixed bottom-8 right-24 bg-gray-50 dark:bg-gray-700 dark:text-white border-2 border-blue-200 text-sm rounded-lg p-3 shadow transition-opacity duration-300 opacity-0">
+                    Click me to add transaction!
+                </div>
             </div>
         </div>
     </div>
 </div>
-
+@Html.Partial("Edit")
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="~/js/home.js" asp-append-version="true"></script>
