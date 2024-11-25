@@ -169,45 +169,42 @@ namespace ASI.Basecode.WebApp.Controllers
             }
         }
 
-
-        // POST: /Home/UpdateBudget
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateBudget([FromBody] BudgetViewModel model)
+        public async Task<IActionResult> UpdateBudget(int id, [FromBody] BudgetViewModel model)
         {
+            var userId = GetUserId(); // Extract UserId from the claims
+
+            if (userId == null || userId <= 0)
+            {
+                return Unauthorized(new { success = false, message = "UserId must be a positive value." });
+            }
+
+            // Set the UserId in the model (you don't need to pass it in the request body)
+            model.UserId = userId.Value;
+
             if (!ModelState.IsValid)
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = "Invalid budget data.",
-                    errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
-                });
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                return BadRequest(new { success = false, errors });
             }
 
             try
             {
-                // Get the currently logged-in user's ID
-                var userId = GetUserId();
-                if (userId == null)
-                {
-                    return BadRequest(new { success = false, message = "User not authenticated." });
-                }
-
-                model.UserId = userId.Value;
-
+                // Proceed with the service call to update the budget
                 await _budgetService.UpdateBudgetAsync(model);
-                return Json(new { success = true, message = "Budget updated successfully." });
+                return Json(new { success = true });
             }
-            catch (KeyNotFoundException ex)
+            catch (KeyNotFoundException knfEx)
             {
-                return NotFound(new { success = false, message = ex.Message });
+                return NotFound(new { success = false, message = knfEx.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { success = false, message = $"Server error: {ex.Message}" });
+                return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
+
 
 
         [HttpPost]
@@ -215,23 +212,27 @@ namespace ASI.Basecode.WebApp.Controllers
         {
             try
             {
+                var userId = GetUserId();
+                if (userId == null)
+                {
+                    return BadRequest(new { success = false, message = "Invalid user ID." });
+                }
+
+                var existingBudget = await _budgetService.GetBudgetByIdAsync(id);
+                if (existingBudget == null || existingBudget.UserId != userId)
+                {
+                    return NotFound(new { success = false, message = "Budget not found or does not belong to the user." });
+                }
+
                 await _budgetService.DeleteBudgetAsync(id);
                 return Ok(new { success = true, message = "Budget deleted successfully." });
             }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { success = false, message = ex.Message });
-            }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error occurred: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "An internal server error occurred." });
+                return StatusCode(500, new { success = false, message = $"Server error: {ex.Message}" });
             }
         }
+
 
 
         // Helper method to get the logged-in user's ID

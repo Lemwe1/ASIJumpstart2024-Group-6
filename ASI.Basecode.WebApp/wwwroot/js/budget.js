@@ -73,6 +73,21 @@ document.addEventListener('DOMContentLoaded', function () {
         document.body.classList.remove('overflow-hidden');
     });
 
+    // Close the modal if clicked outside the modal content
+    addBudgetModal.addEventListener('click', function (event) {
+        if (event.target === addBudgetModal) {
+            addBudgetModal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+    });
+
+    editBudgetModal.addEventListener('click', function (event) {
+        if (event.target === editBudgetModal) {
+            editBudgetModal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+    });
+
     function populateEditModalFields(budget) {
         const { budgetId, monthlyBudget, categoryId } = budget;
 
@@ -131,107 +146,150 @@ document.addEventListener('DOMContentLoaded', function () {
     // Handle add form submission
     document.getElementById('addBudgetForm').addEventListener('submit', handleBudgetFormSubmit);
 
-    // Close the modal if clicked outside the modal content
-    addBudgetModal.addEventListener('click', function (event) {
-        if (event.target === addBudgetModal) {
-            addBudgetModal.classList.add('hidden');
-            document.body.classList.remove('overflow-hidden');
-        }
-    });
 
-    editBudgetModal.addEventListener('click', function (event) {
-        if (event.target === editBudgetModal) {
-            editBudgetModal.classList.add('hidden');
-            document.body.classList.remove('overflow-hidden');
-        }
-    });
+    // Handle form submission for editing a budget
+    document.getElementById('editBudgetForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-    // Handle budget deletion
-    document.getElementById('deleteBudgetButton').addEventListener('click', async function () {
-        const id = parseInt(document.getElementById('budgetId').value, 10);
-        console.log("Budget ID to be deleted:", id);
+        const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
+        const token = tokenElement ? tokenElement.value : null;
 
-        if (isNaN(id) || id <= 0) {
-            console.error('Invalid budget ID specified for deletion.');
-            Swal.fire({
-                title: 'Error',
-                text: 'Invalid budget ID. Please try again.',
-                icon: 'error',
-                confirmButtonColor: '#3B82F6'
-            });
-            return;
-        }
+        const budgetId = parseInt(document.getElementById('budgetId').value, 10); 
+        const categoryId = parseInt(document.getElementById('editBudgetCategory').value, 10);
+        const monthlyBudget = parseFloat(document.getElementById('editBudgetAmount').value); 
+
+        console.log('Budget ID being sent:', budgetId);
+
+        const data = {
+            BudgetId: budgetId, // Matches backend model property name
+            CategoryId: categoryId,
+            MonthlyBudget: monthlyBudget
+        
+        };
+
+        console.log('Sending data:', JSON.stringify(data));
 
         const { isConfirmed } = await Swal.fire({
             title: 'Are you sure?',
-            text: 'Do you really want to delete this budget?',
+            text: 'Do you really want to edit this budget?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#a6a6a6',
-            confirmButtonText: 'Yes, delete it!',
+            confirmButtonText: 'Yes, edit it!',
             cancelButtonText: 'No, cancel!'
         });
 
         if (isConfirmed) {
-            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-
-            if (!token) {
-                console.error('Request verification token missing.');
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Session expired. Please refresh the page and try again.',
-                    icon: 'error',
-                    confirmButtonColor: '#3B82F6'
-                });
-                return;
-            }
-
             try {
-                const response = await fetch('/Home/DeleteBudget', {
+                                
+                const response = await fetch(`/Home/UpdateBudget/${budgetId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'RequestVerificationToken': token
                     },
-                    body: JSON.stringify({ id: id }) // Send the budget ID in the request body
+                    body: JSON.stringify(data)
                 });
 
-                const result = await response.json();
+                if (response.ok) {
+                    const result = await response.json();
 
-                if (response.ok && result.success) {
-                    Swal.fire({
-                        title: 'Success',
-                        text: result.message,
-                        icon: 'success',
-                        confirmButtonColor: '#3B82F6'
-                    }).then(() => {
-                        location.reload(); // Reload to reflect the change
-                    });
+                    if (result.success) {
+                        Swal.fire({
+                            title: 'Success',
+                            text: 'Budget updated successfully!',
+                            icon: 'success',
+                            confirmButtonColor: '#3B82F6',
+                            customClass: { popup: 'swal2-front' }
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: result.message || 'An error occurred while updating the budget.',
+                            icon: 'error',
+                            customClass: { popup: 'swal2-front' }
+                        });
+                    }
                 } else {
+                    // Debug non-OK HTTP responses
+                    const text = await response.text();
+                    console.error('Error Response Text:', text);
                     Swal.fire({
                         title: 'Error',
-                        text: result.message || 'An error occurred during deletion.',
+                        text: 'Failed to update budget. Please try again.',
                         icon: 'error',
-                        confirmButtonColor: '#3B82F6'
+                        customClass: { popup: 'swal2-front' }
                     });
                 }
             } catch (error) {
-                console.error('Error deleting budget:', error);
+                // Handle unexpected errors
                 Swal.fire({
                     title: 'Error',
-                    text: 'There was an issue deleting the budget. Please try again.',
+                    text: error.message || 'An unexpected error occurred.',
                     icon: 'error',
-                    confirmButtonColor: '#3B82F6'
+                    customClass: { popup: 'swal2-front' }
                 });
             }
         }
     });
 
 
-    document.getElementById('editBudgetForm').addEventListener('submit', function (e) {
-        const budgetId = document.getElementById('budgetId').value;
-        console.log('Budget ID being sent:', budgetId);
+    document.getElementById('deleteBudgetButton').addEventListener('click', async function () {
+        const id = document.getElementById('budgetId').value;
+        console.log('Attempting to delete budget with ID:', id);
+
+        if (!id) {
+            Swal.fire('Error', 'Category ID is missing.', 'error');
+            return;
+        }
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You won\'t be able to revert this!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#e53e3e',
+            cancelButtonColor: '#718096',
+            confirmButtonText: 'Yes, delete it!'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const formData = new FormData();
+                formData.append('__RequestVerificationToken', document.querySelector('#editBudgetForm input[name="__RequestVerificationToken"]').value);
+                console.log('Form data for deletion:', [...formData]);
+
+                try {
+                    const response = await fetch(`/Home/DeleteBudget/${id}`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    console.log('Response from delete budget:', response);
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success) {
+                            
+                            editBudgetModal.classList.add('hidden');
+                            editBudgetModal.classList.remove('flex');
+
+                            Swal.fire('Deleted!', 'Budget has been deleted.', 'success').then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire('Error', result.message || 'Failed to delete budget.', 'error');
+                        }
+                    } else {
+                        const result = await response.json();
+                        Swal.fire('Error', result.message || 'Failed to delete budget.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error deleting budget:', error);
+                    Swal.fire('Error', 'Error occurred while deleting the budget.', 'error');
+                }
+            }
+        });
     });
 
 });

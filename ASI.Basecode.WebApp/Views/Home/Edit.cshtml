@@ -38,7 +38,7 @@
                 <select id="editBudgetCategory" name="CategoryId" required class="dark:bg-gray-700 mt-1 block w-full px-1 py-3 border rounded-md text-gray-900 dark:text-white">
                         <option class="text-gray-500" value="" disabled>Select category</option>
 
-                            @if (ViewData["Categories"] is List<MCategory> categories && categories.Any(c => c.Type == "Expense"))
+                            @if (ViewData["Categories"] is List<MCategory> categories && categories.Any(c => c.Type == "Expense" && c.Name != "Default Expense"))
                             {
                                 foreach (var category in categories.Where(c => c.Type == "Expense"))
                                 {

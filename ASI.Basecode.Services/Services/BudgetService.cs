@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ASI.Basecode.Data.Interfaces;
 using ASI.Basecode.Data.Models;
+using ASI.Basecode.Data.Repositories;
 using ASI.Basecode.Services.Interfaces;
 using ASI.Basecode.Services.ServiceModels;
 
@@ -59,13 +60,23 @@ namespace ASI.Basecode.Services.Services
         // Update an existing budget
         public async Task UpdateBudgetAsync(BudgetViewModel model)
         {
-            if (!model.BudgetId.HasValue)
-                throw new ArgumentException("Budget ID is required for updating a budget.");
+            // Validate UserId
+            if (model.UserId <= 0)
+            {
+                throw new ArgumentException("UserId must be a positive integer.", nameof(model.UserId));
+            }
 
             var existingBudget = await _budgetRepository.GetByIdAsync(model.BudgetId.Value);
-
             if (existingBudget == null)
-                throw new KeyNotFoundException($"Budget with ID {model.BudgetId} not found.");
+            {
+                throw new Exception($"Budget with ID {model.BudgetId.Value} not found.");
+            }
+
+            // Ensure that the user is authorized to update this budget
+            if (existingBudget.UserId != model.UserId)
+            {
+                throw new UnauthorizedAccessException("User is not authorized to update this budget.");
+            }
 
             // Update properties
             existingBudget.CategoryId = model.CategoryId;
@@ -74,6 +85,7 @@ namespace ASI.Basecode.Services.Services
 
             await _budgetRepository.UpdateAsync(existingBudget);
         }
+
 
         public async Task DeleteBudgetAsync(int budgetId)
         {
