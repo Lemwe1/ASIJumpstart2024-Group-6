@@ -96,22 +96,29 @@
                         foreach (var budget in budgets)
                         {
                             <div class="budgetCard bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border dark:border-gray-600 mb-4">
-                                <div class="flex justify-end">
-                                    <button data-id="@budget.BudgetId"
-                                            class="editBudgetButton text-sm p-1 dark:bg-gray-700 text-gray-500 dark:text-gray-300 rounded-lg hover:text-blue-500 focus:outline-none focus:ring-none">
-                                        Edit
-                                    </button>
-                                </div>
 
-                                <div class="flex items-center">
+                                <div class="flex">
+                                    <!-- Category Icon -->
                                     <div class="w-14 h-14 rounded-lg flex items-center justify-center text-3xl mr-4" style="background-color:@budget.CategoryColor">
                                         @budget.CategoryIcon
                                     </div>
+
+                                    <!-- Budget Info Section -->
                                     <div class="flex-1">
                                         <h5 class="font-semibold text-lg dark:text-white">@budget.CategoryName</h5>
                                         <p class="text-gray-600 dark:text-gray-300 text-sm">Budget: <b class="text-blue-400">₱ @budget.MonthlyBudget</b></p>
                                     </div>
+
+                                    <!-- Edit Button at the Top Right -->
+                                    <div class="mt-0">
+                                        <button data-id="@budget.BudgetId"
+                                                class="editBudgetButton text-sm p-1 dark:bg-gray-700 text-gray-500 dark:text-gray-300 rounded-lg hover:text-blue-500 focus:outline-none focus:ring-none">
+                                            Edit
+                                        </button>
+                                    </div>
                                 </div>
+
+
 
                                 <!-- Displaying Remaining Balance or Over Budget -->
                                 <p class="text-sm text-gray-300 mt-4">
