@@ -666,19 +666,25 @@
 
         return response.json().then(result => {
             if (result.success) {
-                // If the response indicates success, show a success alert
-                Swal.fire({
-                    title: 'Success',
-                    text: result.message || 'Transaction processed successfully!',
-                    icon: 'success',
-                    confirmButtonColor: '#3B82F6',
-                    customClass: { popup: 'swal2-front' }
-                }).then(() => {
-                    // Reset modal state and close the modal
+                // Check if there are any changes
+                if (isModalDirty) { // Assuming isModalDirty tracks whether there are changes
+                    Swal.fire({
+                        title: 'Success',
+                        text: result.message || 'Transaction processed successfully!',
+                        icon: 'success',
+                        confirmButtonColor: '#3B82F6',
+                        customClass: { popup: 'swal2-front' }
+                    }).then(() => {
+                        resetModal();
+                        $('#editTransactionModal').modal('hide'); // Close modal
+                        window.location.reload(); // Reload page to reflect changes
+                    });
+                } else {
+                    // If no changes, close the modal and reload the page without showing success alert
                     resetModal();
                     $('#editTransactionModal').modal('hide'); // Close modal
-                    window.location.reload(); // Reload the page to reflect changes
-                });
+                    window.location.reload(); // Reload page
+                }
             } else {
                 // If the response is not successful, show an error alert
                 Swal.fire({
@@ -698,6 +704,7 @@
             });
         });
     }
+
 
 
     // Error handler
