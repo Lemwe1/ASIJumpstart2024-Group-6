@@ -68,22 +68,22 @@
         // Hide pagination only if any filter is applied
         const pagination = document.querySelector('.pagination');
         if (categoryFilter !== 'All' || typeFilter !== 'All') {
-            pagination.style.display = 'none'; 
+            pagination.style.display = 'none';
         } else {
-            pagination.style.display = ''; 
+            pagination.style.display = '';
         }
 
         // Hide item count if category or type is selected or if there are no visible transactions
         const itemCount = document.getElementById('item-count');
         if (categoryFilter !== 'All' || typeFilter !== 'All' || !hasVisibleTransactions) {
-            itemCount.style.display = 'none'; 
+            itemCount.style.display = 'none';
         } else {
-            itemCount.style.display = ''; 
+            itemCount.style.display = '';
         }
 
         // Show "No transactions found" if the filter is set to "All" and there are no transactions
         if (categoryFilter === 'All' && typeFilter === 'All' && !hasVisibleTransactions) {
-            noTransactionsRow.style.display = ''; 
+            noTransactionsRow.style.display = '';
         }
     };
 
@@ -663,30 +663,24 @@
                 throw new Error('An error occurred while processing your request.');
             }
         }
+
         return response.json().then(result => {
             if (result.success) {
-                if (isModalDirty) { // Only show success alert if there are changes
-                    Swal.fire({
-                        title: 'Success',
-                        text: result.message || 'Transaction processed successfully!',
-                        icon: 'success',
-                        confirmButtonColor: '#3B82F6',
-                        customClass: { popup: 'swal2-front' }
-                    }).then(() => {
-                        // Reset modal state
-                        resetModal();
-
-                        // Close the modal and reload the page after SweetAlert is dismissed
-                        $('#editTransactionModal').modal('hide'); // Close modal
-                        window.location.reload(); // Reload page to reflect changes
-                    });
-                } else {
-                    // Reset modal state and close it without success alert if no changes
+                // If the response indicates success, show a success alert
+                Swal.fire({
+                    title: 'Success',
+                    text: result.message || 'Transaction processed successfully!',
+                    icon: 'success',
+                    confirmButtonColor: '#3B82F6',
+                    customClass: { popup: 'swal2-front' }
+                }).then(() => {
+                    // Reset modal state and close the modal
                     resetModal();
                     $('#editTransactionModal').modal('hide'); // Close modal
-                    window.location.reload(); // Reload page to reflect changes
-                }
+                    window.location.reload(); // Reload the page to reflect changes
+                });
             } else {
+                // If the response is not successful, show an error alert
                 Swal.fire({
                     title: 'Error',
                     text: result.message || 'An error occurred.',
@@ -704,6 +698,7 @@
             });
         });
     }
+
 
     // Error handler
     function handleError(error) {
@@ -746,7 +741,7 @@
     // Function to handle deletion of a transaction
     document.querySelectorAll('.deleteTransaction').forEach(button => {
         button.addEventListener('click', async () => {
-            const id = button.getAttribute('data-id'); 
+            const id = button.getAttribute('data-id');
 
             const { isConfirmed } = await Swal.fire({
                 title: 'Delete Transaction',
@@ -859,6 +854,6 @@
         // Now validate the form with the current transaction type value
         validateTransaction(event, editTransactionAmountInput, editTransactionWalletSelect, editErrorMessage, transactionTypeValue);
 
-        console.log('Selected transaction type (Edit):', transactionTypeValue); 
+        console.log('Selected transaction type (Edit):', transactionTypeValue);
     });
 });

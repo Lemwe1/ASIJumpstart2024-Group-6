@@ -3,10 +3,48 @@ document.addEventListener('DOMContentLoaded', function () {
     // Add modal elements
     const addBudgetModal = document.getElementById('addBudgetModal');
     const addForm = document.getElementById('budgetForm');
+    const budgetAmountInput = document.getElementById('budgetAmount')
+
 
     // Edit modal elements
     const editBudgetModal = document.getElementById('editBudgetModal');
     const editForm = document.getElementById('editBudgetForm');
+    const editBudgetAmountInput = document.getElementById('editBudgetAmount')
+
+
+    // Live validation for the budget input
+    function validateBudgetInput(inputElement) {
+        inputElement.addEventListener('input', function () {
+            let amount = parseFloat(inputElement.value);  // Directly parse the input value
+
+            // If the input is not a valid number, treat amount as 0
+            if (isNaN(amount)) {
+                amount = 0;
+            }
+
+            // Check if the amount exceeds the maximum budget limit
+            if (amount > 1_000_000_000_000) {
+                // Show SweetAlert error message
+                Swal.fire({
+                    title: 'Validation Error',
+                    text: `Budget must not exceed 1 thrillion.`,
+                    icon: 'warning',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#3B82F6',
+                });
+
+                // Reset the input field if the value exceeds the limit
+                inputElement.value = '';
+            }
+        });
+    }
+
+    // Apply the live validation to the budget amount input field
+    validateBudgetInput(budgetAmountInput);
+    validateBudgetInput(editBudgetAmountInput);
+
+    // Initialize the flag
+    let isModalDirty = false;
 
     // Function to open the Add Budget modal
     function openAddBudgetModal() {
@@ -113,7 +151,6 @@ document.addEventListener('DOMContentLoaded', function () {
             UserId: parseInt(userId, 10)
         };
 
-        console.log('Add Budget Payload:', data);
 
         fetch('/Home/AddBudget', {
             method: 'POST',
@@ -147,94 +184,96 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('addBudgetForm').addEventListener('submit', handleBudgetFormSubmit);
 
 
-    // Handle form submission for editing a budget
-    document.getElementById('editBudgetForm').addEventListener('submit', async (e) => {
+
+    // Add event listener to detect changes in the form
+    const editBudgetForm = document.getElementById('editBudgetForm');
+    editBudgetForm.addEventListener('input', () => {
+        isModalDirty = true;  // Set flag to true when any input changes
+    });
+
+    editBudgetForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
         const token = tokenElement ? tokenElement.value : null;
 
-        const budgetId = parseInt(document.getElementById('budgetId').value, 10); 
+        const budgetId = parseInt(document.getElementById('budgetId').value, 10);
         const categoryId = parseInt(document.getElementById('editBudgetCategory').value, 10);
-        const monthlyBudget = parseFloat(document.getElementById('editBudgetAmount').value); 
+        const monthlyBudget = parseFloat(document.getElementById('editBudgetAmount').value);
+        const userId = document.getElementById('userId').value;
 
-        console.log('Budget ID being sent:', budgetId);
+        // Check if the form is dirty (i.e., the user has made changes)
+        if (!isModalDirty) {
+            $('#editBudgetModal').modal('hide');
+            window.location.reload();
+            return;
+        }
 
+        // Prepare the data for the update
         const data = {
-            BudgetId: budgetId, // Matches backend model property name
+            BudgetId: budgetId,
             CategoryId: categoryId,
-            MonthlyBudget: monthlyBudget
-        
+            MonthlyBudget: monthlyBudget,
+            UserId: parseInt(userId, 10)
         };
 
-        console.log('Sending data:', JSON.stringify(data));
+        try {
+            const response = await fetch(`/Home/UpdateBudget/${budgetId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                },
+                body: JSON.stringify(data)
+            });
 
-        const { isConfirmed } = await Swal.fire({
-            title: 'Are you sure?',
-            text: 'Do you really want to edit this budget?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#a6a6a6',
-            confirmButtonText: 'Yes, edit it!',
-            cancelButtonText: 'No, cancel!'
-        });
+            if (response.ok) {
+                const result = await response.json();
 
-        if (isConfirmed) {
-            try {
-                                
-                const response = await fetch(`/Home/UpdateBudget/${budgetId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'RequestVerificationToken': token
-                    },
-                    body: JSON.stringify(data)
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-
-                    if (result.success) {
-                        Swal.fire({
-                            title: 'Success',
-                            text: 'Budget updated successfully!',
-                            icon: 'success',
-                            confirmButtonColor: '#3B82F6',
-                            customClass: { popup: 'swal2-front' }
-                        }).then(() => {
-                            window.location.reload();
-                        });
-                    } else {
-                        Swal.fire({
-                            title: 'Error',
-                            text: result.message || 'An error occurred while updating the budget.',
-                            icon: 'error',
-                            customClass: { popup: 'swal2-front' }
-                        });
-                    }
+                if (result.success) {
+                    // Show success if the update was successful
+                    Swal.fire({
+                        title: 'Success',
+                        text: 'Budget updated successfully!',
+                        icon: 'success',
+                        confirmButtonColor: '#3B82F6',
+                        customClass: { popup: 'swal2-front' }
+                    }).then(() => {
+                        $('#editBudgetModal').modal('hide');  // Close the modal after success
+                        window.location.reload();  // Optionally reload the page
+                    });
                 } else {
-                    // Debug non-OK HTTP responses
-                    const text = await response.text();
-                    console.error('Error Response Text:', text);
+                    // Show error if the update failed
                     Swal.fire({
                         title: 'Error',
-                        text: 'Failed to update budget. Please try again.',
+                        text: result.message || 'An error occurred while updating the budget.',
                         icon: 'error',
                         customClass: { popup: 'swal2-front' }
                     });
                 }
-            } catch (error) {
-                // Handle unexpected errors
+            } else {
+                // Handle non-OK HTTP responses
+                const text = await response.text();
+                console.error('Error Response Text:', text);
                 Swal.fire({
                     title: 'Error',
-                    text: error.message || 'An unexpected error occurred.',
+                    text: 'Failed to update budget. Please try again.',
                     icon: 'error',
                     customClass: { popup: 'swal2-front' }
                 });
             }
+        } catch (error) {
+            // Handle unexpected errors
+            Swal.fire({
+                title: 'Error',
+                text: error.message || 'An unexpected error occurred.',
+                icon: 'error',
+                customClass: { popup: 'swal2-front' }
+            });
         }
     });
+
+
 
 
     document.getElementById('deleteBudgetButton').addEventListener('click', async function () {
@@ -270,7 +309,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (response.ok) {
                         const result = await response.json();
                         if (result.success) {
-                            
+
                             editBudgetModal.classList.add('hidden');
                             editBudgetModal.classList.remove('flex');
 

@@ -25,7 +25,7 @@ namespace ASI.Basecode.Services.Services
             var budgets = await _budgetRepository.GetBudgetsByUserIdAsync(userId);
             return budgets
                 .Where(budget => budget.UserId == userId)
-                .Select(MapToViewModel); 
+                .Select(MapToViewModel);
         }
 
         // Get a specific budget by its ID
@@ -50,7 +50,7 @@ namespace ASI.Basecode.Services.Services
                 CategoryId = model.CategoryId,
                 UserId = model.UserId,
                 MonthlyBudget = model.MonthlyBudget,
-                RemainingBudget = model.MonthlyBudget 
+                RemainingBudget = model.MonthlyBudget
 
             };
 

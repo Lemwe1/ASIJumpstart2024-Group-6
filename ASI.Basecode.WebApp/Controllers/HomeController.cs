@@ -49,9 +49,9 @@ namespace ASI.Basecode.WebApp.Controllers
             {
                 BudgetId = b.BudgetId,
                 CategoryId = b.CategoryId,
-                CategoryName = b.CategoryName, 
-                CategoryIcon = b.CategoryIcon, 
-                CategoryColor = b.CategoryColor, 
+                CategoryName = b.CategoryName,
+                CategoryIcon = b.CategoryIcon,
+                CategoryColor = b.CategoryColor,
                 UserId = b.UserId,
                 MonthlyBudget = b.MonthlyBudget,
                 RemainingBudget = b.MonthlyBudget - transactions

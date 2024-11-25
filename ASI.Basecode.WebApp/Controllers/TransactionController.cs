@@ -70,8 +70,8 @@ namespace ASI.Basecode.WebApp.Controllers
             // Calculate the number of items displayed on the current page
             int displayedItems = Math.Min(pageSize, totalTransactions - ((page - 1) * pageSize));
 
-            ViewData["DisplayedItems"] = displayedItems; 
-            ViewData["TotalTransactions"] = totalTransactions;  
+            ViewData["DisplayedItems"] = displayedItems;
+            ViewData["TotalTransactions"] = totalTransactions;
 
             return View(paginatedTransactions);
         }
@@ -125,7 +125,7 @@ namespace ASI.Basecode.WebApp.Controllers
                 Note = transaction.Note,
                 CategoryId = transaction.CategoryId,
                 WalletId = transaction.WalletId,
-                CategoryName = categoryName, 
+                CategoryName = categoryName,
                 WalletName = walletName,
                 TransactionSort = transaction.TransactionSort
 
@@ -196,8 +196,8 @@ namespace ASI.Basecode.WebApp.Controllers
                 TransactionSort = transaction.TransactionSort
             };
 
-            ViewData["Categories"] = await _categoryService.GetCategoriesAsync(userId.Value); 
-            ViewData["Wallets"] = await _walletService.GetWalletAsync(userId.Value); 
+            ViewData["Categories"] = await _categoryService.GetCategoriesAsync(userId.Value);
+            ViewData["Wallets"] = await _walletService.GetWalletAsync(userId.Value);
 
             return View(transactionViewModel);
         }
@@ -375,7 +375,7 @@ namespace ASI.Basecode.WebApp.Controllers
                         Day = day,
                         CategoryId = c.CategoryId,
                         CategoryName = c.Name,
-                        CategoryIcon = c.Icon, 
+                        CategoryIcon = c.Icon,
                         TotalAmount = trends
                             .FirstOrDefault(t => t.Day == day && t.CategoryId == c.CategoryId)?.TotalAmount ?? 0 // Handle missing data
                     }))

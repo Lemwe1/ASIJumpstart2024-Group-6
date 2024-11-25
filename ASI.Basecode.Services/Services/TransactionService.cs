@@ -59,6 +59,8 @@ public class TransactionService : ITransactionService
     public async Task AddTransactionAsync(TransactionViewModel transactionViewModel)
     {
         var transaction = MapToModel(transactionViewModel);
+
+        // Fetch the wallet from the repository
         var wallet = await _walletRepository.GetByIdAsync(transaction.WalletId);
 
         if (wallet == null)
@@ -66,31 +68,36 @@ public class TransactionService : ITransactionService
             throw new Exception("Wallet not found.");
         }
 
+        // Adjust the wallet balance based on the transaction amount and type
         AdjustWalletBalance(wallet, transaction.Amount, transaction.TransactionType);
 
+        // If the transaction type is "Expense", process the expense logic
         if (transaction.TransactionType == "Expense")
         {
-            // Use BudgetService to fetch and update the budget
+            // Fetch the budgets associated with the user
             var budgets = await _budgetService.GetBudgetsAsync(transaction.UserId);
+
+            // Find the budget related to the specific category
             var budget = budgets.FirstOrDefault(b => b.CategoryId == transaction.CategoryId);
 
             if (budget != null)
             {
-                if (budget.RemainingBudget < transaction.Amount)
-                {
-                    throw new Exception("Transaction exceeds the remaining budget.");
-                }
+                // Deduct the expense amount from the remaining budget without validation
+                budget.RemainingBudget = Math.Max(0, budget.RemainingBudget - transaction.Amount);
 
-                budget.RemainingBudget -= transaction.Amount;
-
-                // Update the budget
-                await _budgetService.AddBudgetAsync(budget); // Handle updates through AddBudgetAsync
+                // Update the budget in the database
+                await _budgetService.AddBudgetAsync(budget);
             }
         }
 
+        // Update the wallet balance in the repository
         await _walletRepository.UpdateAsync(wallet);
+
+        // Add the transaction to the transaction repository
         await _transactionRepository.AddAsync(transaction);
     }
+
+
 
 
 
