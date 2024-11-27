@@ -214,14 +214,23 @@ public class TransactionService : ITransactionService
     }
 
     // Helper method to update the budget after a transaction
-    private async Task UpdateBudgetAfterTransaction(int categoryId, int userId)
+    public async Task UpdateBudgetAfterTransaction(int categoryId, int userId)
     {
         // Get all expenses for the given category and user
         var transactions = await _transactionRepository.GetAllAsync();
-        var totalExpenses = transactions
-            .Where(t => t.CategoryId == categoryId && t.UserId == userId && t.TransactionType == "Expense")
-            .Sum(t => t.Amount);
 
+        // Get the current month and year
+        var currentMonth = DateTime.Now.Month;
+        var currentYear = DateTime.Now.Year;
+
+        // Filter transactions to get only those that are of type "Expense", 
+        // belong to the given category and user, and fall within the current month and year
+        var totalExpenses = transactions
+            .Where(t => t.CategoryId == categoryId && t.UserId == userId
+                        && t.TransactionType == "Expense"
+                        && t.TransactionDate.Month == currentMonth
+                        && t.TransactionDate.Year == currentYear)  // Only include this month's transactions
+            .Sum(t => t.Amount);
 
         // Get the budget for the category and user
         var budget = await _budgetService.GetBudgetsAsync(userId);
@@ -236,4 +245,5 @@ public class TransactionService : ITransactionService
             await _budgetService.UpdateBudgetAsync(userBudget);
         }
     }
+
 }

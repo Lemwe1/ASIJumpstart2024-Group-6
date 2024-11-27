@@ -12,6 +12,7 @@ namespace ASI.Basecode.Data.Interfaces
         Task UpdateAsync(MTransaction transaction);
         Task DeleteAsync(int transactionId);
         Task<bool> IsCategoryInUseAsync(int categoryId);
+
     }
 
 }

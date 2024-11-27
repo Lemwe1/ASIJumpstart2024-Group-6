@@ -58,6 +58,12 @@ namespace ASI.Basecode.WebApp.Controllers
                 }
             }
 
+            // Call the method to update budgets after transaction
+            foreach (var category in categories)
+            {
+                await _transactionService.UpdateBudgetAfterTransaction(category.CategoryId, userId.Value);
+            }
+
             // Fetch budgets and pass them to the view
             var budgetViewModels = budgets.Select(b => new BudgetViewModel
             {
@@ -96,6 +102,7 @@ namespace ASI.Basecode.WebApp.Controllers
 
             return View(wallets); // Ensure the correct model is passed to the view
         }
+
 
 
 

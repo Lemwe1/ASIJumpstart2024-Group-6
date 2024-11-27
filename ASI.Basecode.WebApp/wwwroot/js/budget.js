@@ -4,11 +4,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const addBudgetModal = document.getElementById('addBudgetModal');
     const addForm = document.getElementById('budgetForm');
     const budgetAmountInput = document.getElementById('budgetAmount');
+    const budgetCategoryInput = document.getElementById('budgetCategory');
 
     // Edit modal elements
     const editBudgetModal = document.getElementById('editBudgetModal');
     const editForm = document.getElementById('editBudgetForm');
     const editBudgetAmountInput = document.getElementById('editBudgetAmount');
+    const editBudgetCategoryInput = document.getElementById('editBudgetCategory');
+
+    // Initialize the flag
+    let isModalDirty = false;
 
     // Live validation for the budget input
     function validateBudgetInput(inputElement) {
@@ -37,12 +42,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Apply the live validation to the budget amount input field
+    // Apply the live validation to the budget amount input fields
     validateBudgetInput(budgetAmountInput);
     validateBudgetInput(editBudgetAmountInput);
-
-    // Initialize the flag
-    let isModalDirty = false;
 
     // Function to open the Add Budget modal
     function openAddBudgetModal() {
@@ -82,22 +84,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (result.success) {
                 const budget = result.data;
 
-                // Check if the budget's last reset date is from the current month
-                const lastResetDate = new Date(budget.LastResetDate);
-                const currentMonth = new Date().getMonth();
-
-                if (lastResetDate.getMonth() !== currentMonth) {
-                    // Reset the remaining budget and update the last reset date
-                    budget.RemainingBudget = budget.MonthlyBudget;
-                    budget.LastResetDate = new Date().toISOString();  // Update to current date
-                    await updateBudget(budget);
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'Budget Reset',
-                        text: 'Your budget has been reset for the new month!',
-                    });
-                }
-
                 openEditBudgetModal(budget);
             } else {
                 console.error('Error fetching budget:', result.message);
@@ -107,81 +93,6 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Error fetching budget:', error);
             alert('Error fetching budget data.');
         }
-    }
-
-    // Function to update the budget after resetting the remaining budget
-    async function updateBudget(budget) {
-        try {
-            const response = await fetch(`/Home/UpdateBudget/${budget.BudgetId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-                },
-                body: JSON.stringify({
-                    BudgetId: budget.BudgetId,
-                    CategoryId: budget.CategoryId,
-                    MonthlyBudget: budget.MonthlyBudget,
-                    RemainingBudget: budget.RemainingBudget,
-                    UserId: budget.UserId,
-                    LastResetDate: budget.LastResetDate  // Ensure LastResetDate is updated
-                })
-            });
-            if (!response.ok) {
-                throw new Error('Failed to update budget');
-            }
-        } catch (error) {
-            console.error('Error updating budget:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'An error occurred while updating your budget.'
-            });
-        }
-    }
-
-    function resetAddFormFields() {
-        document.getElementById('budgetAmount').value = '';
-        document.getElementById('budgetCategory').value = '';
-    }
-
-    // Close add modal
-    document.getElementById('closeBudgetModalBtn').addEventListener('click', function () {
-        addBudgetModal.classList.add('hidden');
-        document.body.classList.remove('overflow-hidden');
-    });
-
-    // Close edit modal
-    document.getElementById('closeEditBudgetModalBtn').addEventListener('click', function () {
-        editBudgetModal.classList.add('hidden');
-        document.body.classList.remove('overflow-hidden');
-    });
-
-    // Close the modal if clicked outside the modal content
-    addBudgetModal.addEventListener('click', function (event) {
-        if (event.target === addBudgetModal) {
-            addBudgetModal.classList.add('hidden');
-            document.body.classList.remove('overflow-hidden');
-        }
-    });
-
-    editBudgetModal.addEventListener('click', function (event) {
-        if (event.target === editBudgetModal) {
-            editBudgetModal.classList.add('hidden');
-            document.body.classList.remove('overflow-hidden');
-        }
-    });
-
-    function populateEditModalFields(budget) {
-        const { budgetId, monthlyBudget, categoryId, lastResetDate } = budget;
-
-        document.getElementById('budgetId').value = budgetId;
-        // Ensure MonthlyBudget is a number before calling .toFixed()
-        const formattedMonthlyBudget = isNaN(monthlyBudget) ? 0.00 : parseFloat(monthlyBudget).toFixed(2);
-        document.getElementById('editBudgetAmount').value = formattedMonthlyBudget;
-        document.getElementById('editBudgetCategory').value = categoryId || '';
-
-        console.log("Budget data:", budget);
     }
 
     // Handle form submission for adding a budget
@@ -228,92 +139,126 @@ document.addEventListener('DOMContentLoaded', function () {
     // Handle add form submission
     document.getElementById('addBudgetForm').addEventListener('submit', handleBudgetFormSubmit);
 
-    // Add event listener to detect changes in the form
+    // Add event listener to detect changes in the form (for Edit modal)
     const editBudgetForm = document.getElementById('editBudgetForm');
     editBudgetForm.addEventListener('input', () => {
         isModalDirty = true;  // Set flag to true when any input changes
     });
 
-    editBudgetForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    // Add event listener for reset button (reset the Add Budget form)
+    document.getElementById('resetBudgetButton').addEventListener('click', function () {
+        resetAddFormFields();
+        isModalDirty = false;
+    });
 
-        const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
-        const token = tokenElement ? tokenElement.value : null;
+    // Reset the Add Budget form fields
+    function resetAddFormFields() {
+        document.getElementById('budgetAmount').value = '';
+        document.getElementById('budgetCategory').value = '';
+        isModalDirty = false; // Reset dirty flag on reset
+    }
 
-        const budgetId = parseInt(document.getElementById('budgetId').value, 10);
-        const categoryId = parseInt(document.getElementById('editBudgetCategory').value, 10);
-        const monthlyBudget = parseFloat(document.getElementById('editBudgetAmount').value);
-        const userId = document.getElementById('userId').value;
+    // Populate edit modal fields
+    function populateEditModalFields(budget) {
+        const { budgetId, monthlyBudget, categoryId, lastResetDate } = budget;
 
-        // Check if the form is dirty (i.e., the user has made changes)
-        if (!isModalDirty) {
-            $('#editBudgetModal').modal('hide');
-            window.location.reload();
-            return;
-        }
+        document.getElementById('budgetId').value = budgetId;
+        // Ensure MonthlyBudget is a number before calling .toFixed()
+        const formattedMonthlyBudget = isNaN(monthlyBudget) ? 0.00 : parseFloat(monthlyBudget).toFixed(2);
+        document.getElementById('editBudgetAmount').value = formattedMonthlyBudget;
+        document.getElementById('editBudgetCategory').value = categoryId || '';
+    }
 
-        // Prepare the data for the update
-        const data = {
-            BudgetId: budgetId,
-            CategoryId: categoryId,
-            MonthlyBudget: monthlyBudget,
-            UserId: parseInt(userId, 10),
-            LastResetDate: new Date().toISOString() 
-        };
-
-        try {
-            const response = await fetch(`/Home/UpdateBudget/${budgetId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'RequestVerificationToken': token
-                },
-                body: JSON.stringify(data)
-            });
-
-            if (response.ok) {
-                const result = await response.json();
-
-                if (result.success) {
-                    // Show success if the update was successful
-                    Swal.fire({
-                        title: 'Success',
-                        text: 'Budget updated successfully!',
-                        icon: 'success',
-                        confirmButtonColor: '#3B82F6',
-                        customClass: { popup: 'swal2-front' }
-                    }).then(() => {
-                        $('#editBudgetModal').modal('hide');  // Close the modal after success
-                        window.location.reload();  // Optionally reload the page
-                    });
-                } else {
-                    // Show error if the update failed
-                    Swal.fire({
-                        title: 'Error',
-                        text: result.message || 'An error occurred while updating the budget.',
-                        icon: 'error',
-                        customClass: { popup: 'swal2-front' }
-                    });
-                }
-            } else {
-                // Handle non-OK HTTP responses
-                const text = await response.text();
-                console.error('Error Response Text:', text);
+    // Close add modal with Swal confirmation
+    addBudgetModal.addEventListener('click', function (event) {
+        if (event.target === addBudgetModal) {
+            if (isModalDirty || budgetAmountInput.value.trim() !== "" || budgetCategoryInput.value.trim() !== "") {
                 Swal.fire({
-                    title: 'Error',
-                    text: 'Failed to update budget. Please try again.',
-                    icon: 'error',
-                    customClass: { popup: 'swal2-front' }
+                    title: 'Are you sure?',
+                    text: 'You have unsaved changes. Do you really want to close without saving?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Close',
+                    cancelButtonText: 'No, Stay'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        addBudgetModal.classList.add('hidden');
+                        document.body.classList.remove('overflow-hidden');
+                    }
                 });
+            } else {
+                addBudgetModal.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
             }
-        } catch (error) {
-            // Handle unexpected errors
-            Swal.fire({
-                title: 'Error',
-                text: error.message || 'An unexpected error occurred.',
-                icon: 'error',
-                customClass: { popup: 'swal2-front' }
-            });
         }
     });
+
+    // Close edit modal with Swal confirmation
+    editBudgetModal.addEventListener('click', function (event) {
+        if (event.target === editBudgetModal) {
+            if (isModalDirty) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'You have unsaved changes. Do you really want to close without saving?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Close',
+                    cancelButtonText: 'No, Stay'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        editBudgetModal.classList.add('hidden');
+                        document.body.classList.remove('overflow-hidden');
+                    }
+                });
+            } else {
+                editBudgetModal.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }
+        }
+    });
+
+    // Add event listener to close the "Add Budget" modal when clicking the close button
+    document.getElementById('closeBudgetModalBtn').addEventListener('click', function () {
+        if (isModalDirty || budgetAmountInput.value.trim() !== "" || budgetCategoryInput.value.trim() !== "") {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You have unsaved changes. Do you really want to close without saving?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Close',
+                cancelButtonText: 'No, Stay'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    addBudgetModal.classList.add('hidden');
+                    document.body.classList.remove('overflow-hidden');
+                }
+            });
+        } else {
+            addBudgetModal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+    });
+
+    // Add event listener to close the "Edit Budget" modal when clicking the close button
+    document.getElementById('closeEditBudgetModalBtn').addEventListener('click', function () {
+        if (isModalDirty) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You have unsaved changes. Do you really want to close without saving?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Close',
+                cancelButtonText: 'No, Stay'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    editBudgetModal.classList.add('hidden');
+                    document.body.classList.remove('overflow-hidden');
+                }
+            });
+        } else {
+            editBudgetModal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+    });
+
 });
