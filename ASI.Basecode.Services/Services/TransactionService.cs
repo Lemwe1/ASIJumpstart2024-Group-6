@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
+
 public class TransactionService : ITransactionService
 {
     private readonly ITransactionRepository _transactionRepository;
@@ -14,11 +15,12 @@ public class TransactionService : ITransactionService
 
     public TransactionService(ITransactionRepository transactionRepository, IWalletRepository walletRepository, IBudgetService budgetService)
     {
-        _transactionRepository = transactionRepository;
-        _walletRepository = walletRepository;
-        _budgetService = budgetService;
+        _transactionRepository = transactionRepository ?? throw new ArgumentNullException(nameof(transactionRepository));
+        _walletRepository = walletRepository ?? throw new ArgumentNullException(nameof(walletRepository));
+        _budgetService = budgetService ?? throw new ArgumentNullException(nameof(budgetService));
     }
 
+    // Get all transactions for a user
     public async Task<IEnumerable<TransactionViewModel>> GetAllTransactionsAsync(int userId)
     {
         // Get all transactions for the user from the repository including related data
@@ -56,6 +58,7 @@ public class TransactionService : ITransactionService
         return transaction != null ? MapToViewModel(transaction) : null;
     }
 
+    // Add a new transaction
     public async Task AddTransactionAsync(TransactionViewModel transactionViewModel)
     {
         var transaction = MapToModel(transactionViewModel);
@@ -69,11 +72,15 @@ public class TransactionService : ITransactionService
         // Adjust wallet balance for the new transaction
         AdjustWalletBalance(wallet, transaction.Amount, transaction.TransactionType);
 
-        // Save changes
+        // Save the new transaction
         await _walletRepository.UpdateAsync(wallet);
         await _transactionRepository.AddAsync(transaction);
+
+        // Update the budget after the transaction is added
+        await UpdateBudgetAfterTransaction(transaction.CategoryId, transaction.UserId);
     }
 
+    // Update an existing transaction
     public async Task UpdateTransactionAsync(TransactionViewModel model)
     {
         var newTransaction = MapToModel(model);
@@ -91,7 +98,7 @@ public class TransactionService : ITransactionService
             throw new Exception("Wallet not found.");
         }
 
-        // Undo the previous transaction's effect
+        // Undo the previous transaction's effect on the wallet balance
         AdjustWalletBalance(wallet, -existingTransaction.Amount, existingTransaction.TransactionType);
 
         // If the wallet has changed, adjust the new wallet
@@ -116,8 +123,12 @@ public class TransactionService : ITransactionService
         // Update the transaction details
         UpdateTransactionDetails(existingTransaction, newTransaction);
         await _transactionRepository.UpdateAsync(existingTransaction);
+
+        // Update the budget after the transaction is updated
+        await UpdateBudgetAfterTransaction(newTransaction.CategoryId, newTransaction.UserId);
     }
 
+    // Delete a transaction
     public async Task DeleteTransactionAsync(int transactionId)
     {
         var existingTransaction = await _transactionRepository.GetByIdAsync(transactionId);
@@ -138,6 +149,9 @@ public class TransactionService : ITransactionService
         // Save changes
         await _walletRepository.UpdateAsync(wallet);
         await _transactionRepository.DeleteAsync(transactionId);
+
+        // Update the budget after the transaction is deleted
+        await UpdateBudgetAfterTransaction(existingTransaction.CategoryId, existingTransaction.UserId);
     }
 
     // Helper method to adjust wallet balance
@@ -164,6 +178,7 @@ public class TransactionService : ITransactionService
         existingTransaction.Amount = newTransaction.Amount;
         existingTransaction.WalletId = newTransaction.WalletId;
     }
+
     // Mapping from MTransaction to TransactionViewModel
     private TransactionViewModel MapToViewModel(MTransaction model)
     {
@@ -195,7 +210,40 @@ public class TransactionService : ITransactionService
             TransactionDate = viewModel.TransactionDate,
             Note = viewModel.Note,
             TransactionSort = viewModel.TransactionSort
-
         };
     }
+
+    // Helper method to update the budget after a transaction
+    public async Task UpdateBudgetAfterTransaction(int categoryId, int userId)
+    {
+        // Get all expenses for the given category and user
+        var transactions = await _transactionRepository.GetAllAsync();
+
+        // Get the current month and year
+        var currentMonth = DateTime.Now.Month;
+        var currentYear = DateTime.Now.Year;
+
+        // Filter transactions to get only those that are of type "Expense", 
+        // belong to the given category and user, and fall within the current month and year
+        var totalExpenses = transactions
+            .Where(t => t.CategoryId == categoryId && t.UserId == userId
+                        && t.TransactionType == "Expense"
+                        && t.TransactionDate.Month == currentMonth
+                        && t.TransactionDate.Year == currentYear)  // Only include this month's transactions
+            .Sum(t => t.Amount);
+
+        // Get the budget for the category and user
+        var budget = await _budgetService.GetBudgetsAsync(userId);
+        var userBudget = budget.FirstOrDefault(b => b.CategoryId == categoryId);
+
+        if (userBudget != null)
+        {
+            // Recalculate the remaining budget
+            userBudget.RemainingBudget = userBudget.MonthlyBudget - totalExpenses;
+
+            // Update the budget with the new remaining budget
+            await _budgetService.UpdateBudgetAsync(userBudget);
+        }
+    }
+
 }

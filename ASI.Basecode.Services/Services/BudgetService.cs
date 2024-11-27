@@ -50,8 +50,8 @@ namespace ASI.Basecode.Services.Services
                 CategoryId = model.CategoryId,
                 UserId = model.UserId,
                 MonthlyBudget = model.MonthlyBudget,
-                RemainingBudget = model.MonthlyBudget
-
+                RemainingBudget = model.MonthlyBudget,
+                LastResetDate = model.LastResetDate
             };
 
             await _budgetRepository.AddAsync(budget);
@@ -82,6 +82,7 @@ namespace ASI.Basecode.Services.Services
             existingBudget.CategoryId = model.CategoryId;
             existingBudget.MonthlyBudget = model.MonthlyBudget;
             existingBudget.RemainingBudget = model.RemainingBudget;
+            existingBudget.LastResetDate = model.LastResetDate;
 
             await _budgetRepository.UpdateAsync(existingBudget);
         }
@@ -131,7 +132,8 @@ namespace ASI.Basecode.Services.Services
                 RemainingBudget = model.RemainingBudget,
                 CategoryName = model.Category?.Name ?? string.Empty,
                 CategoryIcon = model.Category?.Icon ?? string.Empty,
-                CategoryColor = model.Category?.Color ?? string.Empty
+                CategoryColor = model.Category?.Color ?? string.Empty,
+                LastResetDate = model.LastResetDate
             };
         }
     }

@@ -11,5 +11,7 @@ namespace ASI.Basecode.Services.Interfaces
         Task AddTransactionAsync(TransactionViewModel model);
         Task UpdateTransactionAsync(TransactionViewModel model);
         Task DeleteTransactionAsync(int id);
+        Task UpdateBudgetAfterTransaction(int categoryId, int userId);
+
     }
 }
