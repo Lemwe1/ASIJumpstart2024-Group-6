@@ -270,39 +270,34 @@ namespace ASI.Basecode.WebApp.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.ErrorMessage = "Please provide a valid email address.";
-                return View();
+                TempData["ErrorMessage"] = "Invalid email address.";
+                return RedirectToAction("ForgotPassword");
             }
 
-            var user = _userService.GetByEmail(model.Email);  // Retrieve the user by email
+            var user = _userService.GetByEmail(model.Email);
             if (user == null)
             {
-                ViewBag.ErrorMessage = "No account found with that email address.";
-                return View();
+                TempData["ErrorMessage"] = "No account found with this email address.";
+                return RedirectToAction("ForgotPassword");
             }
 
-            // Generate a reset token
-            var token = Guid.NewGuid().ToString();
+            try
+            {
+                // Send the forgot password email
+                var resetLink = Url.Action("ResetPassword", "Account", new { token = user.PasswordResetToken }, Request.Scheme);
+                var emailBody = $"Reset your password by clicking <a href='{resetLink}'>here</a>.";
+                _emailService.SendEmailAsync(user.Mail, "Password Reset", emailBody);
 
-            _logger.LogDebug($"Generated token length: {token.Length}");
-
-            // Store the token with an expiration date (e.g., 24 hours)
-            user.PasswordResetToken = token;
-            user.PasswordResetExpiration = DateTime.Now.AddHours(24);
-
-            _userService.Update(user);  // Save the token and expiration in the database
-
-            // Generate a reset link
-            var resetLink = Url.Action("ResetPassword", "Account", new { token = user.PasswordResetToken }, Request.Scheme);
-
-            // Send reset link via email
-            var emailBody = $"Click <a href='{resetLink}'>here</a> to reset your password.";
-            _emailService.SendEmailAsync(user.Mail, "Password Reset", emailBody);
-
-            // Redirect to the login page after successful email sending
-            TempData["SuccessMessage"] = "Password reset link has been sent to your email.";
-            return RedirectToAction("Login", "Account");
+                TempData["SuccessMessage"] = "Password reset link has been sent to your email.";
+                return RedirectToAction("ForgotPassword");
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "An error occurred while sending the reset email.";
+                return RedirectToAction("ForgotPassword");
+            }
         }
+
 
         [HttpGet]
         [AllowAnonymous]

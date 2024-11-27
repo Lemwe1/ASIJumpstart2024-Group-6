@@ -126,7 +126,7 @@ if (closeEditModal) {
 function openModal(modal) {
     if (modal) {
         modal.classList.remove('hidden');
-        document.body.classList.add('overflow-hidden'); 
+        document.body.classList.add('overflow-hidden');
         document.getElementById('createIcon').value = "";
     } else {
         Swal.fire({
@@ -142,7 +142,7 @@ function openModal(modal) {
 function closeModal(modal) {
     if (modal) {
         modal.classList.add('hidden');
-        document.body.classList.remove('overflow-hidden'); 
+        document.body.classList.remove('overflow-hidden');
     } else {
         Swal.fire({
             title: 'Error',
@@ -585,4 +585,3 @@ document.getElementById('deleteAccountButton').addEventListener('click', async (
 document.addEventListener('DOMContentLoaded', () => {
     loadDebitForm(); // Load the form fields initially
 });
-
