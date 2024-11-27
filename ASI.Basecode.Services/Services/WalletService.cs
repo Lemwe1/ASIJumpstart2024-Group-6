@@ -37,7 +37,7 @@ namespace ASI.Basecode.Services.Services
             var model = MapToModel(viewModel);
 
             // Set WalletOriginalBalance when adding a new wallet
-            model.WalletOriginalBalance = model.WalletBalance; 
+            model.WalletOriginalBalance = model.WalletBalance;
 
             await _walletRepository.AddAsync(model);
         }
