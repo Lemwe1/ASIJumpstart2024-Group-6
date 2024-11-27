@@ -28,7 +28,7 @@ namespace ASI.Basecode.Data
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=NI¥O\\SQLEXPRESS;Database=AsiBasecodeDb;Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer("Server=DESKTOP-90VPBGF\\SQLEXPRESS;Database=AsiBasecodeDb;Trusted_Connection=True");
             }
         }
 
@@ -37,7 +37,7 @@ namespace ASI.Basecode.Data
             modelBuilder.Entity<MBudget>(entity =>
             {
                 entity.HasKey(e => e.BudgetId)
-                    .HasName("PK__M_Budget__E38E79243BCAA0D5");
+                    .HasName("PK__M_Budget__E38E7924D6BD7748");
 
                 entity.ToTable("M_Budgets");
 
@@ -55,19 +55,19 @@ namespace ASI.Basecode.Data
                     .WithMany(p => p.MBudgets)
                     .HasForeignKey(d => d.CategoryId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__M_Budgets__Categ__43D61337");
+                    .HasConstraintName("FK__M_Budgets__Categ__0880433F");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.MBudgets)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__M_Budgets__UserI__44CA3770");
+                    .HasConstraintName("FK__M_Budgets__UserI__09746778");
             });
 
             modelBuilder.Entity<MCategory>(entity =>
             {
                 entity.HasKey(e => e.CategoryId)
-                    .HasName("PK__M_Catego__19093A0B0FABA81E");
+                    .HasName("PK__M_Catego__19093A0B79D345B8");
 
                 entity.ToTable("M_Category");
 
@@ -90,7 +90,7 @@ namespace ASI.Basecode.Data
             modelBuilder.Entity<MTransaction>(entity =>
             {
                 entity.HasKey(e => e.TransactionId)
-                    .HasName("PK__M_Transa__55433A6B4E555744");
+                    .HasName("PK__M_Transa__55433A6BAC20D22F");
 
                 entity.ToTable("M_Transaction");
 
@@ -147,8 +147,6 @@ namespace ASI.Basecode.Data
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.IsVerified).HasColumnName("isVerified");
-
                 entity.Property(e => e.LastName).HasMaxLength(50);
 
                 entity.Property(e => e.LastNameKana).HasMaxLength(50);
@@ -193,7 +191,7 @@ namespace ASI.Basecode.Data
             modelBuilder.Entity<MWallet>(entity =>
             {
                 entity.HasKey(e => e.WalletId)
-                    .HasName("PK__M_Wallet__84D4F90E189C06B3");
+                    .HasName("PK__M_Wallet__84D4F90E28877477");
 
                 entity.ToTable("M_Wallet");
 
