@@ -270,32 +270,38 @@ namespace ASI.Basecode.WebApp.Controllers
         {
             if (!ModelState.IsValid)
             {
-                TempData["ErrorMessage"] = "Invalid email address.";
-                return RedirectToAction("ForgotPassword");
+                TempData["ErrorMessage"] = "Please provide a valid email address.";
+                return View(); // Return the same view with error message
             }
 
-            var user = _userService.GetByEmail(model.Email);
+            var user = _userService.GetByEmail(model.Email);  // Retrieve the user by email
             if (user == null)
             {
-                TempData["ErrorMessage"] = "No account found with this email address.";
-                return RedirectToAction("ForgotPassword");
+                TempData["ErrorMessage"] = "No account found with that email address.";
+                return View(); // Return the same view with error message
             }
 
-            try
-            {
-                // Send the forgot password email
-                var resetLink = Url.Action("ResetPassword", "Account", new { token = user.PasswordResetToken }, Request.Scheme);
-                var emailBody = $"Reset your password by clicking <a href='{resetLink}'>here</a>.";
-                _emailService.SendEmailAsync(user.Mail, "Password Reset", emailBody);
+            // Generate a reset token
+            var token = Guid.NewGuid().ToString();
 
-                TempData["SuccessMessage"] = "Password reset link has been sent to your email.";
-                return RedirectToAction("ForgotPassword");
-            }
-            catch (Exception)
-            {
-                TempData["ErrorMessage"] = "An error occurred while sending the reset email.";
-                return RedirectToAction("ForgotPassword");
-            }
+            _logger.LogDebug($"Generated token length: {token.Length}");
+
+            // Store the token with an expiration date (e.g., 24 hours)
+            user.PasswordResetToken = token;
+            user.PasswordResetExpiration = DateTime.Now.AddHours(24);
+
+            _userService.Update(user);  // Save the token and expiration in the database
+
+            // Generate a reset link
+            var resetLink = Url.Action("ResetPassword", "Account", new { token = user.PasswordResetToken }, Request.Scheme);
+
+            // Send reset link via email
+            var emailBody = $"Click <a href='{resetLink}'>here</a> to reset your password.";
+            _emailService.SendEmailAsync(user.Mail, "Password Reset", emailBody);
+
+            // Set the success message in TempData and return to the same view
+            TempData["SuccessMessage"] = "Password reset link has been sent to your email.";
+            return View(model); // Return to the same view with success message
         }
 
 
