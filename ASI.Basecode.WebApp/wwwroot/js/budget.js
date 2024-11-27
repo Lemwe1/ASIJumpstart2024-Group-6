@@ -156,6 +156,61 @@ document.addEventListener('DOMContentLoaded', function () {
     // Add event listener for the Edit Budget form submit
     document.getElementById('editBudgetForm').addEventListener('submit', handleEditBudgetFormSubmit);
 
+    // Delete Budget button logic
+    document.getElementById('deleteBudgetButton').addEventListener('click', async function () {
+        const id = document.getElementById('budgetId').value;
+        console.log('Attempting to delete budget with ID:', id);
+
+        if (!id) {
+            Swal.fire('Error', 'Budget ID is missing.', 'error');
+            return;
+        }
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You won\'t be able to revert this!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#e53e3e',
+            cancelButtonColor: '#718096',
+            confirmButtonText: 'Yes, delete it!'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const formData = new FormData();
+                formData.append('__RequestVerificationToken', document.querySelector('#editBudgetForm input[name="__RequestVerificationToken"]').value);
+                console.log('Form data for deletion:', [...formData]);
+
+                try {
+                    const response = await fetch(`/Home/DeleteBudget/${id}`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    console.log('Response from delete budget:', response);
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success) {
+
+                            editBudgetModal.classList.add('hidden');
+                            editBudgetModal.classList.remove('flex');
+
+                            Swal.fire('Deleted!', 'Budget has been deleted.', 'success').then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire('Error', result.message || 'Failed to delete budget.', 'error');
+                        }
+                    } else {
+                        const result = await response.json();
+                        Swal.fire('Error', result.message || 'Failed to delete budget.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error deleting budget:', error);
+                    Swal.fire('Error', 'Error occurred while deleting the budget.', 'error');
+                }
+            }
+        });
+    });
 
     // Handle form submission for adding a budget
     function handleBudgetFormSubmit(e) {
