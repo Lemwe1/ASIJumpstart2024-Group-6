@@ -1,7 +1,7 @@
 ﻿document.addEventListener("DOMContentLoaded", () => {
-    const modal = document.getElementById('addTransactionModal');
 
     //add
+    const modal = document.getElementById('addTransactionModal');
     const addTransactionButton = document.getElementById('openAddTransactionModal');
     const closeAddModalButton = document.getElementById('closeTransactionModal');
     const transactionForm = document.getElementById('transactionForm');
@@ -68,22 +68,22 @@
         // Hide pagination only if any filter is applied
         const pagination = document.querySelector('.pagination');
         if (categoryFilter !== 'All' || typeFilter !== 'All') {
-            pagination.style.display = 'none'; // Hide pagination when filtering by category or type
+            pagination.style.display = 'none';
         } else {
-            pagination.style.display = ''; // Show pagination when no filters are applied
+            pagination.style.display = '';
         }
 
         // Hide item count if category or type is selected or if there are no visible transactions
         const itemCount = document.getElementById('item-count');
         if (categoryFilter !== 'All' || typeFilter !== 'All' || !hasVisibleTransactions) {
-            itemCount.style.display = 'none'; // Hide item count if filters are applied or no transactions are visible
+            itemCount.style.display = 'none';
         } else {
-            itemCount.style.display = ''; // Show item count if no filters are applied and transactions are visible
+            itemCount.style.display = '';
         }
 
         // Show "No transactions found" if the filter is set to "All" and there are no transactions
         if (categoryFilter === 'All' && typeFilter === 'All' && !hasVisibleTransactions) {
-            noTransactionsRow.style.display = ''; // Display "No transactions found"
+            noTransactionsRow.style.display = '';
         }
     };
 
@@ -392,11 +392,21 @@
     validateAmountInput(editTransactionAmountInput, editTransactionWalletSelect, editErrorMessage);
 
     function validateTransaction(event, amountInput, walletSelect, errorMessage, transactionType) {
-        event.preventDefault(); // Prevent form submission
-
         const selectedOption = walletSelect.options[walletSelect.selectedIndex];
         const balance = selectedOption ? parseFloat(selectedOption.getAttribute('data-balance') || 0) : null;
         const amount = parseFloat(amountInput.value || 0);
+
+        // If no changes were made and the user is trying to submit, proceed without validation
+        if (!isModalDirty) {
+            if (amountInput === transactionAmountInput) {
+                handleAddTransaction(event);
+            } else {
+                handleEditTransaction(event);
+            }
+            return;
+        }
+
+        event.preventDefault(); // Prevent form submission
 
         // Handle Expense transactions
         if (transactionType === "Expense") {
@@ -466,6 +476,7 @@
 
 
 
+
     // Function to update button styles based on the type
     function updateButtonStyles(button, isSelected, isExpense) {
         // Remove all color classes to avoid overlap
@@ -478,6 +489,7 @@
             } else {
                 button.classList.add('bg-green-500', 'text-white'); // Green for selected income
                 errorMessage.style.display = 'none'; // Hide error message
+                isModalDirty = true;
 
             }
         } else {
@@ -504,6 +516,8 @@
         // Update styles for edit buttons
         updateButtonStyles(editExpenseButton, isExpense, true);
         updateButtonStyles(editIncomeButton, !isExpense, false);
+
+
     }
 
     // Function to set type and apply filters
@@ -649,19 +663,30 @@
                 throw new Error('An error occurred while processing your request.');
             }
         }
+
         return response.json().then(result => {
             if (result.success) {
-                Swal.fire({
-                    title: 'Success',
-                    text: result.message || 'Transaction processed successfully!',
-                    icon: 'success',
-                    confirmButtonColor: '#3B82F6',
-                    customClass: { popup: 'swal2-front' }
-                }).then(() => {
+                // Check if there are any changes
+                if (isModalDirty) { // Assuming isModalDirty tracks whether there are changes
+                    Swal.fire({
+                        title: 'Success',
+                        text: result.message || 'Transaction processed successfully!',
+                        icon: 'success',
+                        confirmButtonColor: '#3B82F6',
+                        customClass: { popup: 'swal2-front' }
+                    }).then(() => {
+                        resetModal();
+                        $('#editTransactionModal').modal('hide'); // Close modal
+                        window.location.reload(); // Reload page to reflect changes
+                    });
+                } else {
+                    // If no changes, close the modal and reload the page without showing success alert
                     resetModal();
-                    window.location.reload();
-                });
+                    $('#editTransactionModal').modal('hide'); // Close modal
+                    window.location.reload(); // Reload page
+                }
             } else {
+                // If the response is not successful, show an error alert
                 Swal.fire({
                     title: 'Error',
                     text: result.message || 'An error occurred.',
@@ -679,6 +704,8 @@
             });
         });
     }
+
+
 
     // Error handler
     function handleError(error) {
@@ -721,7 +748,7 @@
     // Function to handle deletion of a transaction
     document.querySelectorAll('.deleteTransaction').forEach(button => {
         button.addEventListener('click', async () => {
-            const id = button.getAttribute('data-id'); // Get the transaction ID from data-id attribute
+            const id = button.getAttribute('data-id');
 
             const { isConfirmed } = await Swal.fire({
                 title: 'Delete Transaction',
@@ -834,6 +861,6 @@
         // Now validate the form with the current transaction type value
         validateTransaction(event, editTransactionAmountInput, editTransactionWalletSelect, editErrorMessage, transactionTypeValue);
 
-        console.log('Selected transaction type (Edit):', transactionTypeValue); 
+        console.log('Selected transaction type (Edit):', transactionTypeValue);
     });
 });

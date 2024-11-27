@@ -270,15 +270,15 @@ namespace ASI.Basecode.WebApp.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.ErrorMessage = "Please provide a valid email address.";
-                return View();
+                TempData["ErrorMessage"] = "Please provide a valid email address.";
+                return View(); // Return the same view with error message
             }
 
             var user = _userService.GetByEmail(model.Email);  // Retrieve the user by email
             if (user == null)
             {
-                ViewBag.ErrorMessage = "No account found with that email address.";
-                return View();
+                TempData["ErrorMessage"] = "No account found with that email address.";
+                return View(); // Return the same view with error message
             }
 
             // Generate a reset token
@@ -299,10 +299,11 @@ namespace ASI.Basecode.WebApp.Controllers
             var emailBody = $"Click <a href='{resetLink}'>here</a> to reset your password.";
             _emailService.SendEmailAsync(user.Mail, "Password Reset", emailBody);
 
-            // Redirect to the login page after successful email sending
+            // Set the success message in TempData and return to the same view
             TempData["SuccessMessage"] = "Password reset link has been sent to your email.";
-            return RedirectToAction("Login", "Account");
+            return View(model); // Return to the same view with success message
         }
+
 
         [HttpGet]
         [AllowAnonymous]

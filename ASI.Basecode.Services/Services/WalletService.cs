@@ -37,7 +37,7 @@ namespace ASI.Basecode.Services.Services
             var model = MapToModel(viewModel);
 
             // Set WalletOriginalBalance when adding a new wallet
-            model.WalletOriginalBalance = model.WalletBalance; 
+            model.WalletOriginalBalance = model.WalletBalance;
 
             await _walletRepository.AddAsync(model);
         }
@@ -60,14 +60,17 @@ namespace ASI.Basecode.Services.Services
 
             // Update the current wallet balance
             wallet.WalletBalance = viewModel.WalletBalance;
+            wallet.WalletName = viewModel.WalletName;
+            wallet.WalletIcon = viewModel.WalletIcon;
+            wallet.WalletColor = viewModel.WalletColor;
 
             // Optionally log or handle the difference between the original and updated balances
             var balanceChange = wallet.WalletBalance - wallet.WalletOriginalBalance;
 
-
             // Save the updated wallet to the repository
             await _walletRepository.UpdateAsync(wallet);
         }
+
 
 
         public async Task DeleteWalletAsync(int id)

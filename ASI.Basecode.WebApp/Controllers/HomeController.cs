@@ -44,22 +44,43 @@ namespace ASI.Basecode.WebApp.Controllers
             var budgets = await _budgetService.GetBudgetsAsync(userId.Value); // Fetch budgets
             var categories = await _categoryService.GetCategoriesAsync(userId.Value);
 
+            // Reset remaining budget if the month has changed
+            foreach (var budget in budgets)
+            {
+                if (budget.LastResetDate.Month != DateTime.Now.Month)
+                {
+                    // If the month is different, reset remaining budget to monthly budget
+                    budget.RemainingBudget = budget.MonthlyBudget;
+                    budget.LastResetDate = DateTime.Now; // Update reset date to current date
+
+                    // Save the updated budget in the database
+                    await _budgetService.UpdateBudgetAsync(budget);
+                }
+            }
+
+            // Call the method to update budgets after transaction
+            foreach (var category in categories)
+            {
+                await _transactionService.UpdateBudgetAfterTransaction(category.CategoryId, userId.Value);
+            }
+
             // Fetch budgets and pass them to the view
             var budgetViewModels = budgets.Select(b => new BudgetViewModel
             {
                 BudgetId = b.BudgetId,
                 CategoryId = b.CategoryId,
-                CategoryName = b.CategoryName, // Ensure CategoryName is fetched
-                CategoryIcon = b.CategoryIcon, // Optional, if you have icons
-                CategoryColor = b.CategoryColor, // Optional, for custom styling
+                CategoryName = b.CategoryName,
+                CategoryIcon = b.CategoryIcon,
+                CategoryColor = b.CategoryColor,
                 UserId = b.UserId,
                 MonthlyBudget = b.MonthlyBudget,
-                RemainingBudget = b.MonthlyBudget - transactions
-                    .Where(t => t.CategoryId == b.CategoryId && t.TransactionType == "Expense")
-                    .Sum(t => t.Amount)
-            }).ToList();
+                RemainingBudget = b.RemainingBudget,
+                LastResetDate = b.LastResetDate
+            })
+            .OrderByDescending(b => b.BudgetId)
+            .ToList();
 
-            // Pass the budgets and categories to the vi    ew
+            // Pass the budgets and categories to the view
             ViewData["Budgets"] = budgetViewModels;
             ViewData["Categories"] = categories;
 
@@ -82,6 +103,66 @@ namespace ASI.Basecode.WebApp.Controllers
             return View(wallets); // Ensure the correct model is passed to the view
         }
 
+
+
+
+        [HttpGet]
+        // GET: /Home/GetBudget/{id}
+        public async Task<IActionResult> GetBudget(int id)
+        {
+            try
+            {
+                // Get the logged-in user's ID
+                var userId = GetUserId();
+                if (userId == null)
+                {
+                    return Unauthorized(new { success = false, message = "User not authenticated." });
+                }
+
+                // Fetch the budget by ID
+                var budget = await _budgetService.GetBudgetByIdAsync(id);
+                if (budget == null || budget.UserId != userId.Value)
+                {
+                    return NotFound(new { success = false, message = "Budget not found or does not belong to the user." });
+                }
+
+                // Check if the month has changed and reset the remaining budget if necessary
+                if (budget.LastResetDate.Month != DateTime.Now.Month)
+                {
+                    // Reset remaining budget to the monthly budget and update the last reset date
+                    budget.RemainingBudget = budget.MonthlyBudget;
+                    budget.LastResetDate = DateTime.Now;
+
+                    // Update the budget in the database
+                    await _budgetService.UpdateBudgetAsync(budget);
+                }
+
+                // Map budget to BudgetViewModel
+                var budgetViewModel = new BudgetViewModel
+                {
+                    BudgetId = budget.BudgetId,
+                    CategoryId = budget.CategoryId,
+                    CategoryName = budget.CategoryName,
+                    MonthlyBudget = budget.MonthlyBudget,
+                    RemainingBudget = budget.RemainingBudget,
+                    CategoryIcon = budget.CategoryIcon,
+                    CategoryColor = budget.CategoryColor,
+                    LastResetDate = budget.LastResetDate // Include LastResetDate in the response
+                };
+
+                return Json(new { success = true, data = budgetViewModel });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                // Handle specific exceptions like not found
+                return NotFound(new { success = false, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Handle unexpected errors
+                return StatusCode(500, new { success = false, message = $"Server error: {ex.Message}" });
+            }
+        }
 
         // POST: /Home/AddBudget
         [HttpPost]
@@ -110,6 +191,9 @@ namespace ASI.Basecode.WebApp.Controllers
 
                 model.UserId = int.Parse(userClaim.Value);
 
+                // Set the initial LastResetDate when adding a new budget (set it to the current date)
+                model.LastResetDate = DateTime.Now;
+
                 // Call the service to add the budget
                 await _budgetService.AddBudgetAsync(model);
 
@@ -121,39 +205,62 @@ namespace ASI.Basecode.WebApp.Controllers
             }
         }
 
-
-        // POST: /Home/UpdateBudget
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateBudget([FromBody] BudgetViewModel model)
+        public async Task<IActionResult> UpdateBudget(int id, [FromBody] BudgetViewModel model)
         {
+            var userId = GetUserId(); // Extract UserId from the claims
+
+            if (userId == null || userId <= 0)
+            {
+                return Unauthorized(new { success = false, message = "UserId must be a positive value." });
+            }
+
+            // Set the UserId in the model (you don't need to pass it in the request body)
+            model.UserId = userId.Value;
+
             if (!ModelState.IsValid)
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = "Invalid budget data.",
-                    errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
-                });
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                return BadRequest(new { success = false, errors });
             }
 
             try
             {
-                // Get the currently logged-in user's ID
+                // Proceed with the service call to update the budget
+                await _budgetService.UpdateBudgetAsync(model);
+                return Json(new { success = true });
+            }
+            catch (KeyNotFoundException knfEx)
+            {
+                return NotFound(new { success = false, message = knfEx.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
+
+        // POST: /Home/DeleteBudget
+        [HttpPost]
+        public async Task<IActionResult> DeleteBudget(int id)
+        {
+            try
+            {
                 var userId = GetUserId();
                 if (userId == null)
                 {
-                    return BadRequest(new { success = false, message = "User not authenticated." });
+                    return BadRequest(new { success = false, message = "Invalid user ID." });
                 }
 
-                model.UserId = userId.Value;
+                var existingBudget = await _budgetService.GetBudgetByIdAsync(id);
+                if (existingBudget == null || existingBudget.UserId != userId)
+                {
+                    return NotFound(new { success = false, message = "Budget not found or does not belong to the user." });
+                }
 
-                await _budgetService.UpdateBudgetAsync(model);
-                return Json(new { success = true, message = "Budget updated successfully." });
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { success = false, message = ex.Message });
+                await _budgetService.DeleteBudgetAsync(id);
+                return Ok(new { success = true, message = "Budget deleted successfully." });
             }
             catch (Exception ex)
             {

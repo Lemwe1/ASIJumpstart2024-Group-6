@@ -10,6 +10,11 @@
             const failureIcon = document.getElementById('failure-icon');
             const successMessageDiv = document.getElementById('success-message');
             const errorMessageDiv = document.getElementById('error-message');
+            const submitButton = document.getElementById('registerSubmitButton'); // Assuming the button has this ID
+
+            // Change the button text to "Creating an account..."
+            submitButton.textContent = "Registering...";
+            submitButton.disabled = true; // Disable the button to prevent multiple clicks
 
             // Reset all icons, spinner, and messages to initial hidden state
             spinner.classList.add('hidden');
@@ -48,9 +53,13 @@
                         failureIcon.classList.remove('hidden');
                         errorMessageDiv.textContent = data.message; // Show error message from the response
                         errorMessageDiv.classList.remove('hidden'); // Display the error message
+
+                        // Reset the button text and state after a delay
                         setTimeout(function () {
                             overlay.classList.add('hidden');
                             failureIcon.classList.add('hidden');
+                            submitButton.textContent = "Register";
+                            submitButton.disabled = false;
                         }, 2000);
                     }
                 })
@@ -58,9 +67,13 @@
                     console.error('Error:', error);
                     spinner.classList.add('hidden');
                     failureIcon.classList.remove('hidden');
+
+                    // Reset the button text and state after a delay
                     setTimeout(function () {
                         overlay.classList.add('hidden');
                         failureIcon.classList.add('hidden');
+                        submitButton.textContent = "Register";
+                        submitButton.disabled = false;
                     }, 2000);
                 });
         });
@@ -86,6 +99,5 @@
         // Toggle visibility for both Password and Confirm Password fields
         togglePasswordVisibility('toggle-password', 'password-field');
         togglePasswordVisibility('toggle-confirm-password', 'confirm-password-field');
-
     }
 });

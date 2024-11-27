@@ -25,13 +25,13 @@ namespace ASI.Basecode.WebApp.Controllers
             // Get the logged-in user's ID
             int userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "UserId").Value);
 
-            // Fetch the debit liabilities belonging to the logged-in user
+        
             var wallet = await _walletService.GetWalletAsync(userId);
 
             // Filter the list after awaiting the async method and convert to a List
             var userWallet = wallet
                 .Where(x => x.UserId == userId)
-                .ToList(); // Convert to List<DebitLiabilityViewModel>
+                .ToList(); 
 
             if (json)
             {
@@ -72,7 +72,7 @@ namespace ASI.Basecode.WebApp.Controllers
 
 
                 await _walletService.AddWalletAsync(model);
-                return Json(new { success = true, message = "Debit Liability created successfully." });
+                return Json(new { success = true, message = "Wallet created successfully." });
             }
             catch (Exception ex)
             {
@@ -163,7 +163,7 @@ namespace ASI.Basecode.WebApp.Controllers
                 }
 
                 await _walletService.DeleteWalletAsync(id);
-                return Json(new { success = true, message = "Debit liability deleted successfully." });
+                return Json(new { success = true, message = "Wallet deleted successfully." });
             }
             catch (KeyNotFoundException knfEx)
             {

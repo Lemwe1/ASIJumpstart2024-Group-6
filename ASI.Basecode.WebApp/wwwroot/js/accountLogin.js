@@ -10,6 +10,11 @@
             const failureIcon = document.getElementById('failure-icon');
             const successMessageDiv = document.getElementById('success-message');
             const errorMessageDiv = document.getElementById('error-message');
+            const submitButton = document.getElementById('submitButton');
+
+            // Change the button text to "Submitting..."
+            submitButton.textContent = "Logging in...";
+            submitButton.disabled = true; // Disable the button to prevent multiple clicks
 
             // Reset all icons, spinner, and messages to initial hidden state
             spinner.classList.add('hidden');
@@ -55,9 +60,13 @@
                         }
 
                         errorMessageDiv.classList.remove('hidden'); // Display the error message
+
+                        // Reset the button text and state after a delay
                         setTimeout(function () {
                             overlay.classList.add('hidden');
                             failureIcon.classList.add('hidden');
+                            submitButton.textContent = "Submit";
+                            submitButton.disabled = false;
                         }, 2000);
                     }
                 })
@@ -65,12 +74,17 @@
                     console.error('Error:', error);
                     spinner.classList.add('hidden');
                     failureIcon.classList.remove('hidden');
+
+                    // Reset the button text and state after a delay
                     setTimeout(function () {
                         overlay.classList.add('hidden');
                         failureIcon.classList.add('hidden');
+                        submitButton.textContent = "Submit";
+                        submitButton.disabled = false;
                     }, 2000);
                 });
         });
+
         const togglePassword = document.getElementById('toggle-password');
         const passwordField = document.getElementById('form2Example22');
 
@@ -87,4 +101,3 @@
         }
     }
 });
-

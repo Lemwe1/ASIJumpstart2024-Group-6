@@ -164,8 +164,8 @@
                     });
 
                     const datasets = Object.entries(categoryData).map(([categoryName, data]) => {
-                        const totalAmountForCategory = data.amounts.reduce((sum, value) => sum + value, 0); 
-                        const labelWithIcon = `${data.icon} ${categoryName} - ₱ ${totalAmountForCategory.toFixed(2)}`; 
+                        const totalAmountForCategory = data.amounts.reduce((sum, value) => sum + value, 0);
+                        const labelWithIcon = `${data.icon} ${categoryName} - ₱ ${totalAmountForCategory.toFixed(2)}`;
 
                         return {
                             label: labelWithIcon,
@@ -232,11 +232,21 @@
                                 beginAtZero: true,
                             },
                         },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function (tooltipItem) {
+                                        return 'Monthly Expense ₱' + tooltipItem.raw.toLocaleString();
+                                    }
+                                }
+                            }
+                        },
                     },
                 });
             })
             .catch(error => console.error('Error fetching monthly expenses:', error));
     };
+
 
     const renderMonthlyIncomeChart = () => {
         const incomeUrl = '/Transaction/GetMonthlyIncome';
@@ -272,11 +282,22 @@
                                 beginAtZero: true,
                             },
                         },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function (tooltipItem) {
+                                        // Add peso sign to tooltip value
+                                        return 'Monthly Income ₱' + tooltipItem.raw.toLocaleString(); // Show peso sign on hover
+                                    }
+                                }
+                            }
+                        },
                     },
                 });
             })
             .catch(error => console.error('Error fetching monthly income:', error));
     };
+
 
     // Render both charts on page load
     renderMonthlyExpenseChart();
