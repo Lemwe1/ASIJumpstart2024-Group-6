@@ -44,6 +44,20 @@ namespace ASI.Basecode.WebApp.Controllers
             var budgets = await _budgetService.GetBudgetsAsync(userId.Value); // Fetch budgets
             var categories = await _categoryService.GetCategoriesAsync(userId.Value);
 
+            // Reset remaining budget if the month has changed
+            foreach (var budget in budgets)
+            {
+                if (budget.LastResetDate.Month != DateTime.Now.Month)
+                {
+                    // If the month is different, reset remaining budget to monthly budget
+                    budget.RemainingBudget = budget.MonthlyBudget;
+                    budget.LastResetDate = DateTime.Now; // Update reset date to current date
+
+                    // Save the updated budget in the database
+                    await _budgetService.UpdateBudgetAsync(budget);
+                }
+            }
+
             // Fetch budgets and pass them to the view
             var budgetViewModels = budgets.Select(b => new BudgetViewModel
             {
@@ -54,12 +68,11 @@ namespace ASI.Basecode.WebApp.Controllers
                 CategoryColor = b.CategoryColor,
                 UserId = b.UserId,
                 MonthlyBudget = b.MonthlyBudget,
-                RemainingBudget = b.MonthlyBudget - transactions
-                    .Where(t => t.CategoryId == b.CategoryId && t.TransactionType == "Expense")
-                    .Sum(t => t.Amount)
+                RemainingBudget = b.RemainingBudget,
+                LastResetDate = b.LastResetDate
             })
-                .OrderByDescending(b => b.BudgetId)
-                .ToList();
+            .OrderByDescending(b => b.BudgetId)
+            .ToList();
 
             // Pass the budgets and categories to the view
             ViewData["Budgets"] = budgetViewModels;
@@ -85,6 +98,7 @@ namespace ASI.Basecode.WebApp.Controllers
         }
 
 
+
         [HttpGet]
         // GET: /Home/GetBudget/{id}
         public async Task<IActionResult> GetBudget(int id)
@@ -105,6 +119,17 @@ namespace ASI.Basecode.WebApp.Controllers
                     return NotFound(new { success = false, message = "Budget not found or does not belong to the user." });
                 }
 
+                // Check if the month has changed and reset the remaining budget if necessary
+                if (budget.LastResetDate.Month != DateTime.Now.Month)
+                {
+                    // Reset remaining budget to the monthly budget and update the last reset date
+                    budget.RemainingBudget = budget.MonthlyBudget;
+                    budget.LastResetDate = DateTime.Now;
+
+                    // Update the budget in the database
+                    await _budgetService.UpdateBudgetAsync(budget);
+                }
+
                 // Map budget to BudgetViewModel
                 var budgetViewModel = new BudgetViewModel
                 {
@@ -114,7 +139,8 @@ namespace ASI.Basecode.WebApp.Controllers
                     MonthlyBudget = budget.MonthlyBudget,
                     RemainingBudget = budget.RemainingBudget,
                     CategoryIcon = budget.CategoryIcon,
-                    CategoryColor = budget.CategoryColor
+                    CategoryColor = budget.CategoryColor,
+                    LastResetDate = budget.LastResetDate // Include LastResetDate in the response
                 };
 
                 return Json(new { success = true, data = budgetViewModel });
@@ -157,6 +183,9 @@ namespace ASI.Basecode.WebApp.Controllers
                 }
 
                 model.UserId = int.Parse(userClaim.Value);
+
+                // Set the initial LastResetDate when adding a new budget (set it to the current date)
+                model.LastResetDate = DateTime.Now;
 
                 // Call the service to add the budget
                 await _budgetService.AddBudgetAsync(model);
@@ -205,8 +234,7 @@ namespace ASI.Basecode.WebApp.Controllers
             }
         }
 
-
-
+        // POST: /Home/DeleteBudget
         [HttpPost]
         public async Task<IActionResult> DeleteBudget(int id)
         {
@@ -232,8 +260,6 @@ namespace ASI.Basecode.WebApp.Controllers
                 return StatusCode(500, new { success = false, message = $"Server error: {ex.Message}" });
             }
         }
-
-
 
         // Helper method to get the logged-in user's ID
         private int? GetUserId()

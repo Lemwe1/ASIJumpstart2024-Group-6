@@ -11,6 +11,7 @@ namespace ASI.Basecode.Data.Models
         public int UserId { get; set; }
         public decimal MonthlyBudget { get; set; }
         public decimal RemainingBudget { get; set; }
+        public DateTime LastResetDate { get; set; }
 
         public virtual MCategory Category { get; set; }
         public virtual MUser User { get; set; }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace ASI.Basecode.Services.ServiceModels
 {
@@ -24,7 +25,8 @@ namespace ASI.Basecode.Services.ServiceModels
         [Range(0.01, double.MaxValue, ErrorMessage = "Monthly budget must be greater than zero.")]
         public decimal MonthlyBudget { get; set; }
 
-        public decimal RemainingBudget { get; set; } // Automatically calculated
+        public decimal RemainingBudget { get; set; }
+        public DateTime LastResetDate { get; set; }
     }
 
 

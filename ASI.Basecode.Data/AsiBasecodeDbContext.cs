@@ -37,13 +37,15 @@ namespace ASI.Basecode.Data
             modelBuilder.Entity<MBudget>(entity =>
             {
                 entity.HasKey(e => e.BudgetId)
-                    .HasName("PK__M_Budget__E38E792456DA9E4D");
+                    .HasName("PK__M_Budget__E38E79243BCAA0D5");
 
                 entity.ToTable("M_Budgets");
 
                 entity.Property(e => e.BudgetName)
                     .IsRequired()
                     .HasMaxLength(50);
+
+                entity.Property(e => e.LastResetDate).HasColumnType("datetime");
 
                 entity.Property(e => e.MonthlyBudget).HasColumnType("decimal(18, 2)");
 
@@ -53,13 +55,13 @@ namespace ASI.Basecode.Data
                     .WithMany(p => p.MBudgets)
                     .HasForeignKey(d => d.CategoryId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__M_Budgets__Categ__37703C52");
+                    .HasConstraintName("FK__M_Budgets__Categ__43D61337");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.MBudgets)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__M_Budgets__UserI__3864608B");
+                    .HasConstraintName("FK__M_Budgets__UserI__44CA3770");
             });
 
             modelBuilder.Entity<MCategory>(entity =>
