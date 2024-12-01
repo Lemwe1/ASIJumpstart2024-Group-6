@@ -312,6 +312,7 @@ document.getElementById('addAccountForm').addEventListener('submit', async (e) =
 
 let oldBalance = 0;
 
+let oldName = ""; 
 function openEditModal(account) {
     // Ensure account is defined
     if (!account) {
@@ -327,7 +328,7 @@ function openEditModal(account) {
     document.getElementById('editCreateIcon').value = account.WalletIcon || ''; // Default to empty string if undefined
 
     oldBalance = account.WalletBalance;
-
+    oldName = account.WalletName;
     // Make sure the balance input accepts decimals
     const balanceInput = document.getElementById('editAccountBalance');
     balanceInput.setAttribute('step', 'any'); // Allow decimal inputs
@@ -401,6 +402,33 @@ document.getElementById('editAccountForm').addEventListener('submit', async (e) 
 
     console.log('Sending data:', JSON.stringify(data));
 
+    // Check if the name has changed
+    if (name !== oldName) {
+        try {
+            // Check if the new name already exists
+            const existingWalletResponse = await fetch(`/Wallet/Exists?name=${encodeURIComponent(name)}`);
+            const existingWalletResult = await existingWalletResponse.json();
+
+            if (existingWalletResult.exists) {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'A wallet with this name already exists. Please choose a different name.',
+                    icon: 'error',
+                    customClass: { popup: 'swal2-front' }
+                });
+                return; // Stop the process if wallet with the new name exists
+            }
+        } catch (error) {
+            Swal.fire({
+                title: 'Error',
+                text: 'An unexpected error occurred while checking the wallet name.',
+                icon: 'error',
+                customClass: { popup: 'swal2-front' }
+            });
+            return; // Stop the process in case of error
+        }
+    }
+
     const { isConfirmed } = await Swal.fire({
         title: 'Are you sure?',
         text: 'Do you really want to edit this wallet?',
@@ -424,7 +452,6 @@ document.getElementById('editAccountForm').addEventListener('submit', async (e) 
                     Note: balance < oldBalance ? 'Adjust Expense Wallet' : 'Adjust Income Wallet',
                     TransactionDate: new Date().toISOString(),
                     TransactionSort: 'Edit'
-
                 };
 
                 // Create the transaction if the balance has changed
@@ -441,79 +468,49 @@ document.getElementById('editAccountForm').addEventListener('submit', async (e) 
                 if (!transactionResult.success) {
                     throw new Error(transactionResult.message || 'Transaction failed');
                 }
+            }
 
+            // Update wallet balance and other details after the transaction is created
+            const updateResponse = await fetch(`/Wallet/Edit/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                },
+                body: JSON.stringify(data)
+            });
 
-                // Update wallet balance after the transaction is created
-                const updateResponse = await fetch(`/Wallet/Edit/${id}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'RequestVerificationToken': token
-                    },
-                    body: JSON.stringify(data)
+            const updateResult = await updateResponse.json();
+            if (updateResult.success) {
+                closeModal(editAccountModal);
+                Swal.fire({
+                    title: 'Success',
+                    text: 'Wallet edited successfully!',
+                    icon: 'success',
+                    confirmButtonColor: '#3B82F6',
+                    customClass: { popup: 'swal2-front' }
+                }).then(() => {
+                    window.location.reload();
                 });
-
-                const updateResult = await updateResponse.json();
-                if (updateResult.success) {
-                    closeModal(editAccountModal);
-                    Swal.fire({
-                        title: 'Success',
-                        text: 'Wallet edited successfully!',
-                        icon: 'success',
-                        confirmButtonColor: '#3B82F6',
-                        customClass: { popup: 'swal2-front' }
-                    }).then(() => {
-                        window.location.reload();
-                    });
-                } else {
-                    Swal.fire({
-                        title: 'Error',
-                        text: updateResult.message || 'An error occurred.',
-                        icon: 'error',
-                        customClass: { popup: 'swal2-front' }
-                    });
-                }
             } else {
-                // Update wallet balance after the transaction is created
-                const updateResponse = await fetch(`/Wallet/Edit/${id}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'RequestVerificationToken': token
-                    },
-                    body: JSON.stringify(data)
+                Swal.fire({
+                    title: 'Error',
+                    text: updateResult.message || 'An error occurred.',
+                    icon: 'error',
+                    customClass: { popup: 'swal2-front' }
                 });
-                const updateResult = await updateResponse.json();
-                if (updateResult.success) {
-                    closeModal(editAccountModal);
-                    Swal.fire({
-                        title: 'Success',
-                        text: 'Wallet edited successfully!',
-                        icon: 'success',
-                        confirmButtonColor: '#3B82F6',
-                        customClass: { popup: 'swal2-front' }
-                    }).then(() => {
-                        window.location.reload();
-                    });
-                } else {
-                    Swal.fire({
-                        title: 'Error',
-                        text: updateResult.message || 'An error occurred.',
-                        icon: 'error',
-                        customClass: { popup: 'swal2-front' }
-                    });
-                }
             }
         } catch (error) {
             Swal.fire({
                 title: 'Error',
-                text: error.message || 'Catch',
+                text: error.message || 'Unexpected error during wallet edit.',
                 icon: 'error',
                 customClass: { popup: 'swal2-front' }
             });
         }
     }
 });
+
 
 
 // Handle account deletion
