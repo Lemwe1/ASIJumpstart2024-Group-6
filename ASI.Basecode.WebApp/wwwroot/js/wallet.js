@@ -312,7 +312,7 @@ document.getElementById('addAccountForm').addEventListener('submit', async (e) =
 
 let oldBalance = 0;
 
-let oldName = ""; 
+let oldName = "";
 function openEditModal(account) {
     // Ensure account is defined
     if (!account) {
