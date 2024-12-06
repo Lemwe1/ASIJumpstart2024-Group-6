@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 
 namespace ASI.Basecode.Services.ServiceModels
 {
@@ -11,6 +12,11 @@ namespace ASI.Basecode.Services.ServiceModels
 
         [Required(ErrorMessage = "UserCode is required")]
         public string UserCode { get; set; }
+
+        public byte[]? UserImage { get; set; }
+
+        // Corrected property name
+        public IFormFile ProfilePicture { get; set; }
 
         public string FirstName { get; set; }
 
