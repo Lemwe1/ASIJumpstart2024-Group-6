@@ -147,7 +147,6 @@
         editErrorMessage.style.display = 'none';
         populateEditModalFields(transaction);
         updateTypeSelection(transaction.transactionType);
-        filterCategories(transaction.transactionType);
         updateWalletBalance(editTransactionWalletSelect, editWalletBalanceSpan);
     }
 
@@ -284,6 +283,7 @@
         editTransactionCategoryOptions.forEach(option => {
             option.style.display = (option.dataset.type === type || option.value === "") ? 'block' : 'none';
         });
+        editTransactionCategorySelect.value = "";
     }
     // Function to update the wallet balance display
     function updateWalletBalance(selectElement, balanceSpan) {
@@ -300,9 +300,9 @@
             });
 
             balanceSpan.textContent = `(Available Balance: ${formattedBalance})`;
-            balanceSpan.style.display = 'block'; // Show the balance span
+            balanceSpan.style.display = 'block'; 
         } else {
-            balanceSpan.style.display = 'none'; // Hide the balance span if no wallet is selected
+            balanceSpan.style.display = 'none'; 
         }
     }
 
