@@ -72,7 +72,10 @@ CREATE TABLE M_Budgets (
     FOREIGN KEY (CategoryId) REFERENCES M_Category(CategoryId),
     FOREIGN KEY (UserId) REFERENCES M_User(UserId)
 );
--------------------------------------------------------------------------------------------------
+
+
+
+.-------------------------------------------------------------------------------------------------
 2. Pull the Git Repository 
 https://github.com/Lemwe1/ASIJumpstart2024-Group-6
 -------------------------------------------------------------------------------------------------
