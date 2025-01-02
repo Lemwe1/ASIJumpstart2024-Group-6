@@ -82,9 +82,7 @@ https://github.com/Lemwe1/ASIJumpstart2024-Group-6
 3. Make sure the Connection String in your appsettings.json is correct
 Example: "DefaultConnection": "Server={connectionstring here};database=AsiBasecodeDb;Integrated Security=False;Trusted_Connection=True"
 -------------------------------------------------------------------------------------------------
-4. Make sure the ASI.Basecode.WebApp is set as Startup Project
--------------------------------------------------------------------------------------------------
-5. Do the Scaffold
+4. Do the Scaffold, Make sure the startup project is the ASI.Basecode.Data
 Example: Scaffold-DbContext "Server={connectionstring here};Database=AsiBasecodeDb;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -ContextDir . -Force
 -------------------------------------------------------------------------------------------------
-6. Run the project    
+5. Set ASI.Basecode.WebApp is set as Startup Project, and run the Project
