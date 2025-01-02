@@ -1,8 +1,8 @@
-"# ASIBasecodeCSharp2024" 
-
-QUERIES
-================================================
-
+How to Setup the Code/Project Solution:
+-------------------------------------------------------------------------------------------------
+1. Setup the Database
+	- Add the AsiBasecodeDb
+	- Next, do these queries for the tables
 
 ALTER TABLE M_USER
 ADD PasswordResetToken NVARCHAR(255),
@@ -12,17 +12,6 @@ ALTER TABLE M_USER
 ALTER COLUMN Password VARCHAR(512) NOT NULL;
 ALTER TABLE M_USER
 ALTER COLUMN PasswordResetToken NVARCHAR(1000);
-
-ALTER TABLE M_User
-ADD IsVerified BIT NOT NULL DEFAULT 0;
-
-ALTER TABLE [AsiBasecodeDb].[dbo].[M_User]
-ADD VerificationToken NVARCHAR(255),
-    VerificationTokenExpiration DATETIME;
-
-
-================================================
-
 
 CREATE TABLE M_Category (
     CategoryId INT PRIMARY KEY IDENTITY(1,1),
@@ -35,8 +24,6 @@ CREATE TABLE M_Category (
     CONSTRAINT FK_MCategory_MUser_UserId FOREIGN KEY (UserId) REFERENCES M_User(UserId)
 );
 
-SET IDENTITY_INSERT M_Category ON;
-
 INSERT INTO M_Category (CategoryId, Name, Type, Icon, Color, IsGlobal)
 VALUES 
     (1, N'Default Income', N'Income', N'💰', N'#00FF00', 1),
@@ -46,11 +33,6 @@ VALUES
     (5, N'Bills', N'Expense', N'⚡', N'#FFD700', 1),
     (6, N'Car', N'Expense', N'🚗', N'#0000FF', 1),
     (7, N'Income', N'Income', N'💸', N'#008000', 1);
-
-SET IDENTITY_INSERT M_Category OFF;
-
-
-================================================
 
 CREATE TABLE M_Wallet (
     WalletId INT PRIMARY KEY IDENTITY(1,1),
@@ -62,9 +44,6 @@ CREATE TABLE M_Wallet (
     UserId INT NOT NULL,
     CONSTRAINT FK_M_Wallet_UserId FOREIGN KEY (UserId) REFERENCES M_User(UserId)
 );
-
-================================================
-
 
 CREATE TABLE M_Transaction (
     TransactionId INT PRIMARY KEY IDENTITY(1,1),
@@ -82,9 +61,6 @@ CREATE TABLE M_Transaction (
     CONSTRAINT fk_user_id FOREIGN KEY (UserId) REFERENCES M_User(UserId)
 ); 
 
-
-================================================
-
 CREATE TABLE M_Budgets (
     BudgetId INT PRIMARY KEY IDENTITY(1,1),
     BudgetName NVARCHAR(50) NOT NULL,
@@ -92,13 +68,20 @@ CREATE TABLE M_Budgets (
     UserId INT NOT NULL,
     MonthlyBudget DECIMAL(18,2) NOT NULL,
     RemainingBudget DECIMAL(18,2) NOT NULL,
+    LastResetDate DATETIME NOT NULL,
     FOREIGN KEY (CategoryId) REFERENCES M_Category(CategoryId),
     FOREIGN KEY (UserId) REFERENCES M_User(UserId)
 );
-
-
-================================================
-SCAFFOLDING 
-
-Scaffold-DbContext "Addr=(LocalDB)\MSSQLLocalDB;database=AsiBasecodeDb;Integrated Security=False;Trusted_Connection=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -ContextDir . -F
-
+-------------------------------------------------------------------------------------------------
+2. Pull the Git Repository 
+https://github.com/Lemwe1/ASIJumpstart2024-Group-6
+-------------------------------------------------------------------------------------------------
+3. Make sure the Connection String in your appsettings.json is correct
+Example: "DefaultConnection": "Server={connectionstring here};database=AsiBasecodeDb;Integrated Security=False;Trusted_Connection=True"
+-------------------------------------------------------------------------------------------------
+4. Make sure the ASI.Basecode.WebApp is set as Startup Project
+-------------------------------------------------------------------------------------------------
+5. Do the Scaffold
+Example: Scaffold-DbContext "Server={connectionstring here};Database=AsiBasecodeDb;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -ContextDir . -Force
+-------------------------------------------------------------------------------------------------
+6. Run the project    
